@@ -1,0 +1,4 @@
+#!/bin/bash
+HERE=`dirname "$0"`
+# todo: support other JS runners like CasperJS
+node $HERE/runner.js $*
