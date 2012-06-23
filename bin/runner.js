@@ -22,8 +22,8 @@ function runTest(path) {
         testContents = '"use strict";\n' + testContents;
     }
 
-    var fn = new Function('test', 'fixture', 'assert', testContents);
-    fn.call({}, imvujstest.test, imvujstest.fixture, imvujstest.assert);
+    var context = vm.createContext(imvujstest);
+    vm.runInContext(testContents, context, path);
     imvujstest.run_all();
 }
 
