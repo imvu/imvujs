@@ -1,3 +1,8 @@
+include 'include.coffee'
+
+test 'calling imported code', ->
+    assert.equal 10, ReturnsTen()
+
 test 'explicit name', ->
 
 test 'foo', ->

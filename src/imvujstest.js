@@ -35,7 +35,6 @@ function loadScript(path) {
 
 function include(path) {
     var script = loadScript(test.__dirname + '/' + path);
-
     vm.runInThisContext(script, path);
 }
 

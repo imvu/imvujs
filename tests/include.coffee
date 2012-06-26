@@ -1,0 +1,2 @@
+@ReturnsTen = ->
+    10
