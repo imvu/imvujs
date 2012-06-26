@@ -1,156 +1,135 @@
 "use strict";
 
-var BaseClass = require('../src/BaseClass.js');
-var _ = require('../ext/underscore.js');
-var vm = require('vm');
-var fs = require('fs');
-var path_ = require('path');
-var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
+(function() {
 
-var all_tests = [];
-
-function test() {
-    if (arguments.length == 1) {
-        var fn = arguments[0];
-        all_tests.push([fn.name, fn]);
-    } else if (arguments.length == 2) {
-        all_tests.push([arguments[0], arguments[1]]);
-    } else {
-        throw new TypeError("test requires 1 or 2 arguments");
-    }
-}
-
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-};
-
-function loadScript(path) {
-    var testContents = fs.readFileSync(path, 'utf-8');
-    if (endsWith(path, '.coffee')) {
-        testContents = coffeescript.compile(testContents);
-    } else {
-        testContents = '"use strict";' + testContents;
-    }
-    return testContents;
-}
-
-function include(path) {
-    var abspath = path_.resolve(test.__dirname + '/' + path);
-    var script = loadScript(abspath);
-
-    var original = test.__dirname;
-    test.__dirname = path_.dirname(test.__dirname + '/' + path);
-    try {
-        vm.runInThisContext(script, path);
-    }
-    finally {
-        test.__dirname = original;
-    }
-}
-
-function run_all() {
-    for (var i = 0; i < all_tests.length; ++i) {
-        var test = all_tests[i];
-        var name = test[0];
-        var body = test[1];
-        console.log("running", name, '...');
-        var success = false;
-        try {
-            body.call({});
-            success = true;
+    function test() {
+        if (arguments.length == 1) {
+            var fn = arguments[0];
+            all_tests.push([fn.name, fn]);
+        } else if (arguments.length == 2) {
+            all_tests.push([arguments[0], arguments[1]]);
+        } else {
+            throw new TypeError("test requires 1 or 2 arguments");
         }
-        catch (e) {
-            if (e instanceof Error) {
-                console.log("failed test '" + name + "':\n" + e.stack);
-            } else {
-                throw e;
+    }
+
+    function run_all() {
+        for (var i = 0; i < all_tests.length; ++i) {
+            var test = all_tests[i];
+            var name = test[0];
+            var body = test[1];
+            console.log("running", name, '...');
+            var success = false;
+            try {
+                body.call({});
+                success = true;
+            }
+            catch (e) {
+                if (e instanceof Error) {
+                    console.log("failed test '" + name + "':\n" + e.stack);
+                } else {
+                    throw e;
+                }
+            }
+            if (success) {
+                console.log("    passed");
             }
         }
-        if (success) {
-            console.log("    passed");
+        all_tests = [];
+    }
+
+    function fixture(fixtureName, obj) {
+        var setUp = obj.setUp ? obj.setUp : function() {};
+        for (var testName in obj) {
+            if (testName !== 'setUp') {
+                test(fixtureName + '.' + testName, function(body) {
+                    setUp.call(this);
+                    body.call(this);
+                }.bind({}, obj[testName]));
+            }
         }
     }
-    all_tests = [];
-}
 
-function fixture(fixtureName, obj) {
-    var setUp = obj.setUp ? obj.setUp : function() {};
-    for (var testName in obj) {
-        if (testName !== 'setUp') {
-            test(fixtureName + '.' + testName, function(body) {
-                setUp.call(this);
-                body.call(this);
-            }.bind({}, obj[testName]));
-        }
+    function repr(v) {
+        return JSON.stringify(v);
     }
-}
 
-function repr(v) {
-    return JSON.stringify(v);
-}
+    var AssertionError = Error;
 
-var AssertionError = Error;
+    function fail(exception, info) {
+        exception.info = info;
+        throw exception;
+    }
 
-var assert = {
-    true: function(value) {
-        if (!value) {
-            throw new AssertionError("expected truthy, actual " + repr(value));
-        }
-    },
-
-    false: function(value) {
-        if (value) {
-            throw new AssertionError("expected falsy, actual " + repr(value));
-        }
-    },
-
-    equal: function(expected, actual) {
-        if (expected instanceof Array && actual instanceof Array) {
-            assert.equal(expected.length, actual.length);
-            for (var i = 0; i < expected.length; ++i) {
-                assert.equal(expected[i], actual[i]);
+    var assert = {
+        true: function(value) {
+            if (!value) {
+                fail(new AssertionError("expected truthy, actual " + repr(value)),
+                     {Value: value});
             }
-            return;
-        }
-        if (expected !== actual) {
-            throw new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual));
-        }
-    },
+        },
 
-    notEqual: function(expected, actual) {
-        if (expected instanceof Array && actual instanceof Array) {
-            assert.notEqual(expected.length, actual.length);
-            for (var i = 0; i < expected.length; ++i) {
-                assert.notEqual(expected[i], actual[i]);
+        false: function(value) {
+            if (value) {
+                fail(new AssertionError("expected falsy, actual " + repr(value)),
+                     {Value: value});
             }
-            return;
-        }
-        if (expected === actual) {
-            throw new AssertionError('not expected: ' + repr(expected) + ', actual: ' + repr(actual));
-        }
-    },
+        },
 
-    throws: function(exception, fn) {
-        try {
-            fn();
-        }
-        catch (e) {
-            if (e instanceof exception) {
+        equal: function(expected, actual) {
+            if (expected instanceof Array && actual instanceof Array) {
+                assert.equal(expected.length, actual.length);
+                for (var i = 0; i < expected.length; ++i) {
+                    assert.equal(expected[i], actual[i]);
+                }
                 return;
             }
-            throw new AssertionError('expected to throw: ' + repr(exception) + ', actually threw: ' + repr(e));
+            if (expected !== actual) {
+                fail(new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                     {Expected: expected, Actual: actual});
+            }
+        },
+
+        notEqual: function(expected, actual) {
+            if (expected instanceof Array && actual instanceof Array) {
+                assert.notEqual(expected.length, actual.length);
+                for (var i = 0; i < expected.length; ++i) {
+                    assert.notEqual(expected[i], actual[i]);
+                }
+                return;
+            }
+            if (expected === actual) {
+                fail(new AssertionError('not expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                     {Expected: expected, Actual: actual});
+            }
+        },
+
+        throws: function(exception, fn) {
+            try {
+                fn();
+            } catch (e) {
+                if (e instanceof exception) {
+                    return;
+                }
+                fail(new AssertionError('expected to throw: ' + repr(exception) + ', actually threw: ' + repr(e)),
+                     {Expected: exception, Actual: e});
+            }
+            throw new AssertionError('did not throw');
         }
-        throw new AssertionError('did not throw');
-    }
-};
+    };
 
-// synonyms
-assert.equals = assert.equal;
-assert.notEquals = assert.notEqual;
+    var g = 'undefined' === typeof window ? global : window;
 
-exports.assert = assert;
-exports.test = test;
-exports.fixture = fixture;
-exports.run_all = run_all;
-exports.include = include;
-exports.loadScript = loadScript;
+    // synonyms
+    assert.equals = assert.equal;
+    assert.notEquals = assert.notEqual;
+
+    g.all_tests = [];
+    g.test = test;
+    g.run_all = run_all;
+    g.fixture = fixture;
+    g.repr = repr;
+    g.AssertionError = AssertionError;
+    g.assert = assert;
+    g.test = test;
+})();
