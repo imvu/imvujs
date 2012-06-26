@@ -87,16 +87,39 @@ var assert = {
             throw new AssertionError("expected truthy, actual " + repr(value));
         }
     },
+
     false: function(value) {
         if (value) {
             throw new AssertionError("expected falsy, actual " + repr(value));
         }
     },
+
     equal: function(expected, actual) {
+        if (expected instanceof Array && actual instanceof Array) {
+            assert.equal(expected.length, actual.length);
+            for (var i = 0; i < expected.length; ++i) {
+                assert.equal(expected[i], actual[i]);
+            }
+            return;
+        }
         if (expected !== actual) {
             throw new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual));
         }
     },
+
+    notEqual: function(expected, actual) {
+        if (expected instanceof Array && actual instanceof Array) {
+            assert.notEqual(expected.length, actual.length);
+            for (var i = 0; i < expected.length; ++i) {
+                assert.notEqual(expected[i], actual[i]);
+            }
+            return;
+        }
+        if (expected === actual) {
+            throw new AssertionError('not expected: ' + repr(expected) + ', actual: ' + repr(actual));
+        }
+    },
+
     throws: function(exception, fn) {
         try {
             fn();
@@ -110,6 +133,10 @@ var assert = {
         throw new AssertionError('did not throw');
     }
 };
+
+// synonyms
+assert.equals = assert.equal;
+assert.notEquals = assert.notEqual;
 
 exports.assert = assert;
 exports.test = test;

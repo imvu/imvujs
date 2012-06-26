@@ -24,6 +24,7 @@ function runTest(testPath) {
     //     vm.runInNewContext has issues because runInThisContext always runs in the root 
     _.extend(global, imvujstest);
     global.test.__dirname = path.dirname(abspath); // needed for include()
+    global._ = _;
     //var sandbox = _.extend({}, imvujstest);
     //sandbox.console = console;
     //sandbox.require = require;
