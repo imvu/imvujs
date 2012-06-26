@@ -34,9 +34,9 @@ function loadScript(path) {
 }
 
 function include(path) {
-    var context = vm.createContext(global);
-    vm.runInContext(loadScript(this.__dirname + '/' + path), context, path);
-    return context;
+    var script = loadScript(test.__dirname + '/' + path);
+
+    vm.runInThisContext(script, path);
 }
 
 function run_all() {

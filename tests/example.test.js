@@ -1,7 +1,7 @@
-var theModule = include('include.js');
+include('include.js');
 
 test("calling imported code", function() {
-    assert.equal(10, theModule.ReturnsTen());
+    assert.equal(10, ReturnsTen());
 });
 
 test("explicit name", function() {
