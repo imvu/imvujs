@@ -32,7 +32,7 @@ function runTest(testPath) {
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
     vm.runInThisContext(testContents, abspath);
-    delete global.test.__dirname
+    delete global.test.__dirname;
 
     imvujstest.run_all();
 }
