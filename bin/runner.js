@@ -16,6 +16,9 @@ function runTest(testPath) {
 
     var testContents = imvujstest.loadScript(abspath);
 
+    // I'd use Object.create here but prototypes don't extend across
+    // vm contexts in Node.js.  o_O Known issue with Node.js...
+    // http://nodejs.org/api/vm.html#vm_sandboxes
     var sandbox = _.extend({}, imvujstest);
     sandbox.__filename = abspath;
     sandbox.__dirname = path.dirname(abspath);
