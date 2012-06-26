@@ -2,6 +2,9 @@
 
 var BaseClass = require('../src/BaseClass.js');
 var _ = require('../ext/underscore.js');
+var vm = require('vm');
+var fs = require('fs');
+var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
 
 var all_tests = [];
 
@@ -14,6 +17,26 @@ function test() {
     } else {
         throw new TypeError("test requires 1 or 2 arguments");
     }
+}
+
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+
+function loadScript(path) {
+    var testContents = fs.readFileSync(path, 'utf-8');
+    if (endsWith(path, '.coffee')) {
+        testContents = coffeescript.compile(testContents);
+    } else {
+        testContents = '"use strict";' + testContents;
+    }
+    return testContents;
+}
+
+function include(path) {
+    var context = vm.createContext(global);
+    vm.runInContext(loadScript(this.__dirname + '/' + path), context, path);
+    return context;
 }
 
 function run_all() {
@@ -93,3 +116,5 @@ exports.assert = assert;
 exports.test = test;
 exports.fixture = fixture;
 exports.run_all = run_all;
+exports.include = include;
+exports.loadScript = loadScript;

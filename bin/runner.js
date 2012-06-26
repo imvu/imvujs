@@ -2,28 +2,27 @@
 
 var fs = require('fs');
 var vm = require('vm');
+var path = require('path');
 var imvujstest = require('../src/imvujstest.js');
-var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
+var _ = require('../ext/underscore.js');
 
 function usage() {
     console.log("Please pass a test file");
     process.exit(1);
 }
 
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-};
+function runTest(testPath) {
+    var abspath = path.resolve(testPath);
 
-function runTest(path) {
-    var testContents = fs.readFileSync(path, 'utf-8');
-    if (endsWith(path, '.coffee')) {
-        testContents = coffeescript.compile(testContents);
-    } else {
-        testContents = '"use strict";\n' + testContents;
-    }
+    var testContents = imvujstest.loadScript(abspath);
 
-    var context = vm.createContext(imvujstest);
-    vm.runInContext(testContents, context, path);
+    var sandbox = _.extend({}, imvujstest);
+    sandbox.__filename = abspath;
+    sandbox.__dirname = path.dirname(abspath);
+    _.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
+
+    var context = vm.createContext(sandbox);
+    vm.runInContext(testContents, context, abspath);
     imvujstest.run_all();
 }
 

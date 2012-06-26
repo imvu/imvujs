@@ -1,4 +1,9 @@
 
+var a = assert;
+var theModule = include('include.js');
+theModule.AFunction();
+assert;
+
 test("explicit name", function() {
 });
 
