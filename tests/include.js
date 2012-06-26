@@ -1,2 +1,3 @@
-var AFunction = function() {
+function ReturnsTen() {
+    return 10;
 }
