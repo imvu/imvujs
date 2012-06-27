@@ -1,4 +1,4 @@
-include('include.js');
+include('includes/include.js');
 
 test("calling imported code", function() {
     assert.equal(10, ReturnsTen());

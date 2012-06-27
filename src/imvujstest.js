@@ -4,6 +4,7 @@ var BaseClass = require('../src/BaseClass.js');
 var _ = require('../ext/underscore.js');
 var vm = require('vm');
 var fs = require('fs');
+var path_ = require('path');
 var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
 
 var all_tests = [];
@@ -34,8 +35,17 @@ function loadScript(path) {
 }
 
 function include(path) {
-    var script = loadScript(test.__dirname + '/' + path);
-    vm.runInThisContext(script, path);
+    var abspath = path_.resolve(test.__dirname + '/' + path);
+    var script = loadScript(abspath);
+
+    var original = test.__dirname;
+    test.__dirname = path_.dirname(test.__dirname + '/' + path);
+    try {
+        vm.runInThisContext(script, path);
+    }
+    finally {
+        test.__dirname = original;
+    }
 }
 
 function run_all() {

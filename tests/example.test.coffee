@@ -1,4 +1,4 @@
-include 'include.coffee'
+include 'includes/include.coffee'
 
 test 'calling imported code', ->
     assert.equal 10, ReturnsTen()
