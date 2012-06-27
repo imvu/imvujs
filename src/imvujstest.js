@@ -39,12 +39,21 @@
     }
 
     function fixture(fixtureName, obj) {
-        var setUp = obj.setUp ? obj.setUp : function() {};
+        var nul = function() { };
+        var setUp = obj.setUp ? obj.setUp : nul;
+        var tearDown = obj.tearDown ? obj.tearDown : nul;
+
         for (var testName in obj) {
-            if (testName !== 'setUp') {
+            if (testName === 'setUp' || testName == 'tearDown') {
+                continue;
+            } else {
                 test(fixtureName + '.' + testName, function(body) {
                     setUp.call(this);
-                    body.call(this);
+                    try {
+                        body.call(this);
+                    } finally {
+                        tearDown.call(this);
+                    }
                 }.bind({}, obj[testName]));
             }
         }

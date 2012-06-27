@@ -32,3 +32,12 @@ fixture("Fixture", {
         assert.equal(10, this.foo);
     }
 });
+
+fixture("Has a teardown", {
+    tearDown: function() {
+        console.log("tearDown was run");
+    },
+
+    "teardown test": function() {
+    }
+});
