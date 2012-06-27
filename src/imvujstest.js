@@ -47,12 +47,15 @@
             if (testName.substr(0, 4) !== 'test') {
                 continue;
             } else {
+                var self = {};
+                self.__proto__ = obj;
+
                 test(fixtureName + '.' + testName, function(body) {
-                    setUp.call(this);
+                    setUp.call(self);
                     try {
-                        body.call(this);
+                        body.call(self);
                     } finally {
-                        tearDown.call(this);
+                        tearDown.call(self);
                     }
                 }.bind({}, obj[testName]));
             }
@@ -132,6 +135,7 @@
     // synonyms
     assert.equals = assert.equal;
     assert.notEquals = assert.notEqual;
+    assert.null = assert.equal.bind(null, null);
     assert.notNull = assert.notEqual.bind(null, null);
 
     g.all_tests = [];

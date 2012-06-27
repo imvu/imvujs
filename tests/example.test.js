@@ -43,6 +43,6 @@ fixture("Has a teardown", {
         console.log("tearDown was run");
     },
 
-    "teardown test": function() {
+    "test tearDown": function() {
     }
 });
