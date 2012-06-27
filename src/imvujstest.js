@@ -132,6 +132,7 @@
     // synonyms
     assert.equals = assert.equal;
     assert.notEquals = assert.notEqual;
+    assert.notNull = assert.notEqual.bind(null, null);
 
     g.all_tests = [];
     g.test = test;

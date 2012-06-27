@@ -29,6 +29,7 @@ fixture("Fixture", {
     },
     
     "foo is big": function() {
+        assert.notNull(this.foo);
         assert.equal(10, this.foo);
     }
 });
