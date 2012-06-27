@@ -44,7 +44,7 @@
         var tearDown = obj.tearDown ? obj.tearDown : nul;
 
         for (var testName in obj) {
-            if (testName === 'setUp' || testName == 'tearDown') {
+            if (testName.substr(0, 4) !== 'test') {
                 continue;
             } else {
                 test(fixtureName + '.' + testName, function(body) {

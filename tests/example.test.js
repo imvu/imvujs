@@ -28,9 +28,13 @@ fixture("Fixture", {
         this.foo = 10; 
     },
     
-    "foo is big": function() {
+    "test foo is big": function() {
         assert.notNull(this.foo);
         assert.equal(10, this.foo);
+    },
+
+    "This isn't a test, so it had better not run": function() {
+        assert.notNull(null);
     }
 });
 
