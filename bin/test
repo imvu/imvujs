@@ -7,4 +7,4 @@ else
     NODE=../third-party/mac/node
 fi
 
-$HERE/$NODE $HERE/runner.js $*
+$HERE/$NODE $HERE/node-runner.js $*

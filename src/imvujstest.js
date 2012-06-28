@@ -26,7 +26,7 @@
             }
             catch (e) {
                 if (e instanceof Error) {
-                    console.log("failed test '" + name + "':\n" + e.stack);
+                    console.log("    failed:\n\n" + e.stack);
                 } else {
                     throw e;
                 }

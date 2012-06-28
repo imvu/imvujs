@@ -4,7 +4,17 @@ var fs = require('fs');
 var vm = require('vm');
 var path = require('path');
 var _ = require('../ext/underscore.js');
+var util = require('util');
 var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
+
+function syncWrite(data) {
+    fs.writeSync(1, data);
+    fs.fsyncSync(1);
+}
+
+console.log = function() {
+    syncWrite(util.format.apply(this, arguments) + '\n');
+}
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
