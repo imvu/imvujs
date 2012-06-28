@@ -102,6 +102,13 @@
             }
         },
 
+        deepEqual: function(expected, actual) {
+            if (!_.isEqual(expected, actual)) {
+                fail(new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                     {Expected: expected, Actual: actual});
+            }
+        },
+
         notEqual: function(expected, actual) {
             if (expected instanceof Array && actual instanceof Array) {
                 assert.notEqual(expected.length, actual.length);
