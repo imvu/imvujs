@@ -26,7 +26,8 @@
             }
             catch (e) {
                 if (e instanceof Error) {
-                    console.log("    failed:\n\n" + e.stack);
+                    console.log("    failed\n\n" + e.stack);
+                    process.exit(1);
                 } else {
                     throw e;
                 }
