@@ -11,6 +11,7 @@ function syncWrite(data) {
     fs.writeSync(1, data);
     fs.fsyncSync(1);
 }
+global.syncWrite = syncWrite;
 
 console.log = function() {
     syncWrite(util.format.apply(this, arguments) + '\n');
@@ -87,10 +88,12 @@ function runTest(testPath) {
     //sandbox.__dirname = path.dirname(abspath);
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
+    syncWrite(testPath + '\n====\n');
     vm.runInThisContext(testContents, abspath);
     delete global.dirName;
 
     run_all();
+    syncWrite('\n');
 }
 
 function main() {

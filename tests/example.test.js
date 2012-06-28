@@ -40,7 +40,6 @@ fixture("Fixture", {
 
 fixture("Has a teardown", {
     tearDown: function() {
-        console.log("tearDown was run");
     },
 
     "test tearDown": function() {

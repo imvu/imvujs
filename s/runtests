@@ -1,0 +1,12 @@
+#!/bin/bash
+set -ex
+
+HERE=`dirname "$0"`
+
+if [ "$@" ]; then
+    TESTS="$@"
+else
+    TESTS=`find $HERE/.. -iname '*.test.js' -o -iname '*.test.coffee'`
+fi
+
+"$HERE"/../bin/test $TESTS

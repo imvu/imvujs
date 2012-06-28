@@ -2,6 +2,11 @@
 
 (function() {
 
+    // TODO: move to a reporter object
+    function writeRaw(data) {
+        syncWrite(data);
+    }
+
     function test() {
         if (arguments.length == 1) {
             var fn = arguments[0];
@@ -18,7 +23,7 @@
             var test = all_tests[i];
             var name = test[0];
             var body = test[1];
-            console.log("running", name, '...');
+            writeRaw('* ' + name + '... ');
             var success = false;
             try {
                 body.call({});
@@ -26,14 +31,14 @@
             }
             catch (e) {
                 if (e instanceof Error) {
-                    console.log("    failed\n\n" + e.stack);
+                    console.log("    FAIL\n\n" + e.stack);
                     process.exit(1);
                 } else {
                     throw e;
                 }
             }
             if (success) {
-                console.log("    passed");
+                writeRaw('PASS\n');
             }
         }
         all_tests = [];
