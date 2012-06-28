@@ -74,6 +74,11 @@
     }
 
     var assert = {
+        fail: function(info) {
+            info = info || "assert.fail()";
+            fail(new AssertionError(info));
+        },
+
         true: function(value) {
             if (!value) {
                 fail(new AssertionError("expected truthy, actual " + repr(value)),
