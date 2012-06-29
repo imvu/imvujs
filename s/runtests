@@ -1,5 +1,9 @@
 #!/bin/bash
-set -ex
+
+function fail() {
+    echo "Failed"
+    exit 1
+}
 
 HERE=`dirname "$0"`
 
@@ -9,4 +13,21 @@ else
     TESTS=`find $HERE/.. -iname '*.test.js' -o -iname '*.test.coffee'`
 fi
 
-"$HERE"/../bin/test $TESTS
+"$HERE"/../bin/test $TESTS || fail
+
+echo "Now testing failures..."
+# Now test failures!
+
+EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js' -o -iname '*.fail.coffee'`
+for expected in $EXPECTED_FAILS; do
+    "$HERE"/../bin/test $expected
+    if [ "$?" = 0 ]; then
+        echo "$expected passed incorrectly"
+        exit 1
+    fi
+done
+
+echo
+echo "Success!"
+exit 0
+
