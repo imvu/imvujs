@@ -4,5 +4,6 @@ cd `dirname "$0"`/..
 set -ex
 
 git pull -r
+git submodule sync
 git submodule update --init --recursive
 
