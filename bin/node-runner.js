@@ -21,13 +21,15 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 };
 
-function loadScript(path) {
+function loadScript(path, settings) {
     var testContents = fs.readFileSync(path, 'utf-8');
 
     if (endsWith(path, '.coffee')) {
         testContents = coffeescript.compile(testContents);
     } else {
-        testContents = '"use strict";' + testContents;
+        if (settings !== undefined && settings.strictMode) {
+            testContents = '"use strict";' + testContents;
+        }
     }
     return testContents;
 }
@@ -42,18 +44,18 @@ function joinPath(a, b) {
     }
 }
 
-function sysinclude(includePath) {
+function sysinclude(includePath, settings) {
     var abspath = path.resolve(includePath);
-    var script = loadScript(abspath);
+    var script = loadScript(abspath, settings);
 
     vm.runInThisContext(script, includePath);
 }
 
-function include(includePath) {
+function include(includePath, settings) {
     var original = dirName;
     dirName = path.dirname(joinPath(dirName, includePath));
     try {
-        sysinclude(joinPath(original, includePath));
+        sysinclude(joinPath(original, includePath), settings);
     } finally {
         dirName = original;
     }
