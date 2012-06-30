@@ -1,10 +1,10 @@
 #!/bin/bash
 HERE=`dirname "$0"`
 
-NODE=../third-party/windows/nodejs/node.exe
+NODE=$HERE/../third-party/windows/nodejs/node.exe
 
 if [ ! -x $NODE ]; then
-    NODE=../third-party/mac/node
+    NODE=$HERE/../third-party/mac/node
 fi
 
-$HERE/$NODE $HERE/node-runner.js $*
+$NODE $HERE/node-runner.js $*
