@@ -16,6 +16,48 @@
     var completeJs = {}; // url : Future<exportTable>
     var downloadingJs = {}; // url : Future
 
+    /* Returns a function which implements memoization and request coallescing
+     * for the function 'fn'
+     * 
+     * 'fn' must have the signature function(arg, onComplete)
+     * where onComplete is itself a function that takes the result as its sole parameter.
+     */
+    function coallescer(fn) {
+        var futures = {}; // arg : Future
+
+        function coalescedWrapper(arg, onComplete) {
+            if (futures.hasOwnProperty(arg)) {
+                futures[arg].register(onComplete);
+            } else {
+                var future = new concur.Future();
+                futures[arg] = future;
+
+                fn(arg, future.complete.bind(future));
+            }
+        }
+
+        return coalescedWrapper;
+    }
+
+    var _fetchJs = coallescer(function(url, onComplete) {
+        fetch(url, onFetched);
+
+        function onFetched(xhr) {
+            var f = new Function(xhr.responseText + '//@ sourceURL=' + url);
+
+            var saveUrl = ourUrl;
+            var result;
+            ourUrl = url;
+            try {
+                result = f();
+            } finally {
+                ourUrl = saveUrl;
+            }
+
+            onComplete(result);
+        }
+    });
+
     function _importJs(url, onComplete) {
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
@@ -24,29 +66,13 @@
 
         var f = new concur.Future();
         completeJs[url] = f;
-
         f.register(onComplete);
 
-        var future;
-        if (!downloadingJs.hasOwnProperty(url)) {
-            future = new concur.Future();
-            downloadingJs[url] = future;
-
-            fetch(url, onFetched);
-        }
-        future.register(onFetched);
-
-        function onFetched(xhr) {
-            var f = new Function(xhr.responseText + '//@ sourceURL=' + url);
-
-            var saveUrl = ourUrl;
-            ourUrl = url;
-            try {
-                f();
-            } finally {
-                ourUrl = saveUrl;
-            }
-        }
+        /* The completion callback here is left empty because a _module invocation is
+         * expected to occur while evaluating the JS.  This _module invocation is expected to
+         * complete the relevant completeJs[url] future.
+         */
+        _fetchJs(url, function() { });
     }
 
     function _module(dependencies, body) {
