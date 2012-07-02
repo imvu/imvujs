@@ -1,10 +1,12 @@
 #!/bin/bash
 HERE=`dirname "$0"`
 
-NODE=$HERE/../third-party/windows/nodejs/node.exe
+OS=`python -c "import sys; print sys.platform"`
 
-if [ ! -x $NODE ]; then
+if [ $OS == 'darwin' ]; then
     NODE=$HERE/../third-party/mac/node
+else
+    NODE=$HERE/../third-party/windows/nodejs/node.exe
 fi
 
 $NODE $HERE/node-runner.js $*
