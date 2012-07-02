@@ -7,7 +7,7 @@
 
   window.trace = [];
 
-  _module([_importJs.bind(null, 'a.js')], function(a) {
+  module([importJs.bind(null, 'a.js')], function(a) {
       a.invoke();
 
       var failures = 0;

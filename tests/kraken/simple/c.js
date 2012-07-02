@@ -35,7 +35,7 @@ function getTemplate(onComplete) {
     }
 }
 
-_module([], function() {
+module([], function() {
     window.trace.push('c');
     return {
         invoke: function() {

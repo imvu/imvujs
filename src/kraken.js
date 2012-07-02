@@ -39,7 +39,7 @@
         return coalescedWrapper;
     }
 
-    var _fetchJs = coallescer(function(url, onComplete) {
+    var fetchJs = coallescer(function(url, onComplete) {
         fetch(url, onFetched);
 
         function onFetched(xhr) {
@@ -58,7 +58,7 @@
         }
     });
 
-    function _importJs(url, onComplete) {
+    function importJs(url, onComplete) {
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
             return;
@@ -72,10 +72,10 @@
          * expected to occur while evaluating the JS.  This _module invocation is expected to
          * complete the relevant completeJs[url] future.
          */
-        _fetchJs(url, function() { });
+        fetchJs(url, function() { });
     }
 
-    function _module(dependencies, body) {
+    function module(dependencies, body) {
         if (!dependencies instanceof Array) {
             throw new Error("Dependencies must be array");
         }
@@ -119,8 +119,8 @@
         }
     }
 
-    window._importJs = _importJs;
-    window._module = _module;
+    window.importJs = importJs;
+    window.module = module;
 
     //////////////////////////////
     // copypaste from concur.js //
