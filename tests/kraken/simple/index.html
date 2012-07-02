@@ -1,14 +1,13 @@
 <!doctype html>
 <html>
-<script src="/common/underscore-1.3.3/underscore.js"></script>
-<script src="/common/js/jQuery-1.4.4/jQuery.js"></script>
-<script src="/common/imvujstest/src/BaseClass.js"></script>
-<script src="/common/kraken/kraken.js"></script>
+<script src="../../../ext/underscore.js"></script>
+<script src="../../../src/BaseClass.js"></script>
+<script src="../../../src/kraken.js"></script>
 <script>
 
   window.trace = [];
 
-  _module([_importJs.bind(null, '/common/kraken/a.js')], function(a) {
+  _module([_importJs.bind(null, 'a.js')], function(a) {
       a.invoke();
 
       var failures = 0;
@@ -16,7 +15,10 @@
           ++failures;
       }
 
-      $('<tt>').text('PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed').appendTo(document.body);
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
   });
 
 </script>
