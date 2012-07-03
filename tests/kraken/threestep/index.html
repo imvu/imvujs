@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<script src="../../../ext/underscore.js"></script>
+<script src="../../../src/BaseClass.js"></script>
+<script src="../../../src/kraken.js"></script>
+<script>
+
+  /* This test is quite grungy as it depends on the website code in order to work correctly.
+   * In particular, it depends on http://api.localhost.imvu.com/rendered_template/ to render
+   * a Twig template.
+   */
+
+  window.trace = [];
+
+  module(['a.js'], function(a) {
+      a.invoke();
+
+      var failures = 0;
+      if (!_.isEqual(['a', 'invoke', 'success'], window.trace)) {
+          ++failures;
+      }
+
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
+  });
+
+</script>
+</html>

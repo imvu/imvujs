@@ -62,18 +62,17 @@
     function importJs(url, onComplete) {
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
-            return;
+        } else {
+            var f = new concur.Future();
+            completeJs[url] = f;
+            f.register(onComplete);
+
+            /* The completion callback here is left empty because a module() invocation is
+             * expected to occur while evaluating the JS.  This module() invocation is expected to
+             * complete the relevant completeJs[url] future.
+             */
+            fetchJs(url, function() { });
         }
-
-        var f = new concur.Future();
-        completeJs[url] = f;
-        f.register(onComplete);
-
-        /* The completion callback here is left empty because a module() invocation is
-         * expected to occur while evaluating the JS.  This module() invocation is expected to
-         * complete the relevant completeJs[url] future.
-         */
-        fetchJs(url, function() { });
     }
 
     function importOld(url, onComplete) {
@@ -86,10 +85,6 @@
         completeJs[url] = f;
         f.register(onComplete);
 
-        /* The completion callback here is left empty because a module() invocation is
-         * expected to occur while evaluating the JS.  This module() invocation is expected to
-         * complete the relevant completeJs[url] future.
-         */
         fetchJs(url, f.complete.bind(f));
     }
 
@@ -143,9 +138,12 @@
         }
     }
 
-    window.importJs = importJs;
-    window.importOld = importOld;
     window.module = module;
+
+    window.kraken = {
+        module: module,
+        importOld: importOld
+    };
 
     //////////////////////////////
     // copypaste from concur.js //

@@ -11,7 +11,7 @@ var textPostData = {
 function getjQuery(onComplete) {
     console.log("getjQuery");
 
-    importOld('/common/js/jquery-1.4.4/jquery.js', gotjQuery);
+    kraken.importOld('/common/js/jquery-1.4.4/jquery.js', gotjQuery);
 
     function gotjQuery() {
         window.trace.push('jQuery');
