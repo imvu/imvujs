@@ -31,6 +31,7 @@
             } else {
                 var future = new concur.Future();
                 futures[arg] = future;
+                futures[arg].register(onComplete);
 
                 fn(arg, future.complete.bind(future));
             }
@@ -68,11 +69,28 @@
         completeJs[url] = f;
         f.register(onComplete);
 
-        /* The completion callback here is left empty because a _module invocation is
-         * expected to occur while evaluating the JS.  This _module invocation is expected to
+        /* The completion callback here is left empty because a module() invocation is
+         * expected to occur while evaluating the JS.  This module() invocation is expected to
          * complete the relevant completeJs[url] future.
          */
         fetchJs(url, function() { });
+    }
+
+    function importOld(url, onComplete) {
+        if (completeJs.hasOwnProperty(url)) {
+            completeJs[url].register(onComplete);
+            return;
+        }
+
+        var f = new concur.Future();
+        completeJs[url] = f;
+        f.register(onComplete);
+
+        /* The completion callback here is left empty because a module() invocation is
+         * expected to occur while evaluating the JS.  This module() invocation is expected to
+         * complete the relevant completeJs[url] future.
+         */
+        fetchJs(url, f.complete.bind(f));
     }
 
     function module(dependencies, body) {
@@ -126,6 +144,7 @@
     }
 
     window.importJs = importJs;
+    window.importOld = importOld;
     window.module = module;
 
     //////////////////////////////

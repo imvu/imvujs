@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<script src="../../../ext/underscore.js"></script>
+<script src="../../../src/BaseClass.js"></script>
+<script src="../../../src/kraken.js"></script>
+<script>
+
+  window.trace = [];
+
+  module(['a.js'], function(a) {
+      a.invoke();
+
+      var failures = 0;
+      if (!_.isEqual(['jQuery', 'a', 'invoke'], window.trace)) {
+          ++failures;
+      }
+
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
+  });
+
+</script>
+</html>
