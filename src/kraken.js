@@ -101,6 +101,12 @@
         var result = new Array(remainingDependencies);
 
         _.each(dependencies, function(d, index) {
+            if (d instanceof Function) {
+                // Nothing.  d is a function of (url, onComplete)
+            } else if (d.constructor === String) {
+                d = importJs.bind(null, d);
+            }
+
             d(handleResolution.bind(null, index));
         });
 

@@ -1,6 +1,5 @@
 
-module([importJs.bind(null, 'b.js'),
-        importJs.bind(null, 'c.js')], function(b, c) {
+module(['b.js', 'c.js'], function(b, c) {
     trace.push('a');
     return {
         invoke: function() {

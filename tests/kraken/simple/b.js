@@ -1,5 +1,5 @@
 
-module([importJs.bind(null, 'c.js')], function(c) {
+module(['c.js'], function(c) {
     window.trace.push('b');
     return {
         invoke: function() {
