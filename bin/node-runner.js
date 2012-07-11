@@ -9,7 +9,6 @@ var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/
 
 function syncWrite(data) {
     fs.writeSync(1, data);
-    fs.fsyncSync(1);
 }
 global.syncWrite = syncWrite;
 
