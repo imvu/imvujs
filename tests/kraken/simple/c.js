@@ -11,7 +11,7 @@ var textPostData = {
 function getTemplate(onComplete) {
     console.log("getTemplate");
 
-    _importOld('/common/js/jquery-1.4.4/jquery.js', '$', gotjQuery);
+    _importOld('/common/js/jquery-1.7.2/jquery.js', '$', gotjQuery);
 
     function gotjQuery(jQuery) {
         _importJsOddly('/common/js/imvu_rest.js', onImported.bind(null, jQuery));

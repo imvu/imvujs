@@ -44,7 +44,13 @@
         fetch(url, onFetched);
 
         function onFetched(xhr) {
-            var f = new Function(xhr.responseText + '//@ sourceURL=' + url);
+            var f;
+            try {
+                f = new Function(xhr.responseText + '//@ sourceURL=' + url);
+            } catch (e) {
+                console.error("Failed to parse", url);
+                throw e;
+            }
 
             var saveUrl = ourUrl;
             var result;
