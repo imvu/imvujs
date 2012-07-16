@@ -119,7 +119,8 @@
 
         var result = new Array(remainingDependencies);
 
-        _.each(dependencies, function(d, index) {
+        for (var index = 0; index < dependencies.length; ++index) {
+            var d = dependencies[index];
             if (d instanceof Function) {
                 // Nothing.  d is a function of (url, onComplete)
             } else if (d.constructor === String) {
@@ -127,7 +128,7 @@
             }
 
             d(handleResolution.bind(null, index));
-        });
+        }
 
         function handleResolution(index, value) {
             result[index] = value;
@@ -179,7 +180,9 @@
                 this.isComplete = true;
                 this.value = v;
 
-                _.each(this.callbacks, function(f) { return f(v); });
+                for (var index = 0; index < this.callbacks.length; ++index) {
+                    this.callbacks[index](v);
+                }
                 delete this.callbacks;
             }
         }),
@@ -197,7 +200,10 @@
                 }
             }
 
-            _.each(functions, function(f, index) { f(oc.bind(null, index)); });
+            for (var index = 0; index < functions.length; ++index) {
+                var f = functions[index];
+                f(oc.bind(null, index));
+            }
         }
     };
 
