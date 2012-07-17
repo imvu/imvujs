@@ -1,5 +1,9 @@
 (function() {
 
+    var C = console;
+
+    C = { log: function(){ }, error: function() { } };
+
     function fetch(url, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
@@ -56,7 +60,7 @@
             var result;
             ourUrl = url;
             try {
-                result = f();
+                result = f.call(window);
             } finally {
                 ourUrl = saveUrl;
             }
@@ -82,9 +86,16 @@
     }
 
     function importOld(url, onComplete) {
+        if (1 == arguments.length) {
+            // importOld(url)(onComplete) is the same operation as importOld(url, onComplete)
+            return function(onComplete) {
+                return importOld(url, onComplete);
+            };
+        }
+
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
-            return;
+            return null;
         }
 
         var f = new concur.Future();
@@ -92,9 +103,12 @@
         f.register(onComplete);
 
         fetchJs(url, f.complete.bind(f));
+        return null;
     }
 
     function module(dependencies, body) {
+        C.log("module", ourUrl, dependencies);
+
         if (!dependencies instanceof Array) {
             throw new Error("Dependencies must be array");
         }
@@ -107,7 +121,7 @@
         if (completeJs.hasOwnProperty(url)) {
             future = completeJs[url];
         } else {
-            future = new concur.Future();
+            future = new concur.Future("module " + url);
             completeJs[url] = future;
         }
 
@@ -140,6 +154,7 @@
         }
 
         function complete() {
+            C.log('complete', url);
             var exportTable = body.apply(null, result);
             future.complete(exportTable);
         }
@@ -158,7 +173,8 @@
 
     var concur = {
         Future: BaseClass.extend({
-            initialize: function() {
+            initialize: function(name) {
+                this.name = name;
                 this.callbacks = [];
                 this.isComplete = false;
                 this.value = null;
@@ -174,7 +190,7 @@
 
             complete: function(v) {
                 if (this.isComplete) {
-                    throw new Error("Cannot complete a future twice");
+                    throw new Error("Cannot complete a future twice " + JSON.stringify(this.name ? this.name : ""));
                 }
 
                 this.isComplete = true;

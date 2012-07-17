@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<script src="../../../ext/underscore.js"></script>
+<script src="../../../src/BaseClass.js"></script>
+<script src="../../../src/kraken.js"></script>
+</head>
+<body>
+<script>
+  window.trace = [];
+
+  module([
+      kraken.importOld("/common/js/jquery-1.7.2/jquery.js")
+  ], function(a) {
+      var failures = 0;
+      if (typeof jQuery === 'undefined') {
+          ++failures;
+      }
+
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
+  });
+</script>
+</body>
+</html>
