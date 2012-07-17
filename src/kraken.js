@@ -4,6 +4,15 @@
 
     C = { log: function(){ }, error: function() { } };
 
+    function hasProperties(o) {
+        for (var k in o) {
+            if (o.hasOwnProperty(k)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function fetch(url, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
@@ -55,19 +64,24 @@
 
             var f;
             try {
-                f = new Function(xhr.responseText + '//@ sourceURL=' + url);
+                f = new Function('exports', xhr.responseText + '//@ sourceURL=' + url);
             } catch (e) {
                 console.error("Failed to parse", url);
                 throw e;
             }
 
+            var exports = {};
             var saveUrl = ourUrl;
             var result;
             ourUrl = url;
             try {
-                result = f.call(window);
+                result = f.call(window, exports);
             } finally {
                 ourUrl = saveUrl;
+            }
+
+            if (result === undefined && hasProperties(exports)) {
+                result = exports;
             }
 
             onComplete(result);
@@ -97,7 +111,7 @@
         if (i !== -1) {
             return [p.substring(0, i), p.substring(i + 1)];
         } else {
-            return [p, ''];
+            return ['', p];
         }
     }
 
@@ -108,7 +122,9 @@
 
         relativeTo = splitPath(relativeTo)[0];
 
-        if (url[0] == '/' || relativeTo[relativeTo.length - 1] == '/') {
+        if (relativeTo === '') {
+            return url;
+        } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
             return relativeTo + url;
         } else {
             return relativeTo + '/' + url;
