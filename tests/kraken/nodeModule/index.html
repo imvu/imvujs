@@ -7,7 +7,7 @@
 
   window.trace = [];
 
-  module([kraken.importOld('a.js')], function(a) {
+  module(['a.js'], function(a) {
       a.invoke();
 
       var failures = 0;

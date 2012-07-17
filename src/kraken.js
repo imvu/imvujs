@@ -53,6 +53,8 @@
         return coalescedWrapper;
     }
 
+    var moduleWasCalled = false;
+
     var fetchJs = coallescer(function(url, onComplete) {
         fetch(url, onFetched);
 
@@ -72,8 +74,11 @@
 
             var exports = {};
             var saveUrl = ourUrl;
-            var result;
+
             ourUrl = url;
+            moduleWasCalled = false;
+
+            var result;
             try {
                 result = f.call(window, exports);
             } finally {
@@ -102,7 +107,11 @@
              * expected to occur while evaluating the JS.  This module() invocation is expected to
              * complete the relevant completeJs[url] future.
              */
-            fetchJs(url, function() { });
+            fetchJs(url, function(result) {
+                if (!moduleWasCalled) {
+                    f.complete(result);
+                }
+            });
         }
     }
 
@@ -156,6 +165,8 @@
 
     function module(dependencies, body) {
         C.log("module", ourUrl, dependencies);
+
+        moduleWasCalled = true;
 
         if (!dependencies instanceof Array) {
             throw new Error("Dependencies must be array");
