@@ -48,6 +48,11 @@
         fetch(url, onFetched);
 
         function onFetched(xhr) {
+            if (xhr.status != 200) {
+                console.error("Failed to fetch " + url);
+                throw new Error("Failed to fetch " + url + ".  Status code " + xhr.status);
+            }
+
             var f;
             try {
                 f = new Function(xhr.responseText + '//@ sourceURL=' + url);
@@ -103,7 +108,7 @@
 
         relativeTo = splitPath(relativeTo)[0];
 
-        if (url[url.length - 1] == '/' || relativeTo[0] == '/') {
+        if (url[0] == '/' || relativeTo[relativeTo.length - 1] == '/') {
             return relativeTo + url;
         } else {
             return relativeTo + '/' + url;
