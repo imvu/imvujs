@@ -70,6 +70,8 @@
     });
 
     function importJs(url, onComplete) {
+        url = toAbsoluteUrl(url, ourUrl);
+
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
         } else {
@@ -85,6 +87,29 @@
         }
     }
 
+    function splitPath(p) {
+        var i = p.lastIndexOf('/');
+        if (i !== -1) {
+            return [p.substring(0, i), p.substring(i + 1)];
+        } else {
+            return [p, ''];
+        }
+    }
+
+    function toAbsoluteUrl(url, relativeTo) {
+        if (url[0] == '/' || typeof relativeTo !== 'string') {
+            return url;
+        }
+
+        relativeTo = splitPath(relativeTo)[0];
+
+        if (url[url.length - 1] == '/' || relativeTo[0] == '/') {
+            return relativeTo + url;
+        } else {
+            return relativeTo + '/' + url;
+        }
+    }
+
     function importOld(url, onComplete) {
         if (1 == arguments.length) {
             // importOld(url)(onComplete) is the same operation as importOld(url, onComplete)
@@ -92,6 +117,8 @@
                 return importOld(url, onComplete);
             };
         }
+
+        url = toAbsoluteUrl(url, ourUrl);
 
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);

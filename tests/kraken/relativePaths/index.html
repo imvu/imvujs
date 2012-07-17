@@ -10,7 +10,7 @@
 
   window.trace = [];
 
-  module(['a.js'], function(a) {
+  module(['subdir/a.js'], function(a) {
       a.invoke();
 
       var failures = 0;

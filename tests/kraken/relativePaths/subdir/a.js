@@ -1,5 +1,5 @@
 
-module(['subdir/b.js'], function(b) {
+module(['another/b.js'], function(b) {
     return {
         invoke: function() {
             window.trace.push('a');
