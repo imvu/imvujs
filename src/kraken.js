@@ -224,8 +224,7 @@
 
     window.kraken = {
         module: module,
-        importJs: importJs,
-        importOld: importOld
+        importJs: importJs
     };
 
     //////////////////////////////
