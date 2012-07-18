@@ -1,8 +1,14 @@
 (function() {
 
-    var C = console;
+    var C = {
+        log: function(){ },
+        error: function() { },
+        warn: function() { },
+        groupCollapsed: function() { },
+        groupEnd: function() { }
+    };
 
-    C = { log: function(){ }, error: function() { } };
+    //C = console;
 
     function hasProperties(o) {
         for (var k in o) {
@@ -56,6 +62,7 @@
     var moduleWasCalled = false;
 
     var fetchJs = coallescer(function(url, onComplete) {
+        C.warn("fetchJs", url);
         fetch(url, onFetched);
 
         function onFetched(xhr) {
@@ -69,6 +76,9 @@
                 f = new Function('exports', xhr.responseText + '//@ sourceURL=' + url);
             } catch (e) {
                 console.error("Failed to parse", url);
+                console.groupCollapsed('Source');
+                console.log(xhr.responseText);
+                console.groupEnd();
                 throw e;
             }
 
@@ -163,6 +173,20 @@
         return null;
     }
 
+    /*
+     * `define(callback)` shortcut for hacky AMD compatibility
+     * Note that the "real" AMD define() signature is roughly
+     * define(optional moduleName, optional dependencies, callback)
+     */
+    function define(callback) {
+        module([], callback);
+    }
+    define.amd = true;
+
+    function require() {
+        throw new Error('commonjs require modules are not supported');
+    }
+
     function module(dependencies, body) {
         C.log("module", ourUrl, dependencies);
 
@@ -213,13 +237,14 @@
         }
 
         function complete() {
-            C.log('complete', url);
+            C.log('evaluating module', url);
             var exportTable = body.apply(null, result);
             future.complete(exportTable);
         }
     }
 
     window.module = module;
+    window.define = define;
 
     window.kraken = {
         module: module,
