@@ -33,7 +33,6 @@
     var ourUrl = null;
 
     var completeJs = {}; // url : Future<exportTable>
-    var downloadingJs = {}; // url : Future
 
     /* Returns a function which implements memoization and request coallescing
      * for the function 'fn'
@@ -150,29 +149,6 @@
         }
     }
 
-    function importOld(url, onComplete) {
-        if (1 == arguments.length) {
-            // importOld(url)(onComplete) is the same operation as importOld(url, onComplete)
-            return function(onComplete) {
-                return importOld(url, onComplete);
-            };
-        }
-
-        url = toAbsoluteUrl(url, ourUrl);
-
-        if (completeJs.hasOwnProperty(url)) {
-            completeJs[url].register(onComplete);
-            return null;
-        }
-
-        var f = new concur.Future();
-        completeJs[url] = f;
-        f.register(onComplete);
-
-        fetchJs(url, f.complete.bind(f));
-        return null;
-    }
-
     /*
      * `define(callback)` shortcut for hacky AMD compatibility
      * Note that the "real" AMD define() signature is roughly
@@ -248,6 +224,7 @@
 
     window.kraken = {
         module: module,
+        importJs: importJs,
         importOld: importOld
     };
 
@@ -285,26 +262,7 @@
                 }
                 delete this.callbacks;
             }
-        }),
-
-        // functions :: [function (CompletionCallback)] where CompletionCallback is itself a function taking a result
-        joinAsync: function(functions, onComplete) {
-            var count = functions.length;
-            var results = new Array(count);
-
-            function oc(index, result) {
-                results[index] = result;
-                --count;
-                if (0 == count) {
-                    onComplete(results);
-                }
-            }
-
-            for (var index = 0; index < functions.length; ++index) {
-                var f = functions[index];
-                f(oc.bind(null, index));
-            }
-        }
+        })
     };
 
 })();

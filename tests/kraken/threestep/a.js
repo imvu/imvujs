@@ -11,15 +11,15 @@ var textPostData = {
 function getTemplate(onComplete) {
     console.log("getTemplate");
 
-    kraken.importOld('/common/js/jquery-1.7.2/jquery.js', gotjQuery);
+    kraken.importJs('/common/js/jquery-1.7.2/jquery.js', gotjQuery);
 
     function gotjQuery() {
         console.log('gotjQuery');
-        kraken.importOld('/common/js/imvu_rest.js', onImported);
+        kraken.importJs('/common/js/imvu_rest.js', onImported);
     }
 
     function onImported(rest) {
-        IMVU.Rest.ajax({
+        rest.ajax({
             type: "POST",
             contentType: "application/json",
             url: "http://api.localhost.imvu.com/rendered_template/",
