@@ -47,7 +47,7 @@
             if (futures.hasOwnProperty(arg)) {
                 futures[arg].register(onComplete);
             } else {
-                var future = new concur.Future();
+                var future = new Future();
                 futures[arg] = future;
                 futures[arg].register(onComplete);
 
@@ -108,7 +108,7 @@
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
         } else {
-            var f = new concur.Future();
+            var f = new Future();
             completeJs[url] = f;
             f.register(onComplete);
 
@@ -180,7 +180,7 @@
         if (completeJs.hasOwnProperty(url)) {
             future = completeJs[url];
         } else {
-            future = new concur.Future("module " + url);
+            future = new Future("module " + url);
             completeJs[url] = future;
         }
 
@@ -227,41 +227,33 @@
         importJs: importJs
     };
 
-    //////////////////////////////
-    // copypaste from concur.js //
-    //////////////////////////////
+    function Future(name) {
+        this.name = name;
+        this.callbacks = [];
+        this.isComplete = false;
+        this.value = null;
+    }
 
-    var concur = {
-        Future: BaseClass.extend({
-            initialize: function(name) {
-                this.name = name;
-                this.callbacks = [];
-                this.isComplete = false;
-                this.value = null;
-            },
+    Future.prototype.register = function(f) {
+        if (this.isComplete) {
+            f(this.value);
+        } else {
+            this.callbacks.push(f);
+        }
+    };
 
-            register: function(f) {
-                if (this.isComplete) {
-                    f(this.value);
-                } else {
-                    this.callbacks.push(f);
-                }
-            },
+    Future.prototype.complete = function(v) {
+        if (this.isComplete) {
+            throw new Error("Cannot complete a future twice " + JSON.stringify(this.name ? this.name : ""));
+        }
 
-            complete: function(v) {
-                if (this.isComplete) {
-                    throw new Error("Cannot complete a future twice " + JSON.stringify(this.name ? this.name : ""));
-                }
+        this.isComplete = true;
+        this.value = v;
 
-                this.isComplete = true;
-                this.value = v;
-
-                for (var index = 0; index < this.callbacks.length; ++index) {
-                    this.callbacks[index](v);
-                }
-                delete this.callbacks;
-            }
-        })
+        for (var index = 0; index < this.callbacks.length; ++index) {
+            this.callbacks[index](v);
+        }
+        delete this.callbacks;
     };
 
 })();
