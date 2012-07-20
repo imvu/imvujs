@@ -70,9 +70,10 @@
                 throw new Error("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
 
-            var f;
+            var evaluated;
             try {
-                f = new Function('exports', xhr.responseText + '//@ sourceURL=' + url);
+                var s = "function evaluated(exports) {\n" + xhr.responseText + '\n}\n//@ sourceURL=' + url;
+                eval(s);
             } catch (e) {
                 console.error("Failed to parse", url);
                 console.groupCollapsed('Source');
@@ -89,7 +90,7 @@
 
             var result;
             try {
-                result = f.call(window, exports);
+                result = evaluated.call(window, exports);
             } finally {
                 ourUrl = saveUrl;
             }
