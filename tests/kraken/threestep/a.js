@@ -32,13 +32,13 @@ function getTemplate(onComplete) {
     }
 }
 
-module([getTemplate], function(template) {
+module({template: getTemplate}, function(imports) {
     window.trace.push('a');
     return {
         invoke: function() {
             window.trace.push('invoke');
-            window.trace.push(template.status);
-            console.log("a.js here", template);
+            window.trace.push(imports.template.status);
+            console.log("a.js here", imports.template);
         }
     };
 });

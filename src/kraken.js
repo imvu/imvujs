@@ -10,6 +10,20 @@
 
     //C = console;
 
+    function getObjectKeys(o) {
+        if (o.keys) {
+            return o.keys();
+        } else {
+            var result = [];
+            for (var k in o) {
+                if (o.hasOwnProperty(k)) {
+                    result.push(k);
+                }
+            }
+            return result;
+        }
+    }
+
     function hasProperties(o) {
         for (var k in o) {
             if (o.hasOwnProperty(k)) {
@@ -156,7 +170,7 @@
      * define(optional moduleName, optional dependencies, callback)
      */
     function define(callback) {
-        module([], callback);
+        module({}, callback);
     }
     define.amd = true;
 
@@ -185,27 +199,31 @@
             completeJs[url] = future;
         }
 
-        var remainingDependencies = dependencies.length;
+        var remainingDependencies = getObjectKeys(dependencies).length;
         if (remainingDependencies == 0) {
             complete();
             return;
         }
 
-        var result = new Array(remainingDependencies);
+        var result = {};
 
-        for (var index = 0; index < dependencies.length; ++index) {
-            var d = dependencies[index];
+        for (var key in dependencies) {
+            if (!dependencies.hasOwnProperty(key)) {
+                continue;
+            }
+
+            var d = dependencies[key];
             if (d instanceof Function) {
                 // Nothing.  d is a function of (url, onComplete)
             } else if (d.constructor === String) {
                 d = importJs.bind(null, d);
             }
 
-            d(handleResolution.bind(null, index));
+            d(handleResolution.bind(null, key));
         }
 
-        function handleResolution(index, value) {
-            result[index] = value;
+        function handleResolution(name, value) {
+            result[name] = value;
 
             --remainingDependencies;
             if (0 == remainingDependencies) {
@@ -215,7 +233,7 @@
 
         function complete() {
             C.log('evaluating module', url);
-            var exportTable = body.apply(null, result);
+            var exportTable = body.call(null, result);
             future.complete(exportTable);
         }
     }

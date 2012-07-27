@@ -7,8 +7,8 @@
 
   window.trace = [];
 
-  module(['a.js'], function(a) {
-      a.invoke();
+  module({a: 'a.js'}, function(imports) {
+      imports.a.invoke();
 
       var failures = 0;
       if (!_.isEqual(['a'], window.trace)) {

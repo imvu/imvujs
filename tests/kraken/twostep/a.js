@@ -19,7 +19,7 @@ function getjQuery(onComplete) {
     }
 }
 
-module([getjQuery], function() {
+module({_unused: getjQuery}, function(imports) {
     window.trace.push('a');
     return {
         invoke: function() {

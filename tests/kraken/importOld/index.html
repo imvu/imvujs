@@ -9,9 +9,9 @@
 <script>
   window.trace = [];
 
-  module([
-      "/common/js/jquery-1.7.2/jquery.js"
-  ], function(a) {
+  module({
+      _unused: "/common/js/jquery-1.7.2/jquery.js"
+  }, function(imports) {
       var failures = 0;
       if (typeof jQuery === 'undefined') {
           ++failures;

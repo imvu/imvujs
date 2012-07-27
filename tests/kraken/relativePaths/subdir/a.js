@@ -1,9 +1,9 @@
 
-module(['another/b.js'], function(b) {
+module({b:'another/b.js'}, function(imports) {
     return {
         invoke: function() {
             window.trace.push('a');
-            b.invoke();
+            imports.b.invoke();
         }
     };
 });

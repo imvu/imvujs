@@ -1,10 +1,10 @@
 
-module(['c.js'], function(c) {
+module({c: 'c.js'}, function(imports) {
     window.trace.push('b');
     return {
         invoke: function() {
             console.log("b.js here");
-            c.invoke();
+            imports.c.invoke();
         }
     };
 });

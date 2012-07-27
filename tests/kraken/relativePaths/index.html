@@ -10,8 +10,8 @@
 
   window.trace = [];
 
-  module(['subdir/a.js'], function(a) {
-      a.invoke();
+  module({a: 'subdir/a.js'}, function(imports) {
+      imports.a.invoke();
 
       var failures = 0;
       if (!_.isEqual(['a', 'b'], window.trace)) {

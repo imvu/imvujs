@@ -1,5 +1,5 @@
 
-module([], function() {
+module({}, function(imports) {
     window.trace.push('c');
     return {
         invoke: function() {
