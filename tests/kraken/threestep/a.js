@@ -15,6 +15,11 @@ function getTemplate(onComplete) {
 
     function gotjQuery() {
         console.log('gotjQuery');
+        kraken.importJs('/common/js/easyXDM-2.4.15.118/easyXDM.js', gotEasyXdm);
+    }
+
+    function gotEasyXdm() {
+        console.log('gotEasyXdm');
         kraken.importJs('/common/js/imvu_rest.js', onImported);
     }
 
@@ -27,6 +32,9 @@ function getTemplate(onComplete) {
                 "filename": "/vstream/templates/text_post.tml",
                 "data": textPostData
             }),
+            complete: function(jqxhr, textStatus) {
+                console.log("hello");
+            },
             success: onComplete
         }, {sauce: 'aoeuaoeu'});
     }

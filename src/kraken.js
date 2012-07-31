@@ -1,5 +1,25 @@
 (function() {
 
+    // https://developer-new.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
+    function bind(fn, oThis) {
+        if (typeof fn !== "function") {
+            // closest thing possible to the ECMAScript 5 internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+        }
+
+        var aArgs = Array.prototype.slice.call(arguments, 2);
+        var fNOP = function () {};
+        var fBound = function () {
+            return fn.apply((fn instanceof fNOP && oThis) ? fn : oThis,
+                            aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+
+        fNOP.prototype = fn.prototype;
+        fBound.prototype = new fNOP();
+ 
+        return fBound;
+    };
+
     var C = {
         log: function(){ },
         error: function() { },
@@ -34,10 +54,12 @@
     }
 
     function fetch(url, callback) {
+        var DONE = 4; // IE8 does not define this constant.
+
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         xhr.onreadystatechange = function () {
-            if (this.readyState === this.DONE) {
+            if (this.readyState === DONE) {
                 callback(this);
             }
         };
@@ -65,7 +87,7 @@
                 futures[arg] = future;
                 futures[arg].register(onComplete);
 
-                fn(arg, future.complete.bind(future));
+                fn(arg, bind(future.complete, future));
             }
         }
 
@@ -216,10 +238,10 @@
             if (d instanceof Function) {
                 // Nothing.  d is a function of (url, onComplete)
             } else if (d.constructor === String) {
-                d = importJs.bind(null, d);
+                d = bind(importJs, null, d);
             }
 
-            d(handleResolution.bind(null, key));
+            d(bind(handleResolution, null, key));
         }
 
         function handleResolution(name, value) {

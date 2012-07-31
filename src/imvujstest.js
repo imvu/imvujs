@@ -85,14 +85,14 @@
             fail(new AssertionError(info));
         },
 
-        true: function(value) {
+        'true': function(value) {
             if (!value) {
                 fail(new AssertionError("expected truthy, actual " + repr(value)),
                      {Value: value});
             }
         },
 
-        false: function(value) {
+        'false': function(value) {
             if (value) {
                 fail(new AssertionError("expected falsy, actual " + repr(value)),
                      {Value: value});
@@ -153,7 +153,7 @@
     // synonyms
     assert.equals = assert.equal;
     assert.notEquals = assert.notEqual;
-    assert.null = assert.equal.bind(null, null);
+    assert['null'] = assert.equal.bind(null, null);
     assert.notNull = assert.notEqual.bind(null, null);
 
     g.all_tests = [];

@@ -1,5 +1,21 @@
 
 (function() {
+
+    var create;
+    if (Object.create) {
+        create = Object.create;
+    } else {
+        // IE7 and 8
+        create = function (o) {
+            if (arguments.length > 1) {
+                throw new Error('Object.create implementation only accepts the first parameter.');
+            }
+            function F() {}
+            F.prototype = o;
+            return new F();
+        };
+    }
+
     // Shamelessly lifted from underscore.js
     function extend(obj) {
         for (var i = 1; i < arguments.length; ++i) {
@@ -30,7 +46,7 @@
         };
         extend(NewClass, this, classDef);
 
-        NewClass.prototype = Object.create(this.prototype);
+        NewClass.prototype = create(this.prototype);
         extend(NewClass.prototype, def);
 
         return NewClass;
