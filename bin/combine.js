@@ -2,6 +2,31 @@
 var fs = require('fs');
 var uglify = require('uglify-js');
 
+function splitPath(p) {
+    var i = p.lastIndexOf('/');
+    if (i !== -1) {
+        return [p.substring(0, i), p.substring(i + 1)];
+    } else {
+        return ['', p];
+    }
+}
+
+function toAbsoluteUrl(url, relativeTo) {
+    if (url[0] == '/' || typeof relativeTo !== 'string') {
+        return url;
+    }
+
+    relativeTo = splitPath(relativeTo)[0];
+
+    if (relativeTo === '') {
+        return url;
+    } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
+        return relativeTo + url;
+    } else {
+        return relativeTo + '/' + url;
+    }
+}
+
 function matchModuleCall(node) {
     try {
         if (node[0] != 'call'
@@ -112,6 +137,10 @@ function readModules(root) {
 
             resolved[next] = module;
 
+            for (var k in module.deps) {
+                module.deps[k] = toAbsoluteUrl(module.deps[k], next);
+            }
+
             unresolved = unresolved.concat(objectValues(module.deps));
         }
     }
@@ -194,7 +223,14 @@ function main(argv) {
     return 0;
 }
 
-main(process.argv);
+if ('undefined' === typeof exports) {
+    main(process.argv);
+} else {
+    exports.readModules = readModules;
+    exports.emitModules = emitModules;
+    exports.combine = combine;
+    exports.gen_code = uglify.uglify.gen_code;
+}
 
 /*
 var code = fs.readFileSync('testy.js', 'utf8');
