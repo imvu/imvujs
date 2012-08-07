@@ -223,7 +223,7 @@ function main(argv) {
     return 0;
 }
 
-if ('undefined' === typeof exports) {
+if (null === module.parent) {
     main(process.argv);
 } else {
     exports.readModules = readModules;
