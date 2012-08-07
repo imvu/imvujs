@@ -1,6 +1,7 @@
 include 'includes/include.coffee'
 
 combine = require '../bin/combine'
+path    = require 'path'
 
 expected = [
     '(function() {',
@@ -27,10 +28,18 @@ expected = [
     '})();'
     ].join('\n')
 
-test 'functional', ->
-    q = combine.combine 'tests/combine/d.js'
+fixture 'functional',
+    setUp: ->
+        @cwd = process.cwd()
+        process.chdir(path.dirname(testPath))
 
-    assert.equal(
-        combine.gen_code(q, {beautify: true}),
-        expected
-    )
+    tearDown: ->
+        process.chdir(@cwd)
+
+    'test basic functionality': ->
+        q = combine.combine 'combine/d.js'
+
+        assert.equal(
+            combine.gen_code(q, {beautify: true}),
+            expected
+        )
