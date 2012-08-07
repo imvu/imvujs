@@ -1,3 +1,6 @@
 [submodule "third-party/coffeescript-1.3.3"]
 	path = third-party/coffeescript-1.3.3
 	url = git://github.com/jashkenas/coffee-script.git
+[submodule "third-party/node-jshint"]
+	path = third-party/node-jshint
+	url = https://github.com/imvu/node-jshint
