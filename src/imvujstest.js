@@ -164,4 +164,11 @@
     g.AssertionError = AssertionError;
     g.assert = assert;
     g.test = test;
+
+    g.setTimeout = function() {
+        throw new AssertionError("Don't call setTimeout in tests.  Use fakes.");
+    };
+    g.setInterval = function() {
+        throw new AssertionError("Don't call setInterval in tests.  Use fakes.");
+    };
 })();
