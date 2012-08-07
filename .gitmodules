@@ -3,4 +3,4 @@
 	url = git://github.com/jashkenas/coffee-script.git
 [submodule "third-party/node-jshint"]
 	path = third-party/node-jshint
-	url = https://github.com/imvu/node-jshint
+	url = git@github.com:imvu/node-jshint.git
