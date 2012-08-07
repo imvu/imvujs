@@ -6,7 +6,7 @@ OS=`python -c "import sys; print sys.platform"`
 if [ $OS == 'darwin' ]; then
     NODE=$HERE/../third-party/mac/node
 elif [ $OS == 'linux2' ]; then
-    NODE=nodejs
+    NODE=$HERE/../third-party/linux/node-0.8.5/bin/node
 else
     NODE=$HERE/../third-party/windows/nodejs/node.exe
 fi
