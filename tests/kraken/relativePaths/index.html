@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
 <head>
-<script src="../../../ext/underscore.js"></script>
 <script src="../../../src/BaseClass.js"></script>
 <script src="../../../src/kraken.js"></script>
 </head>
@@ -14,7 +13,7 @@
       imports.a.invoke();
 
       var failures = 0;
-      if (!_.isEqual(['a', 'b'], window.trace)) {
+      if (window.trace[0] !== 'a' || window.trace[1] !== 'b') {
           ++failures;
       }
 
