@@ -29,3 +29,7 @@ module {polyfill: '../src/polyfill.js'}, (imports) ->
 
         assert.equal(1, p.y)
         assert.equal(9, p.x)
+
+    test 'console', ->
+        # Just test that the functions are there
+        polyfill.console.log("We don't expect this log to do anything, but we want the function to be defined")
