@@ -20,7 +20,8 @@ echo "Now testing failures..."
 
 EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js' -o -iname '*.fail.coffee'`
 for expected in $EXPECTED_FAILS; do
-    "$HERE"/../bin/test $expected
+    echo $expected ...
+    "$HERE"/../bin/test $expected > /dev/null
     if [ "$?" = 0 ]; then
         echo "$expected passed incorrectly"
         exit 1
