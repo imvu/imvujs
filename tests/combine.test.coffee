@@ -1,5 +1,3 @@
-include 'includes/include.coffee'
-
 combine = require '../bin/combine'
 path    = require 'path'
 
