@@ -57,6 +57,10 @@
         var DONE = 4; // IE8 does not define this constant.
 
         var xhr = new XMLHttpRequest();
+        if (!kraken.caching) {
+            xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
+            url += '&timestamp' + +new Date();
+        }
         xhr.open('GET', url);
         xhr.onreadystatechange = function () {
             if (this.readyState === DONE) {
@@ -265,7 +269,8 @@
 
     window.kraken = {
         module: module,
-        importJs: importJs
+        importJs: importJs,
+        caching: true
     };
 
     function Future(name) {
