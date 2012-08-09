@@ -1,8 +1,9 @@
 
 include "../src/node-kraken.js"
+include "../src/polyfill.js"
 
-module {polyfill: '../src/polyfill.js'}, (imports) ->
-    polyfill = imports.polyfill
+module {}, () ->
+    polyfill = imvu.polyfill
 
     test 'ObjectKeys', ->
         proto = ->

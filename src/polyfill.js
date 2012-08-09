@@ -1,5 +1,5 @@
 
-module({}, function(imports) {
+(function() {
     // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
     var ObjectKeys = (function () {
         var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -104,9 +104,13 @@ module({}, function(imports) {
 
     // We export these to allow tests to exercise them, whether or not the tests
     // are running in an environment where native implementations exist. -- andy 7 August 2012
-    return {
+
+    var g = 'undefined' !== typeof window ? window : global;
+
+    g.imvu = g.imvu || {};
+    g.imvu.polyfill = {
         ObjectKeys: ObjectKeys,
         FunctionBind: FunctionBind,
         console: polyfillConsole
     };
-});
+})();

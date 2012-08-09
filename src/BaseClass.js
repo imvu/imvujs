@@ -65,7 +65,9 @@
         exports.BaseClass = BaseClass;
 
     } else {
-        window.BaseClass = BaseClass;
+        window.imvu = window.imvu || {};
+
+        window.imvu.BaseClass = BaseClass;
     }
 
 })();
