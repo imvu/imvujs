@@ -1,4 +1,4 @@
 #!/bin/bash
-cd `dirname "$0"`/..
 
-python third-party/scons.py $*
+HERE=`dirname "$0"`
+python "$HERE/../third-party/scons.py" -C "$HERE/.." -Q $@
