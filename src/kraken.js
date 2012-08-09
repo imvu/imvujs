@@ -130,7 +130,6 @@
 
             var result;
             try {
-                console.warn(ourUrl, window);
                 result = evaluated.call(window, exports);
             } finally {
                 ourUrl = saveUrl;
