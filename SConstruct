@@ -1,11 +1,18 @@
 import os
 
-SRC = [
+BASE_SOURCES = [
     'src/polyfill.js',
-    'ext/jquery-1.7.2.js',
     'ext/underscore-1.3.3.js',
     'src/BaseClass.js',
+]
+
+WEB_SOURCES = BASE_SOURCES + [
+    'ext/jquery-1.7.2.js',
     'src/kraken.js',
+]
+
+NODE_SOURCES = [
+    'src/node-kraken.js',
 ]
 
 env = Environment(
@@ -13,17 +20,26 @@ env = Environment(
     toolpath=['tools'],
     tools=['closure'])
 
-imvu_js = env.ClosureCompiler(
+targets = []
+
+targets += env.ClosureCompiler(
     'out/imvu.js',
-    SRC,
+    WEB_SOURCES,
     CLOSURE_FLAGS=['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
-imvu_min_js = env.ClosureCompiler(
+targets += env.ClosureCompiler(
     'out/imvu.min.js',
-    SRC)
+    WEB_SOURCES)
+
+targets += env.ClosureCompiler(
+    'out/imvu.node.js',
+    NODE_SOURCES,
+    CLOSURE_FLAGS=['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+targets += env.ClosureCompiler(
+    'out/imvu.node.min.js',
+    NODE_SOURCES)
 
 if 'target' in ARGUMENTS:
-    install = env.Install(ARGUMENTS['target'], imvu_js)
-    install = env.Install(ARGUMENTS['target'], imvu_min_js)
+    env.Install(ARGUMENTS['target'], targets)
     env.Alias('install', ARGUMENTS['target'])
 
 env.Default('out')
