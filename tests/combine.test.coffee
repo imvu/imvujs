@@ -1,4 +1,4 @@
-combine = require '../bin/combine'
+combine = require '../bin/combine.js'
 path    = require 'path'
 
 expected = [
