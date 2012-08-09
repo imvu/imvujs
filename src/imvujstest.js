@@ -134,7 +134,7 @@
             }
         },
 
-        throws: function(exception, fn) {
+        'throws': function(exception, fn) {
             try {
                 fn();
             } catch (e) {
