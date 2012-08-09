@@ -1,0 +1,13 @@
+#!/bin/sh
+HERE=`dirname "$0"`
+
+OS=`python -c "import sys; print sys.platform"`
+if [ $OS == 'darwin' ]; then
+    NODEJS="$HERE/../third-party/mac/node"
+elif [ $OS == 'linux2' ]; then
+    NODEJS="$HERE/../third-party/linux/node-0.8.5/bin/node"
+else
+    NODEJS="$HERE/../third-party/windows/nodejs/node"
+fi
+
+exec $NODEJS $@
