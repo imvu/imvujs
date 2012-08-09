@@ -11,7 +11,7 @@ WEB_SOURCES = BASE_SOURCES + [
     'src/kraken.js',
 ]
 
-NODE_SOURCES = [
+NODE_SOURCES = BASE_SOURCES + [
     'src/node-kraken.js',
 ]
 
