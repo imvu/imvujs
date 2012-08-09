@@ -1,11 +1,11 @@
 import os
 
 SRC = [
+    'src/polyfill.js',
     'ext/jquery-1.7.2.js',
     'ext/underscore-1.3.3.js',
     'src/BaseClass.js',
     'src/kraken.js',
-    'src/polyfill.js',
 ]
 
 env = Environment(
