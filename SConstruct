@@ -1,3 +1,4 @@
+import os
 
 SRC = [
     'ext/jquery-1.7.2.js',
@@ -7,7 +8,10 @@ SRC = [
     'src/polyfill.js',
 ]
 
-env = Environment(toolpath=['tools'], tools=['closure'])
+env = Environment(
+    ENV=os.environ,
+    toolpath=['tools'],
+    tools=['closure'])
 
 imvujs = env.ClosureCompiler('out/imvu.js', SRC)
 

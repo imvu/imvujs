@@ -3,7 +3,7 @@
 var fs = require('fs');
 var vm = require('vm');
 var path = require('path');
-var _ = require('../ext/underscore.js');
+var _ = require('../ext/underscore-1.3.3.js');
 var util = require('util');
 var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
 

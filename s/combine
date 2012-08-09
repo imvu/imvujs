@@ -1,6 +1,4 @@
 #!/bin/bash
 cd `dirname "$0"`/..
 
-
-
-./third-party/mac/node ./bin/combine.js $*
+s/node ./bin/combine.js $*
