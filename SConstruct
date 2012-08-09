@@ -13,10 +13,17 @@ env = Environment(
     toolpath=['tools'],
     tools=['closure'])
 
-imvujs = env.ClosureCompiler('out/imvu.js', SRC)
+imvu_js = env.ClosureCompiler(
+    'out/imvu.js',
+    SRC,
+    CLOSURE_FLAGS=['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+imvu_min_js = env.ClosureCompiler(
+    'out/imvu.min.js',
+    SRC)
 
 if 'target' in ARGUMENTS:
-    install = env.Install(ARGUMENTS['target'], imvujs)
-    env.Alias('install', install)
+    install = env.Install(ARGUMENTS['target'], imvu_js)
+    install = env.Install(ARGUMENTS['target'], imvu_min_js)
+    env.Alias('install', ARGUMENTS['target'])
 
-env.Default(imvujs)
+env.Default('out')

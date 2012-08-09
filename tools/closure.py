@@ -7,7 +7,6 @@ def generate(env):
     env['JAVA'] = 'java'
     env['CLOSURE_COMPILER'] = env.File('#/third-party/closure-compiler/compiler.jar')
     env.Append(
-        CLOSURE_FLAGS=['--compilation_level', 'SIMPLE_OPTIMIZATIONS'],
         BUILDERS={'ClosureCompiler':ClosureCompiler})
 
 def exists(_env):
