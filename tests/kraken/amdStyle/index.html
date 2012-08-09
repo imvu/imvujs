@@ -10,7 +10,7 @@
       imports.a.invoke();
 
       var failures = 0;
-      if (window.trace[0] !== 'a') {
+      if (JSON.stringify(window.trace) != JSON.stringify(['a'])) {
           ++failures;
       }
 
