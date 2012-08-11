@@ -13,7 +13,7 @@
       imports.a.invoke();
 
       var failures = 0;
-      if (JSON.stringify(window.trace) != JSON.stringify(['a', 'b'])) {
+      if (JSON.stringify(window.trace) !== JSON.stringify(['c', 'a', 'b'])) {
           ++failures;
       }
 

@@ -1,5 +1,8 @@
 
-module({b:'another/b.js'}, function(imports) {
+module({
+    b:'another/b.js',
+    c: 'c.js'
+}, function(imports) {
     return {
         invoke: function() {
             window.trace.push('a');

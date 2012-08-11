@@ -184,10 +184,14 @@
         if (relativeTo === '') {
             return url;
         } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
-            return relativeTo + url;
+            url = relativeTo + url;
         } else {
-            return relativeTo + '/' + url;
+            url = relativeTo + '/' + url;
         }
+
+        // Prune /../s from the path
+        return url.replace(/\/\.\.\/[a-zA-Z0-9_\-\.]+\//g, '/')
+                  .replace(/\/[a-zA-Z0-9_\-\.]+\/\.\.\//g, '/');
     }
 
     /*
