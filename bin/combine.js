@@ -105,6 +105,29 @@ function readModule(path) {
         }
     });
 
+    if (result === null) {
+        /*
+         * Let's assume that this is a node style module.
+         * We'll pretend that the code was written like so:
+         * 
+         * module({}, function(_) {
+         *     var exports = {};
+         *     themodulebody;
+         *     return exports;
+         * });
+         */
+
+        var body = ast[1].slice(0);
+
+        body.unshift(['var', [['exports', ['object', []]]]]);
+        body.push(['return', ['name', 'exports']]);
+
+        result = {
+            deps: {},
+            body: ["function",null,["_"], body]
+        };
+    }
+
     return result;
 }
 

@@ -1,5 +1,5 @@
 // a.js
 
-module({}, function(imports) {
+module({e:'e.js'}, function(imports) {
     return a_export_table;
 });
