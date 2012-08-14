@@ -63,6 +63,8 @@ function include(includePath, settings) {
 global.require = require;
 global.include = include;
 sysinclude(__dirname + '/../src/imvujstest.js');
+sysinclude(__dirname + '/../out/imvu.node.js');
+sysinclude(__dirname + '/../src/node-kraken.js');
 
 function usage() {
     console.log("Please pass a test file");

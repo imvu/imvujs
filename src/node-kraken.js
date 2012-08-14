@@ -19,6 +19,7 @@ function includeModule(path) {
 }
 
 function module(dependencies, body) {
+    var cfp = currentFilePath;
     var importList = {};
 
     for (var k in dependencies) {
@@ -28,5 +29,5 @@ function module(dependencies, body) {
         importList[k] = impls[v];
     }
 
-    impls[currentFilePath] = body(importList);
+    impls[cfp] = body(importList);
 }
