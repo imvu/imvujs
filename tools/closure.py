@@ -1,4 +1,3 @@
-
 from SCons.Builder import Builder
 
 def generate(env):
