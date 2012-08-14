@@ -8,7 +8,7 @@ if [ $OS == 'darwin' ]; then
 elif [ $OS == 'linux2' ]; then
     NODE=$HERE/../third-party/linux/node-0.8.5/bin/node
 else
-    NODE=$HERE/../third-party/windows/nodejs/node.exe
+    NODE=$HERE/../third-party/windows/nodejs-0.8.6/node.exe
 fi
 
 $NODE $HERE/node-runner.js $*
