@@ -1,3 +1,4 @@
+import os.path
 from SCons.Builder import Builder
 
 def generate(env):
@@ -10,8 +11,12 @@ def generate(env):
         emitter=depend_on_closure_compiler
     )
 
+    closure = os.path.join(os.path.dirname(__file__), '..', 'third-party', 'closure-compiler', 'compiler.jar')
+    closure = os.path.normpath(closure)
+    closure = os.path.relpath(closure, env.Dir('#').abspath)
+
     env['JAVA'] = 'java'
-    env['CLOSURE_COMPILER'] = env.File('#/third-party/closure-compiler/compiler.jar')
+    env['CLOSURE_COMPILER'] = closure
     env.Append(
         BUILDERS={'ClosureCompiler':ClosureCompiler})
 
