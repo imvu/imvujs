@@ -3,7 +3,7 @@ path    = require 'path'
 
 expected = [
     '(function() {',
-    '    var $kraken$1 = function(_) {',
+    '    var $kraken$1 = function(imports) {',
     '        var exports = {};',
     '        function foo() {}',
     '        function bar() {}',

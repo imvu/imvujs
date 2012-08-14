@@ -110,7 +110,7 @@ function readModule(path) {
          * Let's assume that this is a node style module.
          * We'll pretend that the code was written like so:
          * 
-         * module({}, function(_) {
+         * module({}, function(imports) {
          *     var exports = {};
          *     themodulebody;
          *     return exports;
@@ -124,7 +124,7 @@ function readModule(path) {
 
         result = {
             deps: {},
-            body: ["function",null,["_"], body]
+            body: ["function",null,["imports"], body]
         };
     }
 
