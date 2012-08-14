@@ -11,7 +11,7 @@ def generate(env):
         emitter=depend_on_closure_compiler
     )
 
-    closure = os.path.join(os.path.dirname(__file__), '..', 'third-party', 'closure-compiler', 'compiler.jar')
+    closure = os.path.join(os.path.dirname(__file__), '..', 'third-party', 'closure-compiler-2079', 'compiler.jar')
     closure = os.path.normpath(closure)
     closure = os.path.relpath(closure, env.Dir('#').abspath)
 
