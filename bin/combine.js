@@ -1,5 +1,6 @@
-var fs = require('fs');
+var fs     = require('fs');
 var uglify = require('uglify-js');
+var path   = require('path');
 
 var fix_output = require('../src/fix_output.js');
 fix_output.fixConsole(console);
@@ -15,6 +16,9 @@ function splitPath(p) {
 }
 
 function toAbsoluteUrl(url, relativeTo) {
+    url = url.replace(/\\/g, '/');
+    relativeTo = relativeTo.replace(/\\/g, '/');
+
     if (url[0] == '/' || typeof relativeTo !== 'string') {
         return url;
     }
@@ -178,7 +182,7 @@ function readModules(root) {
             resolved[next] = module;
 
             for (var k in module.deps) {
-                module.deps[k] = toAbsoluteUrl(module.deps[k], next);
+                module.deps[k] = path.normalize(toAbsoluteUrl(module.deps[k], next));
             }
 
             unresolved = unresolved.concat(objectValues(module.deps));
