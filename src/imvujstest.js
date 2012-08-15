@@ -139,7 +139,7 @@
                 fn();
             } catch (e) {
                 if (e instanceof exception) {
-                    return;
+                    return e;
                 }
                 fail(new AssertionError('expected to throw: ' + repr(exception) + ', actually threw: ' + repr(e)),
                      {Expected: exception, Actual: e});

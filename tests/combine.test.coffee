@@ -1,5 +1,6 @@
-combine = require '../bin/combine.js'
+uglify  = require 'uglify-js'
 path    = require 'path'
+combine = require '../bin/combine.js'
 
 expected = [
     '(function() {',
@@ -51,3 +52,19 @@ fixture 'functional',
             combine.gen_code(q, {beautify: true}),
             expected
         )
+
+test 'invalid source produces an error message', ->
+    ast = uglify.parser.parse(
+        'module({}, function(imports) { }());'
+    )
+
+    e = assert.throws Error, combine.readModule.bind(null, 'blarp', ast)
+    assert.equal 'Bad module body', e.message
+
+test 'invalid dependency list produces an error message', ->
+    ast = uglify.parser.parse(
+        'module(["a", "b.js"], function(imports) { });'
+    )
+
+    e = assert.throws Error, combine.readModule.bind(null, 'blarp', ast)
+    assert.equal 'Bad deps', e.message

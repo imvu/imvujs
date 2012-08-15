@@ -27,7 +27,7 @@ function toAbsoluteUrl(url, relativeTo) {
     }
 }
 
-function matchModuleCall(node) {
+function matchModuleCall(path, node) {
     try {
         if (node[0] != 'call'
             || node[1][0] != 'name'
@@ -39,10 +39,25 @@ function matchModuleCall(node) {
         return null;
     }
 
-    return {
-        deps: matchModules(node[2][0]),
-        body: matchModuleBody(node[2][1])
-    };
+    var deps;
+    var body;
+
+    if (!(deps = matchModules(node[2][0]))) {
+        console.error("Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(node[2][0][0]));
+        console.error(uglify.uglify.gen_code(node[2][0], {beautify: true}));
+        throw new Error("Bad deps");
+
+    } else if (!(body = matchModuleBody(node[2][1]))) {
+        console.error("Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(node[2][1][0]));
+        console.error(uglify.uglify.gen_code(node[2][1], {beautify: true}));
+        throw new Error("Bad module body");
+
+    } else {
+        return {
+            deps: matchModules(node[2][0]),
+            body: matchModuleBody(node[2][1])
+        };
+    }
 
     function matchModules(node) {
         if (node[0] != 'object') {
@@ -91,14 +106,11 @@ function traverse(node, visit) {
     }
 }
 
-function readModule(path) {
-    var code = fs.readFileSync(path, 'utf8');
-    var ast = uglify.parser.parse(code);
-
+function readModule(path, ast) {
     var result = null;
     traverse(ast, function(node) {
         if (result === null) {
-            var mc = matchModuleCall(node);
+            var mc = matchModuleCall(path, node);
             if (mc !== null) {
                 result = mc;
             }
@@ -152,7 +164,10 @@ function readModules(root) {
 
         if (!resolved.hasOwnProperty(next)) {
             // TODO: Handle relative paths.
-            var module = readModule(next);
+            var code = fs.readFileSync(next, 'utf8');
+            var ast = uglify.parser.parse(code);
+
+            var module = readModule(next, ast);
 
             if (module === null) {
                 throw "Invalid module " + next;
@@ -249,6 +264,7 @@ function main(argv) {
 if (null === module.parent) {
     main(process.argv);
 } else {
+    exports.readModule = readModule;
     exports.readModules = readModules;
     exports.emitModules = emitModules;
     exports.combine = combine;
