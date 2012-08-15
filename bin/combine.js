@@ -1,6 +1,7 @@
 
 var fs = require('fs');
 var uglify = require('uglify-js');
+var path = require('path');
 
 function splitPath(p) {
     var i = p.lastIndexOf('/');
@@ -164,6 +165,9 @@ function readModules(root) {
 
         if (!resolved.hasOwnProperty(next)) {
             // TODO: Handle relative paths.
+
+            console.warn("Reading file", next);
+
             var code = fs.readFileSync(next, 'utf8');
             var ast = uglify.parser.parse(code);
 
@@ -176,7 +180,7 @@ function readModules(root) {
             resolved[next] = module;
 
             for (var k in module.deps) {
-                module.deps[k] = toAbsoluteUrl(module.deps[k], next);
+                module.deps[k] = path.normalize(toAbsoluteUrl(module.deps[k], next));
             }
 
             unresolved = unresolved.concat(objectValues(module.deps));
