@@ -7,14 +7,9 @@ var _ = require('../ext/underscore-1.3.3.js');
 var util = require('util');
 var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
 
-function syncWrite(data) {
-    fs.writeSync(1, data);
-}
-global.syncWrite = syncWrite;
-
-console.log = function() {
-    syncWrite(util.format.apply(this, arguments) + '\n');
-}
+var fix_output = require('../src/fix_output.js');
+fix_output.fixConsole(console);
+global.syncWrite = fix_output.syncWriteStdout;
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;

@@ -1,6 +1,9 @@
-
 var fs = require('fs');
 var uglify = require('uglify-js');
+
+var fix_output = require('../src/fix_output.js');
+fix_output.fixConsole(console);
+
 
 function splitPath(p) {
     var i = p.lastIndexOf('/');
