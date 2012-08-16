@@ -166,7 +166,6 @@ function readModules(root) {
         var next = unresolved.shift();
 
         if (!resolved.hasOwnProperty(next)) {
-            // TODO: Handle relative paths.
             var code = fs.readFileSync(next, 'utf8');
             var ast = uglify.parser.parse(code);
 
