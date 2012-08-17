@@ -86,7 +86,7 @@ function runTest(testPath) {
     //sandbox.__dirname = path.dirname(abspath);
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
-    syncWrite(testPath + '\n====\n');
+    syncWrite(path.normalize(testPath) + '\n----\n');
     global.testPath = abspath;
     vm.runInThisContext(testContents, abspath);
     delete global.dirName;
