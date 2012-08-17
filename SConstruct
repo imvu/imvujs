@@ -2,8 +2,9 @@ import os
 
 BASE_SOURCES = [
     'src/polyfill.js',
-    'ext/underscore-1.3.3.js',
     'src/BaseClass.js',
+    'ext/underscore-1.3.3.js',
+    'ext/backbone-0.9.2.js',
 ]
 
 WEB_SOURCES = BASE_SOURCES + [
