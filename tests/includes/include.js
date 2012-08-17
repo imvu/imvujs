@@ -1,1 +1,4 @@
-include('include.coffee');
+module({
+    includeCoffee: 'include.coffee'
+}, function(imports) {
+});

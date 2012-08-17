@@ -28,8 +28,6 @@ function loadScript(path, settings) {
     return testContents;
 }
 
-var dirName = '';
-
 function joinPath(a, b) {
     if (a.length > 0) {
         return a + '/' + b;
@@ -45,18 +43,8 @@ function sysinclude(includePath, settings) {
     vm.runInThisContext(script, includePath);
 }
 
-function include(includePath, settings) {
-    var original = dirName;
-    dirName = path.dirname(joinPath(dirName, includePath));
-    try {
-        sysinclude(joinPath(original, includePath), settings);
-    } finally {
-        dirName = original;
-    }
-}
-
 global.require = require;
-global.include = include;
+global.sysinclude = sysinclude;
 sysinclude(__dirname + '/../src/imvujstest.js');
 sysinclude(__dirname + '/../out/imvu.node.js');
 sysinclude(__dirname + '/../src/node-kraken.js');
@@ -77,7 +65,6 @@ function runTest(testPath) {
     //
     // Nested confusion:
     //     vm.runInNewContext has issues because runInThisContext always runs in the root 
-    dirName = path.dirname(abspath); // needed for include()
     global._ = _;
     //var sandbox = _.extend({}, imvujstest);
     //sandbox.console = console;
@@ -88,8 +75,8 @@ function runTest(testPath) {
 
     syncWrite(path.normalize(testPath) + '\n----\n');
     global.testPath = abspath;
+    currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
-    delete global.dirName;
 
     run_all();
     syncWrite('\n');

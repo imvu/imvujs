@@ -2,19 +2,19 @@
  * Node.js implementation of the kraken interface.
  */
 
+var path = require('path');
+
 var impls = {}; // path : body
 var currentFilePath = null;
 
-function includeModule(path) {
-    if (path in impls) {
-        return;
-    }
+function includeModule(modulePath) {
+    var cfp = currentFilePath;
 
     try {
-        currentFilePath = path;
-        include(path);
+        currentFilePath = modulePath;
+        sysinclude(modulePath);
     } finally {
-        currentFilePath = null;
+        currentFilePath = cfp;
     }
 }
 
@@ -23,9 +23,12 @@ function module(dependencies, body) {
     var importList = {};
 
     for (var k in dependencies) {
-        var v = dependencies[k];
+        var v = path.join(path.dirname(cfp), dependencies[k]);
 
-        includeModule(v);
+        if (!(v in impls)) {
+            includeModule(v);
+        }
+
         importList[k] = impls[v];
     }
 

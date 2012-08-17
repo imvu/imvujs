@@ -1,8 +1,6 @@
 
-include "../src/node-kraken.js"
-include "../src/polyfill.js"
-
-module {}, () ->
+module {
+}, () ->
     polyfill = imvu.polyfill
 
     test 'ObjectKeys', ->
