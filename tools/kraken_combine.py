@@ -7,7 +7,7 @@ def generate(env):
         return target, source
 
     KrakenCombine = Builder(
-        action='$KRAKEN_COMBINE $SOURCE > $TARGET',
+        action='bash $KRAKEN_COMBINE $SOURCE > $TARGET',
         emitter=depend_on_combiner
     )
 
