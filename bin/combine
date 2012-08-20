@@ -1,4 +1,4 @@
 #!/bin/bash
 MYDIR=`dirname "$0"`/..
 
-$MYDIR/s/node $MYDIR/bin/combine.js $*
+"$MYDIR/s/node" "$MYDIR/bin/combine.js" $*

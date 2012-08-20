@@ -2,10 +2,6 @@ var fs     = require('fs');
 var uglify = require('uglify-js');
 var path   = require('path');
 
-var fix_output = require('../src/fix_output.js');
-fix_output.fixConsole(console);
-
-
 function splitPath(p) {
     var i = p.lastIndexOf('/');
     if (i !== -1) {
@@ -246,7 +242,18 @@ function emitModules(rootPath, modules) {
 }
 
 function combine(rootPath) {
-    return ['toplevel', [['stat', ['call', ['function', null, [], emitModules(rootPath, readModules(rootPath))]]]]];
+    return [
+        'toplevel', [
+            ['stat', [
+                'call', [
+                    'function',
+                    null,
+                    [],
+                    emitModules(rootPath, readModules(rootPath))
+                ]
+            ]]
+        ]
+    ];
 }
 
 function usage() {
@@ -254,6 +261,9 @@ function usage() {
 }
 
 function main(argv) {
+    var fix_output = require('../src/fix_output.js');
+    fix_output.fixConsole(console);
+
     if (3 !== argv.length) {
         usage();
         return 1;
