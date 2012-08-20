@@ -174,12 +174,36 @@
         }
     }
 
+    function normalizePath(path) {
+        var segments = path.split(/\//g); // NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
+        var i = 0;
+        while (i < segments.length) {
+            var s = segments[i];
+            if (s == '.') {
+                segments.splice(i, 1);
+                continue;
+            } else if (s == '..' && i == 0 && segments.length > 2) {
+                segments.splice(i, 2);
+                continue;
+            } else if (s == '..' && i > 0) {
+                segments.splice(i - 1, 2);
+                continue;
+            } else {
+                i += 1;
+            }
+        }
+
+        return segments.join('/');
+    }
+
     function toAbsoluteUrl(url, relativeTo) {
+        url = normalizePath(url);
+
         if (url[0] == '/' || typeof relativeTo !== 'string') {
             return url;
         }
 
-        relativeTo = splitPath(relativeTo)[0];
+        relativeTo = splitPath(normalizePath(relativeTo))[0];
 
         if (relativeTo === '') {
             return url;
