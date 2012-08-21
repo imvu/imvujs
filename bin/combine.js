@@ -167,7 +167,15 @@ function readModules(root) {
 
         if (!resolved.hasOwnProperty(next)) {
             var code = fs.readFileSync(next, 'utf8');
-            var ast = uglify.parser.parse(code);
+            var ast;
+            try {
+                ast = uglify.parser.parse(code);
+            } catch (e) {
+                console.error();
+                console.error("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+                console.error();
+                process.exit(1);
+            }
 
             var module = readModule(next, ast);
 
