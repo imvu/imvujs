@@ -286,10 +286,3 @@ if (null === module.parent) {
     exports.combine = combine;
     exports.gen_code = uglify.uglify.gen_code;
 }
-
-/*
-var code = fs.readFileSync('testy.js', 'utf8');
-var ast = uglify.parser.parse(code);
-console.log("AST");
-console.log(JSON.stringify(ast));
-*/

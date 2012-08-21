@@ -1,0 +1,4 @@
+#!/bin/bash
+MYDIR=`dirname "$0"`/..
+
+"$MYDIR/s/node" "$MYDIR/bin/scan-dependencies.js" $*
