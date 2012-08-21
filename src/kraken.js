@@ -112,7 +112,7 @@
 
             var evaluated;
             try {
-                var s = "function evaluated(exports) {\n'use strict';\n\n" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url;
+                var s = "function evaluated(exports) {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url;
                 eval(s);
             } catch (e) {
                 console.error("Failed to parse", url);
