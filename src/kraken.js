@@ -196,8 +196,6 @@
     }
 
     function toAbsoluteUrl(url, relativeTo) {
-        url = normalizePath(url);
-
         if (url[0] == '/' || typeof relativeTo !== 'string') {
             return url;
         }
@@ -211,6 +209,8 @@
         } else {
             url = relativeTo + '/' + url;
         }
+
+        return normalizePath(url);
 
         // Prune /../s from the path
         return url.replace(/\/\.\.\/[a-zA-Z0-9_\-\.]+\//g, '/')
