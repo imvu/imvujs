@@ -110,6 +110,20 @@
     if (!(console && console.log)) {
         console = polyfillConsole;
     }
+    
+
+    //ensure that we have requestAnimationFrame, or something like it
+    var polyfillRequestAnimationFrame = window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function( callback, element ) {
+            window.setTimeout( callback, 1000/60 );
+        };
+
+    if(!window.requestAnimationFrame) {
+        window.requestAnimationFrame = polyfillRequestAnimationFrame;
+    }
 
 
     // We export these to allow tests to exercise them, whether or not the tests
