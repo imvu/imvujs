@@ -158,23 +158,32 @@ function objectValues(o) {
     return r;
 }
 
+function errorExit() {
+    console.error();
+    console.error.apply(console.error, arguments);
+    console.error();
+    process.exit(1);
+}
+
 function readModules(root) {
     var resolved = {}; // abspath : module
-    var unresolved = [root];
+    var unresolved = [['root', root]]; // [referrer, filename]
 
     while (unresolved.length) {
         var next = unresolved.shift();
+        var referrer = next[0];
+        next = next[1];
 
         if (!resolved.hasOwnProperty(next)) {
+            if (!fs.existsSync(next)) {
+                errorExit("Module '" + referrer + "' refers to nonexistent dependency '" + next + "'");
+            }
             var code = fs.readFileSync(next, 'utf8');
             var ast;
             try {
                 ast = uglify.parser.parse(code);
             } catch (e) {
-                console.error();
-                console.error("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
-                console.error();
-                process.exit(1);
+                errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
             }
 
             var module = readModule(next, ast);
@@ -189,7 +198,11 @@ function readModules(root) {
                 module.deps[k] = path.normalize(toAbsoluteUrl(module.deps[k], next));
             }
 
-            unresolved = unresolved.concat(objectValues(module.deps));
+            unresolved = unresolved.concat(
+                objectValues(module.deps).map(function(dep) {
+                    return [next, dep]
+                })
+            );
         }
     }
 
