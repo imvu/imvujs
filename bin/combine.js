@@ -216,9 +216,6 @@ function readModules(root) {
 }
 
 function emitModules(rootPath, modules) {
-    var missing = modules[1];
-    modules = modules[0];
-    
     var emitted = [];
     var aliases = {}; // path : alias
 
@@ -271,7 +268,23 @@ function emitModules(rootPath, modules) {
     return body;
 }
 
+function ScriptError(message) {
+    this.message = message;
+}
+
 function combine(rootPath) {
+    var m = readModules(rootPath);
+    var modules = m[0];
+    var missing = m[1];
+
+    if (Object.keys(missing).length) {
+        var msg = '';
+        for (var m in missing) {
+            msg += "Module '" + m + "' is missing, referred to by: " + Object.keys(missing[m]).join(', ');
+        }
+        throw new ScriptError(msg);
+    }
+
     return [
         'toplevel', [
             ['stat', [
@@ -279,7 +292,7 @@ function combine(rootPath) {
                     'function',
                     null,
                     [],
-                    emitModules(rootPath, readModules(rootPath))
+                    emitModules(rootPath, modules)
                 ]
             ]]
         ]
@@ -301,8 +314,16 @@ function main(argv) {
 
     var fileName = argv[2];
 
-    var newScript = combine(fileName);
-    console.log(uglify.uglify.gen_code(newScript, {beautify: true}));
+    try {
+        var newScript = combine(fileName);
+        console.log(uglify.uglify.gen_code(newScript, {beautify: true}));
+    }
+    catch (e) {
+        if (e instanceof ScriptError) {
+            errorExit(e.message);
+        }
+        throw e;
+    }
 
     return 0;
 }
@@ -315,4 +336,5 @@ if (null === module.parent) {
     exports.emitModules = emitModules;
     exports.combine = combine;
     exports.gen_code = uglify.uglify.gen_code;
+    exports.ScriptError = ScriptError;
 }

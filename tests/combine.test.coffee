@@ -58,6 +58,10 @@ fixture 'functional',
             expected
         )
 
+    'test combine produces error if any modules are missing': ->
+        exc = assert.throws(combine.ScriptError, -> combine.combine 'combine/has-missing.js')
+        assert.equal("Module 'combine/missing.js' is missing, referred to by: combine/has-missing.js", exc.message)
+
     'test readModules returns module dependencies': ->
         [modules, missing] = combine.readModules 'combine/d.js'
         assert.deepEqual {}, missing
