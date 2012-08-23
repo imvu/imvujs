@@ -111,7 +111,7 @@
 
             var evaluated;
             try {
-                var s = "function evaluated(exports) {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url;
+                var s = "function evaluated() {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url;
                 eval(s);
             } catch (e) {
                 console.error("Failed to parse", url);
@@ -121,7 +121,6 @@
                 throw e;
             }
 
-            var exports = {};
             var saveUrl = ourUrl;
 
             ourUrl = url;
@@ -129,13 +128,9 @@
 
             var result;
             try {
-                result = evaluated.call(window, exports);
+                result = evaluated.call(void 0);
             } finally {
                 ourUrl = saveUrl;
-            }
-
-            if (result === undefined && hasProperties(exports)) {
-                result = exports;
             }
 
             onComplete(result);
@@ -223,6 +218,9 @@
      * define(optional moduleName, optional dependencies, callback)
      */
     function define(callback) {
+        if (Object.prototype.toString.call(callback) == '[object Array]') {
+            callback = arguments[1];
+        }
         module({}, callback);
     }
     define.amd = true;

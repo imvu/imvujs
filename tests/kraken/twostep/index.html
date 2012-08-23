@@ -10,7 +10,7 @@
       imports.a.invoke();
 
       var failures = 0;
-      if (JSON.stringify(window.trace) != JSON.stringify(['jQuery', 'a', 'invoke'])) {
+      if (JSON.stringify(window.trace) != JSON.stringify(['b', 'a', 'invoke'])) {
           ++failures;
       }
 

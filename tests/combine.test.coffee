@@ -5,12 +5,20 @@ combine = require '../bin/combine.js'
 expected = [
     '(function() {',
     '    var $kraken$1 = function(imports) {',
-    '        var exports = {};',
+    '        var $kraken$exports;',
+    '        function define(a, b) {',
+    '            $kraken$exports = b();',
+    '        }',
+    '        define.amd = true;',
     '        function foo() {}',
     '        function bar() {}',
-    '        exports.foo = foo;',
-    '        exports.bar = bar;',
-    '        return exports;',
+    '        define([], function() {',
+    '            return {',
+    '                foo: foo,',
+    '                bar: bar',
+    '            };',
+    '        });',
+    '        return $kraken$exports;',
     '    }({});',
     '    var $kraken$2 = function(imports) {',
     '        return a_export_table;',
@@ -34,7 +42,8 @@ expected = [
     '    module({}, function() {',
     '        return d_export_table;',
     '    })',
-    '})();'
+    '})();',
+
 ].join('\n')
 
 sorted = (ls) ->

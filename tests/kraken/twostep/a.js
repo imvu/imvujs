@@ -1,25 +1,15 @@
 
-var textPostData = {
-    login_cid: 123,
-    comments: [],
-    element_key: "0000001",
-    show_likes: true,
-    total_likes: 1002,
-    total_likes_label: "1k"
-};
-
-function getjQuery(onComplete) {
+function getB(onComplete) {
     console.log("getjQuery");
 
-    kraken.importJs('/common/js/jquery-1.7.2/jquery.js', gotjQuery);
+    kraken.importJs('b.js', gotB);
 
-    function gotjQuery() {
-        window.trace.push('jQuery');
+    function gotB() {
         onComplete(null, null);
     }
 }
 
-module({_unused: getjQuery}, function(imports) {
+module({_unused: getB}, function(imports) {
     window.trace.push('a');
     return {
         invoke: function() {

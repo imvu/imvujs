@@ -122,20 +122,30 @@ function readModule(path, ast) {
 
     if (result === null) {
         /*
-         * Let's assume that this is a node style module.
+         * Let's assume that this is a CommonJS module.
          * We'll pretend that the code was written like so:
          * 
-         * module({}, function(imports) {
-         *     var exports = {};
+         * module({}, function() {
+         *     var $kraken$exports;
+         *     function define(a, b) {
+         *         $kraken$exports = b();
+         *     }
+         *     define.amd = true;
          *     themodulebody;
-         *     return exports;
+         *     return $kraken$exports;
          * });
+         * 
+         * Possible improvement: Scan the module body for references to an "exports" object
+         * to infer NodeJS modules.
          */
 
         var body = ast[1].slice(0);
 
-        body.unshift(['var', [['exports', ['object', []]]]]);
-        body.push(['return', ['name', 'exports']]);
+        body.unshift(["stat", ["assign", true, ["dot", ["name", "define"], "amd"], ["name", "true"]]]);
+        body.unshift(['defun', 'define', ['a', 'b'], [
+            ['stat', ['assign', true, ['name', '$kraken$exports'], ['call', ['name', 'b'], []]]]]]);
+        body.unshift(['var', [['$kraken$exports']]]);
+        body.push(['return', ['name', '$kraken$exports']]);
 
         result = {
             deps: {},
@@ -279,8 +289,8 @@ function combine(rootPath) {
 
     if (Object.keys(missing).length) {
         var msg = '';
-        for (var m in missing) {
-            msg += "Module '" + m + "' is missing, referred to by: " + Object.keys(missing[m]).join(', ');
+        for (var mm in missing) {
+            msg += "Module '" + mm + "' is missing, referred to by: " + Object.keys(missing[mm]).join(', ');
         }
         throw new ScriptError(msg);
     }

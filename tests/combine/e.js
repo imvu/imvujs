@@ -2,5 +2,8 @@
 
 function foo() { }
 function bar() { }
-exports.foo = foo;
-exports.bar = bar;
+
+define([], function() {
+    return { foo: foo
+           , bar: bar };
+});
