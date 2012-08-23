@@ -202,7 +202,7 @@ function readModules(root) {
 
             unresolved = unresolved.concat(
                 objectValues(module.deps).map(function(dep) {
-                    return [next, dep]
+                    return [next, dep];
                 })
             );
         }
