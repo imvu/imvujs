@@ -176,7 +176,9 @@ function readModules(root) {
 
         if (!resolved.hasOwnProperty(next)) {
             if (!fs.existsSync(next)) {
-                errorExit("Module '" + referrer + "' refers to nonexistent dependency '" + next + "'");
+                resolved[next] = {};
+                continue;
+                //errorExit("Module '" + referrer + "' refers to nonexistent dependency '" + next + "'");
             }
             var code = fs.readFileSync(next, 'utf8');
             var ast;
