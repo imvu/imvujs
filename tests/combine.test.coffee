@@ -63,6 +63,10 @@ fixture 'functional',
         assert.deepEqual {}, missing
         assert.deepEqual ["combine/a.js","combine/c.js","combine/d.js","combine/e.js","combine/subdir/b.js"], sorted Object.keys(modules)
 
+    'test readModules returns missing modules': ->
+        [modules, missing] = combine.readModules 'combine/missing.js'
+        assert.deepEqual {'combine/missing.js': {'<root>': true}}, missing
+
 test 'invalid source produces an error message', ->
     ast = uglify.parser.parse(
         'module({}, function(imports) { }());'

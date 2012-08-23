@@ -167,7 +167,7 @@ function errorExit() {
 
 function readModules(root) {
     var resolved = {}; // abspath : module
-    var unresolved = [['root', root]]; // [[referrer, filename]...]
+    var unresolved = [['<root>', root]]; // [[referrer, filename]...]
     var missing = {}; // abspath : {referrerpath: true}
 
     while (unresolved.length) {
