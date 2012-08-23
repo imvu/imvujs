@@ -12,6 +12,8 @@ function includeModule(modulePath) {
 
     try {
         currentFilePath = modulePath;
+        exports = void 0; // Prevents some modules from figuring out that we're really on NodeJS.
+
         sysinclude(modulePath);
     } finally {
         currentFilePath = cfp;
@@ -37,7 +39,7 @@ function module(dependencies, body) {
 
 // AMD compatibility
 function define(dependencies, body) {
-    var deps = {}
+    var deps = {};
     for (var i = 0; i < dependencies.length; ++i) {
         var name = dependencies[i];
         deps[name] = name + '.js';
