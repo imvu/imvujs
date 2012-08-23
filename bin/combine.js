@@ -167,7 +167,8 @@ function errorExit() {
 
 function readModules(root) {
     var resolved = {}; // abspath : module
-    var unresolved = [['root', root]]; // [referrer, filename]
+    var unresolved = [['root', root]]; // [[referrer, filename]...]
+    var missing = {}; // abspath : {referrerpath: true}
 
     while (unresolved.length) {
         var next = unresolved.shift();
@@ -175,23 +176,26 @@ function readModules(root) {
         next = next[1];
 
         if (!resolved.hasOwnProperty(next)) {
-            if (!fs.existsSync(next)) {
-                resolved[next] = {};
-                continue;
-                //errorExit("Module '" + referrer + "' refers to nonexistent dependency '" + next + "'");
-            }
-            var code = fs.readFileSync(next, 'utf8');
-            var ast;
-            try {
-                ast = uglify.parser.parse(code);
-            } catch (e) {
-                errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
-            }
+            if (fs.existsSync(next)) {
+                var code = fs.readFileSync(next, 'utf8');
+                var ast;
+                try {
+                    ast = uglify.parser.parse(code);
+                } catch (e) {
+                    errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+                }
 
-            var module = readModule(next, ast);
+                var module = readModule(next, ast);
+                if (module === null) {
+                    throw "Invalid module " + next;
+                }
+            } else {
+                if (!missing.hasOwnProperty(next)) {
+                    missing[next] = {};
+                }
+                missing[next][referrer] = true;
 
-            if (module === null) {
-                throw "Invalid module " + next;
+                var module = {deps:[]};
             }
 
             resolved[next] = module;
@@ -208,10 +212,13 @@ function readModules(root) {
         }
     }
 
-    return resolved;
+    return [resolved, missing];
 }
 
 function emitModules(rootPath, modules) {
+    var missing = modules[1];
+    modules = modules[0];
+    
     var emitted = [];
     var aliases = {}; // path : alias
 
