@@ -63,9 +63,14 @@ fixture 'functional',
         assert.deepEqual {}, missing
         assert.deepEqual ["combine/a.js","combine/c.js","combine/d.js","combine/e.js","combine/subdir/b.js"], sorted Object.keys(modules)
 
-    'test readModules returns missing modules': ->
+    'test readModules: root can be missing': ->
         [modules, missing] = combine.readModules 'combine/missing.js'
         assert.deepEqual {'combine/missing.js': {'<root>': true}}, missing
+
+    'test readModules: can refer to missing modules': ->
+        [modules, missing] = combine.readModules 'combine/has-missing.js'
+        assert.deepEqual {'combine/missing.js': {'combine/has-missing.js': true}}, missing        
+        assert.deepEqual ['combine/has-missing.js', 'combine/missing.js'], sorted Object.keys(modules)
 
 test 'invalid source produces an error message', ->
     ast = uglify.parser.parse(
