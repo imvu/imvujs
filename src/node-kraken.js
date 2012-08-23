@@ -34,3 +34,21 @@ function module(dependencies, body) {
 
     impls[cfp] = body(importList);
 }
+
+// AMD compatibility
+function define(dependencies, body) {
+    var deps = {}
+    for (var i = 0; i < dependencies.length; ++i) {
+        var name = dependencies[i];
+        deps[name] = name + '.js';
+    }
+
+    module(deps, function(imports) {
+        var args = [];
+        for (var i = 0; i < dependencies.length; ++i) {
+            args.push(imports[dependencies[i]]);
+        }
+        return body.apply(undefined, args);
+    });
+}
+define.amd = true;
