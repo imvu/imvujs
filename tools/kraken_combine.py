@@ -5,7 +5,9 @@ import subprocess
 def generate(env):
     def depend_on_combiner_and_dependencies(target, source, env):
         env.Depends(target, env['KRAKEN_COMBINE'])
+        env.Depends(target, env['KRAKEN_COMBINE'] + '.js')
         env.Depends(target, env['KRAKEN_SCAN'])
+        env.Depends(target, env['KRAKEN_SCAN'] + '.js')
 
         popen = subprocess.Popen(
             ['bash', env.subst('$KRAKEN_SCAN')] + map(str, source),
