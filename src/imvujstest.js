@@ -149,7 +149,7 @@
         
         isInstance: function(type, actual) {
         	if(!(target instanceof type)) {
-        		fail(new AssertionError(repr(actual) 'not instance of' repr(type)),
+        		fail(new AssertionError(repr(actual) + 'not instance of' + repr(type)),
         			{Type: type, Actual: actual});
         	}
         },
