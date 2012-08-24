@@ -145,6 +145,13 @@
                      {Expected: exception, Actual: e});
             }
             throw new AssertionError('did not throw');
+        },
+        
+        isInstance: function(type, actual) {
+        	if( !(target instanceof type)) {
+        		fail(new AssertionError(repr(target) 'not instance of' repr(type)),
+        			{Type: type, Actual: actual});
+        	}
         }
     };
 
