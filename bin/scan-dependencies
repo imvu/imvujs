@@ -1,4 +1,8 @@
 #!/bin/bash
-MYDIR=`dirname "$0"`/..
+if [ $MSYSTEM = 'MINGW32' ]; then
+    MYDIR=third-party/imvujs
+else
+    MYDIR=`dirname "$0"`/..
+fi
 
 "$MYDIR/s/node" "$MYDIR/bin/scan-dependencies.js" $*
