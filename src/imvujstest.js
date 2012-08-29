@@ -120,6 +120,24 @@
             }
         },
 
+        nearEqual: function( expected, actual, tolerance ) {
+            if( tolerance === undefined ) {
+                tolerance = 0.0;
+            }
+            if( expected instanceof Array && actual instanceof Array ) {
+                assert.equal(expected.length, actual.length);
+                for( var i=0; i<expected.length; ++i ) {
+                    assert.nearEqual(expected[i], actual[i], tolerance);
+                }
+                return;
+            }
+            if( Math.abs(expected - actual) > tolerance ) {
+                fail( new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual) +
+                                         ', tolerance: ' + repr(tolerance) + ', diff: ' + repr(actual-expected) ),
+                      { Expected:expected, Actual:actual, Tolerance:tolerance } );
+            }
+        },
+
         notEqual: function(expected, actual) {
             if (expected instanceof Array && actual instanceof Array) {
                 assert.notEqual(expected.length, actual.length);
