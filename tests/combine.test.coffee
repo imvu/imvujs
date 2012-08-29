@@ -100,3 +100,10 @@ test 'invalid dependency list produces an error message', ->
 
     e = assert.throws Error, combine.readModule.bind(null, 'blarp', ast)
     assert.equal 'Bad deps', e.message
+
+test 'missing return statement produces an error message', ->
+    ast = uglify.parser.parse(
+        'module({}, function(imports) { function oh_no_i_have_forgotten_to() { return; } });'
+    );
+
+    assert.throws combine.ScriptError, combine.combine.bind(null, 'combine/noreturn.js')

@@ -225,6 +225,14 @@ function readModules(root) {
     return [resolved, missing];
 }
 
+function checkModule(name, module) {
+    var statements = module.body[3];
+    var last = statements[statements.length - 1];
+    if (last[0] != 'return') {
+        throw new ScriptError("Module " + name + " does not end with a return statement.  Modules must return export tables!");
+    }
+}
+
 function emitModules(rootPath, modules) {
     var emitted = [];
     var aliases = {}; // path : alias
@@ -282,6 +290,8 @@ function ScriptError(message) {
     this.message = message;
 }
 
+ScriptError.prototype = new Error();
+
 function combine(rootPath) {
     var m = readModules(rootPath);
     var modules = m[0];
@@ -293,6 +303,13 @@ function combine(rootPath) {
             msg += "Module '" + mm + "' is missing, referred to by: " + Object.keys(missing[mm]).join(', ');
         }
         throw new ScriptError(msg);
+    }
+
+    console.warn("SNCH ", modules);
+    for (var k in modules) {
+        if (modules.hasOwnProperty(k)) {
+            checkModule(k, modules[k]);
+        }
     }
 
     return [
@@ -327,8 +344,8 @@ function main(argv) {
     try {
         var newScript = combine(fileName);
         console.log(uglify.uglify.gen_code(newScript, {beautify: true}));
-    }
-    catch (e) {
+
+    } catch (e) {
         if (e instanceof ScriptError) {
             errorExit(e.message);
         }
