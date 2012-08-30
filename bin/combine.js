@@ -305,7 +305,6 @@ function combine(rootPath) {
         throw new ScriptError(msg);
     }
 
-    console.warn("SNCH ", modules);
     for (var k in modules) {
         if (modules.hasOwnProperty(k)) {
             checkModule(k, modules[k]);
