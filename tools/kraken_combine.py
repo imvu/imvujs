@@ -15,7 +15,10 @@ def generate(env):
         stdout, _ = popen.communicate()
         if popen.returncode:
             raise AssertionError('scan-dependencies failed with return code %r' % (popen.returncode,))
-        env.Depends(target, filter(None, stdout.split('\n')))
+
+        paths = filter(None, stdout.split('\n'))
+        paths = [path.replace('\\', '/') for path in paths]
+        env.Depends(target, paths)
 
         return target, source
 
