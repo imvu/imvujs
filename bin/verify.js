@@ -53,16 +53,19 @@ function check(ast) {
     visit(globalScope, ast);
 
     function visit(scope, node) {
-        //console.log("visit", scope, JSON.stringify(node));
-
         var t = node[0];
         if (t == 'var') {
             var vars = node[1];
             vars.forEach(function(e) {
                 scope.add(e[0]);
+                if (e.length > 1) {
+                    visit(scope, e[1]);
+                }
             });
-        } else if (t == 'defun') {
-            scope.add(node[1]);
+        } else if (t == 'defun' || t == 'function') {
+            if (node[1]) {
+                scope.add(node[1]);
+            }
 
             var s = new Scope(scope);
 
@@ -82,6 +85,8 @@ function check(ast) {
                     errors.push(node);
                 }
             }
+
+            visit(scope, node[3]);
 
         } else {
             node.forEach(function(n) {
@@ -108,17 +113,16 @@ function main(argv) {
 
         var errors = check(ast);
         if (errors.length) {
+            console.error("Errors in", fileName);
             errors.forEach(function (e) {
-                console.log("DOOP", e);
+                //console.log("DOOP", e);
                 if (e[3][0] == 'function') {
                     // special case
-                    console.error("ERROR", combine.gen_code(e[2]), " = function(...) {...}");
+                    console.error(":\t", combine.gen_code(e[2]), " = function(...) {...}");
                 } else {
-                    console.error("ERROR", combine.gen_code(e));
+                    console.error(":\t", combine.gen_code(e));
                 }
             });
-        } else {
-            console.log("OK!");
         }
     });
 }

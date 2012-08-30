@@ -50,6 +50,22 @@ test 'functions', ->
 
 test 'property of complex expression', ->
     accept 'f().property = value'
+    accept 'window.f().property = value'
+
+test 'bug', ->
+    accept 'var o = {labelGrid: function(decimals) { if (decimals[0] < 0) decimals[0] = 0; if (decimals[1] < 0) decimals[1] = 0; }}'
+
+test 'function literal', ->
+    accept 'var o; o = function(x) { x[0] = 5; };'
+    reject 'var o; o = function() { x[0] = 5; };'
+
+test 'function literal in variable initializer', ->
+    accept 'var o = function(x) { x[0] = 5; };'
+    reject 'var o = function() { x[0] = 5; };'
+
+test 'function literal as object property', ->
+    accept 'var o = {f:function(x) { x[0] = 5; }};'
+    reject 'var o = {f:function( ) { x[0] = 5; }};'
 
 test 'reports multiple errors in a single run', ->
     errors = parse 'a = b; c = d;'
