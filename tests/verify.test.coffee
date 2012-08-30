@@ -48,6 +48,9 @@ test 'recursion', ->
 test 'functions', ->
     accept 'function F() { } F.property = value;'
 
+test 'property of complex expression', ->
+    accept 'f().property = value'
+
 test 'reports multiple errors in a single run', ->
     errors = parse 'a = b; c = d;'
     assert.equal 2, errors.length

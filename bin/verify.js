@@ -41,7 +41,7 @@ function leftMostSubExpression(node) {
     } else if (node[0] == 'dot') {
         return leftMostSubExpression(node[1]);
     } else {
-        throw new Error("NYI");
+        return node;
     }
 }
 
@@ -76,9 +76,11 @@ function check(ast) {
 
         } else if (t == 'assign') {
             var v = leftMostSubExpression(node[2]);
-            var name = v[1];
-            if (!scope.has(name)) {
-                errors.push(node);
+            if (v[0] == 'name') {
+                var name = v[1];
+                if (!scope.has(name)) {
+                    errors.push(node);
+                }
             }
 
         } else {
