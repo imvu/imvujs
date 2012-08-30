@@ -52,9 +52,6 @@ test 'property of complex expression', ->
     accept 'f().property = value'
     accept 'window.f().property = value'
 
-test 'bug', ->
-    accept 'var o = {labelGrid: function(decimals) { if (decimals[0] < 0) decimals[0] = 0; if (decimals[1] < 0) decimals[1] = 0; }}'
-
 test 'function literal', ->
     accept 'var o; o = function(x) { x[0] = 5; };'
     reject 'var o; o = function() { x[0] = 5; };'
