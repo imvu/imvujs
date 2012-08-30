@@ -358,10 +358,11 @@ function main(argv) {
 if (null === module.parent) {
     main(process.argv);
 } else {
-    exports.readModule = readModule;
+    exports.readModule  = readModule;
     exports.readModules = readModules;
     exports.emitModules = emitModules;
-    exports.combine = combine;
-    exports.gen_code = uglify.uglify.gen_code;
+    exports.errorExit   = errorExit;
+    exports.combine     = combine;
+    exports.gen_code    = uglify.uglify.gen_code;
     exports.ScriptError = ScriptError;
 }

@@ -1,5 +1,5 @@
 
-verify = require '../bin/verify'
+verify = require '../bin/verify.js'
 uglify = require 'uglify-js'
 
 parse = uglify.parser.parse
@@ -45,6 +45,17 @@ test 'recursion', ->
     accept 'function f(x) { function g(y) { x = y; } }'
     reject 'function f() { function g(x) { } } x = 9;'
 
+test 'functions', ->
+    accept 'function F() { } F.property = value;'
+
 test 'reports multiple errors in a single run', ->
     errors = parse 'a = b; c = d;'
     assert.equal 2, errors.length
+
+test 'this', ->
+    accept 'function f() { this.foo = bar; }'
+    accept 'this.foo = bar;'
+
+test 'things which are technically monkeypatching the global object, but are totally fine in Kraken modules', ->
+    accept 'function f() { }'
+    accept 'var x; x = 2;'

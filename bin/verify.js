@@ -48,7 +48,9 @@ function leftMostSubExpression(node) {
 function check(ast) {
     var errors = [];
 
-    visit(new Scope(null), ast);
+    var globalScope = new Scope(null);
+    globalScope.add('this');
+    visit(globalScope, ast);
 
     function visit(scope, node) {
         //console.log("visit", scope, JSON.stringify(node));
@@ -60,7 +62,10 @@ function check(ast) {
                 scope.add(e[0]);
             });
         } else if (t == 'defun') {
+            scope.add(node[1]);
+
             var s = new Scope(scope);
+
             var params = node[2];
             params.forEach(s.add.bind(s));
 
@@ -73,7 +78,7 @@ function check(ast) {
             var v = leftMostSubExpression(node[2]);
             var name = v[1];
             if (!scope.has(name)) {
-                errors.push({expr: node[2]});
+                errors.push(node);
             }
 
         } else {
@@ -86,6 +91,34 @@ function check(ast) {
     }
 
     return errors;
+}
+
+function main(argv) {
+    argv.slice(2).forEach(function (fileName) {
+        var code = fs.readFileSync(fileName, 'utf8');
+
+        var ast;
+        try {
+            ast = uglify.parser.parse(code);
+        } catch (e) {
+            combine.errorExit("Error in", fileName, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+        }
+
+        var errors = check(ast);
+        if (errors.length) {
+            errors.forEach(function (e) {
+                console.log("DOOP", e);
+                if (e[3][0] == 'function') {
+                    // special case
+                    console.error("ERROR", combine.gen_code(e[2]), " = function(...) {...}");
+                } else {
+                    console.error("ERROR", combine.gen_code(e));
+                }
+            });
+        } else {
+            console.log("OK!");
+        }
+    });
 }
 
 if (null === module.parent) {
