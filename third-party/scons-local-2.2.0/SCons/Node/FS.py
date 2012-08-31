@@ -1941,6 +1941,7 @@ class Dir(Base):
         return result
 
     def dir_on_disk(self, name):
+        name = _my_normcase(name)
         if self.entry_exists_on_disk(name):
             try: return self.Dir(name)
             except TypeError: pass
@@ -1950,6 +1951,7 @@ class Dir(Base):
         return node
 
     def file_on_disk(self, name):
+        name = _my_normcase(name)
         if self.entry_exists_on_disk(name) or \
            diskcheck_rcs(self, name) or \
            diskcheck_sccs(self, name):
