@@ -69,7 +69,12 @@
     }
 
     function repr(v) {
-        return JSON.stringify(v);
+        var t = typeof v;
+        if (t === 'object' || t === 'array' || t === 'function') {
+            return v.toString();
+        } else {
+            return JSON.stringify(v);
+        }
     }
 
     var AssertionError = Error;
@@ -159,7 +164,7 @@
                 if (e instanceof exception) {
                     return e;
                 }
-                fail(new AssertionError('expected to throw: ' + repr(exception) + ', actually threw: ' + repr(e)),
+                fail(new AssertionError('expected to throw: "' + repr(exception) + '", actually threw: "' + repr(e) + '"'),
                      {Expected: exception, Actual: e});
             }
             throw new AssertionError('did not throw');
