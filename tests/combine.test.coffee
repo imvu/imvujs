@@ -69,21 +69,29 @@ fixture 'functional',
 
     'test combine produces error if any modules are missing': ->
         exc = assert.throws(combine.ScriptError, -> combine.combine 'combine/has-missing.js')
-        assert.equal("Module 'combine/missing.js' is missing, referred to by: combine/has-missing.js", exc.message)
+        assert.equal("Module '" + path.normalize('combine/missing.js') + "' is missing, referred to by: combine/has-missing.js", exc.message)
 
     'test readModules returns module dependencies': ->
-        [modules, missing] = combine.readModules 'combine/d.js'
+        [modules, missing] = combine.readModules path.normalize('combine/d.js')
         assert.deepEqual {}, missing
-        assert.deepEqual ["combine/a.js","combine/c.js","combine/d.js","combine/e.js","combine/subdir/b.js"], sorted Object.keys(modules)
+        assert.deepEqual ["combine/a.js","combine/c.js","combine/d.js","combine/e.js","combine/subdir/b.js"].map(path.normalize), sorted Object.keys(modules)
 
     'test readModules: root can be missing': ->
         [modules, missing] = combine.readModules 'combine/missing.js'
         assert.deepEqual {'combine/missing.js': {'<root>': true}}, missing
 
     'test readModules: can refer to missing modules': ->
-        [modules, missing] = combine.readModules 'combine/has-missing.js'
-        assert.deepEqual {'combine/missing.js': {'combine/has-missing.js': true}}, missing        
-        assert.deepEqual ['combine/has-missing.js', 'combine/missing.js'], sorted Object.keys(modules)
+        missing_js = path.normalize('combine/missing.js')
+        has_missing_js = path.normalize('combine/has-missing.js')
+
+        [modules, missing] = combine.readModules has_missing_js
+
+        expected = {}
+        expected[missing_js] = {}
+        expected[missing_js][has_missing_js] = true
+
+        assert.deepEqual expected, missing
+        assert.deepEqual [has_missing_js, missing_js], sorted Object.keys(modules)
 
 test 'invalid source produces an error message', ->
     ast = uglify.parser.parse(
