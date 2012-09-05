@@ -5,6 +5,9 @@
 var path = require('path');
 
 var impls = {}; // path : body
+if (typeof global.implsPending == "undefined") {
+    global.implsPending = {};
+}
 var currentFilePath = null;
 
 function includeModule(modulePath) {
@@ -27,10 +30,22 @@ function module(dependencies, body) {
     for (var k in dependencies) {
         var v = path.join(path.dirname(cfp), dependencies[k]);
 
-        if (!(v in impls)) {
-            includeModule(v);
+        for (var vPending in global.implsPending) {
+            if (vPending == v) {
+                syncWrite("Error: circular module dependency detected:\n");
+                syncWrite("  " + dependencies[k] + " is required in\n");
+                syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
+                process.exit(1);
+            }
         }
 
+        if (!(v in impls)) {
+            global.implsPending[v] = cfp;
+            includeModule(v);
+        } else {
+        }
+
+        delete global.implsPending[v];
         importList[k] = impls[v];
     }
 
