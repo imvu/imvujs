@@ -1,6 +1,6 @@
 module({include: 'includes/include.js'}, function(imports) {
     test("calling imported code", function() {
-        assert.equal(10, ReturnsTen());
+        assert.equal(10, imports.include.ReturnsTen());
     });
 
     test("explicit name", function() {

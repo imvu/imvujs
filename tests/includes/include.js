@@ -1,4 +1,5 @@
-module({
-    includeCoffee: 'include.coffee'
-}, function(imports) {
+module({}, function(imports) {
+    return {
+        ReturnsTen: function() { return 10; }
+    }
 });
