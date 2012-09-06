@@ -23,7 +23,7 @@ NODE_SOURCES = BASE_SOURCES + [
 env = Environment(
     ENV=os.environ,
     toolpath=['tools'],
-    tools=['closure'])
+    tools=['closure', 'gzip'])
 
 targets = []
 
@@ -42,6 +42,8 @@ targets += env.ClosureCompiler(
 targets += env.ClosureCompiler(
     'out/imvu.node.min.js',
     NODE_SOURCES)
+
+env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 
 if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)
