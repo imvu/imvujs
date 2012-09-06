@@ -10,7 +10,7 @@ HERE=`dirname "$0"`
 if [ "$@" ]; then
     TESTS="$@"
 else
-    TESTS=`find $HERE/.. -iname '*.test.js' -o -iname '*.test.coffee'`
+    TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
 
 "$HERE"/../bin/test $TESTS || fail
@@ -18,7 +18,7 @@ fi
 echo "Now testing failures..."
 # Now test failures!
 
-EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js' -o -iname '*.fail.coffee'`
+EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js'`
 for expected in $EXPECTED_FAILS; do
     echo $expected ...
     "$HERE"/../bin/test $expected > /dev/null

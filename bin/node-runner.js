@@ -5,7 +5,6 @@ var vm = require('vm');
 var path = require('path');
 var _ = require('../ext/underscore-1.3.3.js');
 var util = require('util');
-var coffeescript = require('../third-party/coffeescript-1.3.3/lib/coffee-script/coffee-script.js');
 
 var fix_output = require('../src/fix_output.js');
 fix_output.fixConsole(console);
@@ -17,13 +16,8 @@ function endsWith(str, suffix) {
 
 function loadScript(path, settings) {
     var testContents = fs.readFileSync(path, 'utf-8');
-
-    if (endsWith(path, '.coffee')) {
-        testContents = coffeescript.compile(testContents);
-    } else {
-        if (settings !== undefined && settings.strictMode) {
-            testContents = '"use strict";' + testContents;
-        }
+    if (settings !== undefined && settings.strictMode) {
+        testContents = '"use strict";' + testContents;
     }
     return testContents;
 }
