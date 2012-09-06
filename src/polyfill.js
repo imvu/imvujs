@@ -12,7 +12,7 @@
 
     // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys
     var ObjectKeys = (function () {
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
+        var hasOwnProperty2 = Object.prototype.hasOwnProperty;
         var hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString');
         var dontEnums = [
             'toString',
@@ -33,14 +33,14 @@
             var result = [];
 
             for (var prop in obj) {
-                if (hasOwnProperty.call(obj, prop)) {
+                if (hasOwnProperty2.call(obj, prop)) {
                     result.push(prop);
                 }
             }
 
             if (hasDontEnumBug) {
                 for (var i=0; i < dontEnumsLength; i++) {
-                    if (hasOwnProperty.call(obj, dontEnums[i])) {
+                    if (hasOwnProperty2.call(obj, dontEnums[i])) {
                         result.push(dontEnums[i]);
                     }
                 }
@@ -51,7 +51,7 @@
 
     if (!Object.keys) {
         Object.keys = ObjectKeys;
-    };
+    }
 
     // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/bind
     function FunctionBind(oThis) {
@@ -64,8 +64,8 @@
             fToBind = this,
             fNOP = function () {},
             fBound = function () {
-                return fToBind.apply(this instanceof fNOP
-                                     ? this
+                return fToBind.apply(this instanceof fNOP ? 
+                                     this
                                      : oThis,
                                      aArgs.concat(Array.prototype.slice.call(arguments)));
             };
@@ -74,7 +74,7 @@
         fBound.prototype = new fNOP();
 
         return fBound;
-    };
+    }
 
     if (!Function.prototype.bind) {
         Function.prototype.bind = FunctionBind;
@@ -98,7 +98,6 @@
         markTimeline:   noop,
         profile:        noop,
         profileEnd:     noop,
-        markTimeline:   noop,
         table:          noop,
         time:           noop,
         timeEnd:        noop,

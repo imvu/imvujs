@@ -1,26 +1,25 @@
-"use strict";
-
 (function() {
+"use strict";
 
     // TODO: move to a reporter object
     function writeRaw(data) {
-        syncWrite(data);
+        g.syncWrite(data);
     }
 
     function test() {
-        if (arguments.length == 1) {
+        if (arguments.length === 1) {
             var fn = arguments[0];
-            all_tests.push([fn.name, fn]);
-        } else if (arguments.length == 2) {
-            all_tests.push([arguments[0], arguments[1]]);
+            g.all_tests.push([fn.name, fn]);
+        } else if (arguments.length === 2) {
+            g.all_tests.push([arguments[0], arguments[1]]);
         } else {
             throw new TypeError("test requires 1 or 2 arguments");
         }
     }
 
     function run_all() {
-        for (var i = 0; i < all_tests.length; ++i) {
-            var test = all_tests[i];
+        for (var i = 0; i < g.all_tests.length; ++i) {
+            var test = g.all_tests[i];
             var name = test[0];
             var body = test[1];
             writeRaw('* ' + name + '... ');
@@ -41,7 +40,7 @@
                 writeRaw('PASS\n');
             }
         }
-        all_tests = [];
+        g.all_tests = [];
     }
 
     function fixture(fixtureName, obj) {
@@ -174,10 +173,10 @@
         },
         
         isInstance: function(type, actual) {
-        	if(!(actual instanceof type)) {
-        		fail(new AssertionError(repr(actual) + 'not instance of' + repr(type)),
-        			{Type: type, Actual: actual});
-        	}
+            if(!(actual instanceof type)) {
+                fail(new AssertionError(repr(actual) + 'not instance of' + repr(type)),
+                    {Type: type, Actual: actual});
+            }
         },
     };
 

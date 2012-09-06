@@ -3,7 +3,7 @@
  */
 
 var impls = {}; // path : body
-if (typeof global.implsPending == "undefined") {
+if (typeof global.implsPending === "undefined") {
     global.implsPending = {};
 }
 var currentFilePath = null;
@@ -26,9 +26,9 @@ function module(dependencies, body, settings) {
     var path = settings.path || require('path');
     var sysinclude = settings.sysinclude || global.sysinclude;
     var criticalErrorHandler = settings.criticalErrorHandler || function() { 
-        syncWrite("Error: circular module dependency detected:\n");
-        syncWrite("  " + dependencies[k] + " is required in\n");
-        syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
+        global.syncWrite("Error: circular module dependency detected:\n");
+        global.syncWrite("  " + dependencies[k] + " is required in\n");
+        global.syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
         process.exit(1); 
     };
     var cfp = currentFilePath;
@@ -38,7 +38,7 @@ function module(dependencies, body, settings) {
         var v = path.join(path.dirname(cfp), dependencies[k]);
 
         for (var vPending in global.implsPending) {
-            if (vPending == v) {
+            if (vPending === v) {
                 criticalErrorHandler();
                 return;
             }

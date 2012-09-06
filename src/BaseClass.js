@@ -12,7 +12,7 @@
             }
         }
         return obj;
-    };
+    }
 
     var BaseClass = function () {};
 

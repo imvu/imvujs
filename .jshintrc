@@ -1,0 +1,41 @@
+// for options, consult http://www.jshint.com/options/
+{
+    "predef" : [
+        // browser environment
+        "console",
+        "global",
+        "alert",
+
+        // not a global, a common idiom for throwing an exception when missing a keyword argument
+        "imvuMustBeDefined",
+
+        // imvu.js libraries
+        "$",
+        "Backbone",
+        "_",
+        "BaseClass",
+        "module",
+
+        // test framework
+        "assert",
+        "include",
+        "fixture",
+        "require",  // for node.js imvujstest
+        "exports",  // for node.js imvujstest
+        "process", // for node.js imvujstest
+        "test"
+    ],
+    "eqeqeq":true, // require strict equal === and !===
+    "es5": true,
+    "browser": true,
+    "shadow": true, // we like to write: for (var i = 0; i < foo.length; ++i)
+    "multistr": true, // disable when we move HTML out of JavaScript
+    "loopfunc": true, // we get this right with .bind
+    "undef": true,
+    "nonstandard": true,
+    
+    
+    // probably we need to fix this
+    "proto": true,   // "__proto__" is used in imvujstest.js
+    "evil": true    // "evel" is used in kraken.js
+}

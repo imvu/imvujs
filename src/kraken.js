@@ -18,7 +18,7 @@
         fBound.prototype = new fNOP();
  
         return fBound;
-    };
+    }
 
     var C = {
         log: function(){ },
@@ -58,7 +58,7 @@
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
-        if (!kraken.caching) {
+        if (!window.kraken.caching) {
             xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
         }
         xhr.onreadystatechange = function () {
@@ -104,7 +104,7 @@
         fetch(url, onFetched);
 
         function onFetched(xhr) {
-            if (xhr.status != 200) {
+            if (xhr.status !== 200) {
                 console.error("Failed to fetch " + url);
                 throw new Error("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
@@ -173,13 +173,13 @@
         var i = 0;
         while (i < segments.length) {
             var s = segments[i];
-            if (s == '.') {
+            if (s === '.') {
                 segments.splice(i, 1);
                 continue;
-            } else if (s == '..' && i == 0 && segments.length > 2) {
+            } else if (s === '..' && i === 0 && segments.length > 2) {
                 segments.splice(i, 2);
                 continue;
-            } else if (s == '..' && i > 0) {
+            } else if (s === '..' && i > 0) {
                 segments.splice(i - 1, 2);
                 continue;
             } else {
@@ -191,7 +191,7 @@
     }
 
     function toAbsoluteUrl(url, relativeTo) {
-        if (url[0] == '/' || typeof relativeTo !== 'string') {
+        if (url[0] === '/' || typeof relativeTo !== 'string') {
             return url;
         }
 
@@ -206,10 +206,6 @@
         }
 
         return normalizePath(url);
-
-        // Prune /../s from the path
-        return url.replace(/\/\.\.\/[a-zA-Z0-9_\-\.]+\//g, '/')
-                  .replace(/\/[a-zA-Z0-9_\-\.]+\/\.\.\//g, '/');
     }
 
     /*
@@ -218,7 +214,7 @@
      * define(optional moduleName, optional dependencies, callback)
      */
     function define(callback) {
-        if (Object.prototype.toString.call(callback) == '[object Array]') {
+        if (Object.prototype.toString.call(callback) === '[object Array]') {
             callback = arguments[1];
         }
         module({}, callback);
@@ -251,7 +247,7 @@
         }
 
         var remainingDependencies = getObjectKeys(dependencies).length;
-        if (remainingDependencies == 0) {
+        if (remainingDependencies === 0) {
             complete();
             return;
         }
@@ -277,7 +273,7 @@
             result[name] = value;
 
             --remainingDependencies;
-            if (0 == remainingDependencies) {
+            if (0 === remainingDependencies) {
                 complete();
             }
         }

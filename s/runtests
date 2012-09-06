@@ -7,9 +7,21 @@ function fail() {
 
 HERE=`dirname "$0"`
 
+# Run JSHint against any .js file staged in git
+NODEJS="$HERE/node"
+JSHINT="$HERE/../third-party/node-jshint/bin/hint"
+
 if [ "$@" ]; then
     TESTS="$@"
+    echo "Running jshint..."
+    $NODEJS $JSHINT $TESTS || exit 1
 else
+    echo "Running jshint..."
+    if [ .$MSYSTEM = .MINGW32 ]; then
+        find src -iname '*.js' -exec $NODEJS $JSHINT {} \;  || fail
+    else
+        find src -iname '*.js' -exec $NODEJS $JSHINT {} + || fail
+    fi
     TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
 
