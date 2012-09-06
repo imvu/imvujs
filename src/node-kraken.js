@@ -2,15 +2,13 @@
  * Node.js implementation of the kraken interface.
  */
 
-var path = require('path');
-
 var impls = {}; // path : body
 if (typeof global.implsPending == "undefined") {
     global.implsPending = {};
 }
 var currentFilePath = null;
 
-function includeModule(modulePath) {
+function includeModule(modulePath, sysinclude) {
     var cfp = currentFilePath;
 
     try {
@@ -23,7 +21,16 @@ function includeModule(modulePath) {
     }
 }
 
-function module(dependencies, body) {
+function module(dependencies, body, settings) {
+    settings = settings || {};
+    var path = settings.path || require('path');
+    var sysinclude = settings.sysinclude || global.sysinclude;
+    var criticalErrorHandler = settings.criticalErrorHandler || function() { 
+        syncWrite("Error: circular module dependency detected:\n");
+        syncWrite("  " + dependencies[k] + " is required in\n");
+        syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
+        process.exit(1); 
+    };
     var cfp = currentFilePath;
     var importList = {};
 
@@ -32,17 +39,14 @@ function module(dependencies, body) {
 
         for (var vPending in global.implsPending) {
             if (vPending == v) {
-                syncWrite("Error: circular module dependency detected:\n");
-                syncWrite("  " + dependencies[k] + " is required in\n");
-                syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
-                process.exit(1);
+                criticalErrorHandler();
+                return;
             }
         }
 
         if (!(v in impls)) {
             global.implsPending[v] = cfp;
-            includeModule(v);
-        } else {
+            includeModule(v, sysinclude);
         }
 
         delete global.implsPending[v];
