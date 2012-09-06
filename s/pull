@@ -1,9 +1,20 @@
 #!/bin/bash
 cd `dirname "$0"`/..
 
-set -ex
+set -e
 
+function error_exit() {
+    set +x
+    echo "Error, aborting..."
+    exit 1
+}
+trap error_exit ERR
+
+set -x
 git pull -r
+
 git submodule sync
 git submodule update --init --recursive
 
+cp s/.githooks/* .git/hooks/
+chmod -R +x .git/hooks/

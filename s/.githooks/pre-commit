@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if
+    git diff --cached | egrep '^\+.*	'>/dev/null
+then
+    echo "Tabs found in your commit. Please use (four) spaces and re-commit."
+    exit 1
+fi
+
+s/build || exit 1
+s/runtests || exit 1
