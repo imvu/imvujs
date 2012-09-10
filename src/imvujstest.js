@@ -70,7 +70,7 @@
     function repr(v) {
         var t = typeof v;
         if (t === 'object' || t === 'array' || t === 'function') {
-            if (v.constructor === Object) {
+            if (v.constructor === Object || v.constructor === Array) {
                 return JSON.stringify(v);
             }
             return v.toString();
