@@ -203,4 +203,7 @@
     g.setInterval = function() {
         throw new AssertionError("Don't call setInterval in tests.  Use fakes.");
     };
+    process.nextTick = function() {
+        throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
+    };
 })();
