@@ -11,8 +11,9 @@ BASE_SOURCES = [
     'ext/backbone-0.9.2.js',
 ]
 
-WEB_SOURCES = BASE_SOURCES + [
-    'ext/jquery-1.7.2.js',
+WEB_SOURCES = [
+    'ext/jquery-1.7.2.js'
+] + BASE_SOURCES + [
     'src/kraken.js',
 ]
 
