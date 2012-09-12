@@ -57,11 +57,8 @@
 
                 test(fixtureName + '.' + testName, function(body) {
                     setUp.call(self);
-                    try {
-                        body.call(self);
-                    } finally {
-                        tearDown.call(self);
-                    }
+                    body.call(self);
+                    tearDown.call(self);
                 }.bind({}, obj[testName]));
             }
         }
