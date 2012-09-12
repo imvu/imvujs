@@ -1,4 +1,4 @@
 #!/bin/bash
 
 HERE=`dirname "$0"`
-python "$HERE/../third-party/scons.py" -C "$HERE/.." -Q $@
+python "$HERE/../third-party/scons.py" -C "$HERE/.." -Q --debug=explain $@
