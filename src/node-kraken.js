@@ -15,7 +15,7 @@ function includeModule(modulePath, sysinclude) {
         currentFilePath = modulePath;
         exports = void 0; // Prevents some modules from figuring out that we're really on NodeJS.
 
-        sysinclude(modulePath);
+        sysinclude(cfp, modulePath);
     } finally {
         currentFilePath = cfp;
     }

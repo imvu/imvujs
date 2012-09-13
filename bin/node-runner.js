@@ -30,8 +30,12 @@ function joinPath(a, b) {
     }
 }
 
-function sysinclude(includePath, settings) {
+function sysinclude(currentPath, includePath, settings) {
     var abspath = path.resolve(includePath);
+    if (!fs.existsSync(abspath)) {
+        console.log("File " + includePath + " included by " + currentPath + " does not exist");
+        process.exit(1);
+    }
     var script = loadScript(abspath, settings);
 
     vm.runInThisContext(script, includePath);
@@ -39,9 +43,9 @@ function sysinclude(includePath, settings) {
 
 global.require = require;
 global.sysinclude = sysinclude;
-sysinclude(__dirname + '/../src/imvujstest.js');
-sysinclude(__dirname + '/../out/imvu.node.js');
-sysinclude(__dirname + '/../src/node-kraken.js');
+sysinclude(__filename, __dirname + '/../src/imvujstest.js');
+sysinclude(__filename, __dirname + '/../out/imvu.node.js');
+sysinclude(__filename, __dirname + '/../src/node-kraken.js');
 
 function usage() {
     console.log("Please pass a test file");

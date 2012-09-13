@@ -17,7 +17,7 @@ module({
                 criticalErrorHandler: function() {
                     this.criticalErrorOccurred = true;
                 }.bind(this),
-                sysinclude: function(includePath, settings) {
+                sysinclude: function(currentPath, includePath, settings) {
                     this.sysincludeCalls.push(includePath);
                     if (this.sysincludeModuleDep) {
                         module({depB: "a.js"}, this.fakeModuleBody, this.settings);
