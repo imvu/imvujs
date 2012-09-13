@@ -24,12 +24,17 @@
     }
 
     function runTest(body) {
+        var objs = [];
         for (var i = 0; i < superFixtures.length; ++i) {
-            superFixtures[i].beforeTest();
+            var obj = {};
+            objs.push(obj);
+            superFixtures[i].beforeTest.call(obj);
         }
+
         body.call({});
+
         for (var i = superFixtures.length - 1; i >= 0; --i) {
-            superFixtures[i].afterTest();
+            superFixtures[i].afterTest.call(objs[i]);
         }
     }
 
