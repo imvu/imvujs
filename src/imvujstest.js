@@ -190,7 +190,7 @@
             throw new AssertionError('did not throw');
         },
         
-        isInstance: function(type, actual) {
+        instanceof: function(actual, type) {
             if(!(actual instanceof type)) {
                 fail(new AssertionError(repr(actual) + 'not instance of' + repr(type)),
                     {Type: type, Actual: actual});
