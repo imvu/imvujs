@@ -1,9 +1,15 @@
 (function() {
-"use strict";
+    "use strict";
+
+    var superFixtures = [];
 
     // TODO: move to a reporter object
     function writeRaw(data) {
         g.syncWrite(data);
+    }
+
+    function registerSuperFixture(superFixture) {
+        superFixtures.push(superFixture);
     }
 
     function test() {
@@ -17,6 +23,16 @@
         }
     }
 
+    function runTest(body) {
+        for (var i = 0; i < superFixtures.length; ++i) {
+            superFixtures[i].beforeTest();
+        }
+        body.call({});
+        for (var i = superFixtures.length - 1; i >= 0; --i) {
+            superFixtures[i].afterTest();
+        }
+    }
+
     function run_all() {
         for (var i = 0; i < g.all_tests.length; ++i) {
             var test = g.all_tests[i];
@@ -25,7 +41,7 @@
             writeRaw('* ' + name + '... ');
             var success = false;
             try {
-                body.call({});
+                runTest(body);
                 success = true;
             }
             catch (e) {
@@ -186,6 +202,7 @@
     assert.notNull = assert.notEqual.bind(null, null);
 
     g.all_tests = [];
+    g.registerSuperFixture = registerSuperFixture;
     g.test = test;
     g.run_all = run_all;
     g.fixture = fixture;

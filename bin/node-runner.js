@@ -12,7 +12,7 @@ global.syncWrite = fix_output.syncWriteStdout;
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
-};
+}
 
 function loadScript(path, settings) {
     var testContents = fs.readFileSync(path, 'utf-8');
@@ -48,6 +48,16 @@ function usage() {
     process.exit(1);
 }
 
+function loadSuperFixture(superfixture) {
+    var abspath = path.resolve(superfixture);
+    var testContents = loadScript(abspath);
+
+    global._ = _;
+    global.testPath = abspath;
+    currentFilePath = abspath;
+    vm.runInThisContext(testContents, abspath);
+}
+
 function runTest(testPath) {
     var abspath = path.resolve(testPath);
 
@@ -81,7 +91,24 @@ function main() {
         return usage();
     }
 
-    process.argv.slice(2).forEach(runTest);
+    var tests = [];
+    var superfixtures = [];
+
+    var argv = process.argv;
+    for (var i = 2; i < argv.length; ++i) {
+        if (argv[i] === '--superfixture' && (i + 1) < argv.length) {
+            superfixtures.push(argv[i + 1]);
+            ++i;
+        } else {
+            tests.push(argv[i]);
+        }
+    }
+
+    for (var i = 0; i < superfixtures.length; ++i) {
+        loadSuperFixture(superfixtures[i]);
+    }
+
+    tests.forEach(runTest);
 }
 
 main();

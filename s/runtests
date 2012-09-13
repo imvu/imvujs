@@ -25,7 +25,7 @@ else
     TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
 
-"$HERE"/../bin/test $TESTS || fail
+"$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $TESTS || fail
 
 echo "Now testing failures..."
 # Now test failures!
@@ -33,7 +33,7 @@ echo "Now testing failures..."
 EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js'`
 for expected in $EXPECTED_FAILS; do
     echo $expected ...
-    "$HERE"/../bin/test $expected > /dev/null
+    "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $expected > /dev/null
     if [ "$?" = 0 ]; then
         echo "$expected passed incorrectly"
         exit 1
