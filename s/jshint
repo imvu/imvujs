@@ -1,0 +1,8 @@
+#!/bin/bash
+
+HERE=`dirname "$0"`
+
+NODEJS="$HERE/node"
+JSHINT="$HERE/../third-party/node-jshint/bin/hint"
+
+"$NODEJS" "$JSHINT" "$@" || exit 1
