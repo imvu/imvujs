@@ -20,4 +20,19 @@ module({}, function() {
         e = assert.throws(TypeError, function() { f.foojin(); });
         assert.equal("Property 'foojin' of object #<foo> is not a function", e.message);
     });
+
+/*
+    test("BaseClasses can be named", function() {
+        var Foo = BaseClass.extend('Foo', {
+            method: function() {
+                return 10;
+            }
+        });
+        var i = new Foo();
+        assert.equal(10, i.method());
+
+        assert.equal('Name', Foo.name);
+        assert.equal(i.constructor, Foo);
+    });
+*/
 });

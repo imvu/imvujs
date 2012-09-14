@@ -3,8 +3,12 @@
 
     var BaseClass = function () {};
 
-    BaseClass.extend = function (def, classDef) {
-        var NewClass;
+    BaseClass.extend = function (name, def, classDef) {
+        if (typeof name !== 'string') {
+            classDef = def;
+            def = name;
+            name = '<BaseClass>';
+        }
 
         if (typeof def === 'undefined') {
             def = {};
@@ -13,9 +17,9 @@
             classDef = {};
         }
 
-        NewClass = function () {
+        function NewClass() {
             this.initialize.apply(this, arguments);
-        };
+        }
         _.extend(NewClass, this, classDef);
 
         NewClass.prototype = Object.create(this.prototype);
