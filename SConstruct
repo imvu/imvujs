@@ -5,9 +5,9 @@ SetOption('num_jobs', multiprocessing.cpu_count())
 print "running with -j", GetOption('num_jobs')
 
 BASE_SOURCES = [
+    'ext/underscore-1.3.3.js',
     'src/polyfill.js',
     'src/BaseClass.js',
-    'ext/underscore-1.3.3.js',
     'ext/backbone-0.9.2.js',
 ]
 
