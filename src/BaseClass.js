@@ -16,7 +16,6 @@
             "(function " + name + "() {\n" +
             "    this.initialize.apply(this, arguments);\n" +
             "});\n");
-
         _.extend(NewClass, this, classDef);
 
         NewClass.prototype = Object.create(this.prototype);

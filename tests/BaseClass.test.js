@@ -10,7 +10,7 @@ module({}, function() {
         assert.equal(f.constructor, foo);
     });
 
-    test("Exceptions thrown by calling methods on JS objects includes the class name", function() {
+    test("Exceptions thrown by calling methods on JS objects include the class name", function() {
         var f = new foo();
 
         var e = assert.throws(TypeError, function() { f.foojin(); });
@@ -73,5 +73,17 @@ module({}, function() {
 
         assert.equal('Foo', Foo.name);
         assert.equal(Foo, i.constructor);
+    });
+
+    test("Exceptions thrown by calling methods on BaseClass objects include the class name", function() {
+        var Foo = BaseClass.extend('Foo');
+        var f = new Foo();
+
+        var e = assert.throws(TypeError, function() { f.foojin(); });
+        assert.equal("Object #<Foo> has no method 'foojin'", e.message);
+
+        f.foojin = undefined;
+        e = assert.throws(TypeError, function() { f.foojin(); });
+        assert.equal("Property 'foojin' of object #<Foo> is not a function", e.message);
     });
 });
