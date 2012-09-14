@@ -21,7 +21,47 @@ module({}, function() {
         assert.equal("Property 'foojin' of object #<foo> is not a function", e.message);
     });
 
-/*
+    test("Can create a BaseClass without a def", function() {
+        var calls = [];
+        var Foo = BaseClass.extend();
+        var Bar = Foo.extend({
+            method: function() {
+                calls.push('Bar.method');
+            }
+        });
+        (new Bar).method();
+        assert.equal(['Bar.method'], calls);
+    });
+
+    test("base class methods are accessible from derived classes", function() {
+        var calls = [];
+        var Foo = BaseClass.extend({
+            method: function() {
+                calls.push('Foo.method');
+            }
+        });
+        var Bar = Foo.extend();
+        (new Bar).method();
+        assert.equal(['Foo.method'], calls);
+    });
+
+    test("Can make classes with BaseClass.extend", function() {
+        var calls = [];
+        var Foo = BaseClass.extend({
+            method: function() {
+                calls.push('Foo.method');
+            }
+        });
+        Foo.staticmethod = function() {
+            calls.push('Foo.staticmethod');
+        };
+
+        (new Foo).method();
+        Foo.staticmethod();
+        
+        assert.equal(['Foo.method', 'Foo.staticmethod'], calls);
+    });
+
     test("BaseClasses can be named", function() {
         var Foo = BaseClass.extend('Foo', {
             method: function() {
@@ -31,8 +71,7 @@ module({}, function() {
         var i = new Foo();
         assert.equal(10, i.method());
 
-        assert.equal('Name', Foo.name);
-        assert.equal(i.constructor, Foo);
+        assert.equal('Foo', Foo.name);
+        assert.equal(Foo, i.constructor);
     });
-*/
 });

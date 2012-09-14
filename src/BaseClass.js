@@ -7,22 +7,20 @@
         if (typeof name !== 'string') {
             classDef = def;
             def = name;
-            name = '<BaseClass>';
+            name = 'NewClass';
         }
 
-        if (typeof def === 'undefined') {
-            def = {};
-        }
-        if (typeof classDef === 'undefined') {
-            classDef = {};
-        }
+        // TODO: assert that name matches the rules for identifiers in JS
 
-        function NewClass() {
-            this.initialize.apply(this, arguments);
-        }
+        var NewClass = eval(
+            "(function " + name + "() {\n" +
+            "    this.initialize.apply(this, arguments);\n" +
+            "});\n");
+
         _.extend(NewClass, this, classDef);
 
         NewClass.prototype = Object.create(this.prototype);
+        NewClass.prototype.constructor = NewClass;
         _.extend(NewClass.prototype, def);
 
         return NewClass;
