@@ -15,6 +15,10 @@ var IMVU = IMVU || {};
             return v.toString();
         }
 
+        if (v instanceof Array) {
+            return "[" + v.map(IMVU.repr).join(", ") + "]";
+        }
+
         return JSON.stringify(v);
     };
 })();

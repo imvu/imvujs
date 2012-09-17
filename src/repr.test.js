@@ -24,4 +24,10 @@ module({}, function() {
         assert.equal("function (){}", IMVU.repr(function(){}));
         assert.equal("function (x){return x;}", IMVU.repr(function(x){return x;}));
     });
+
+    test("arrays", function() {
+        assert.equal("[]", IMVU.repr([]));
+        assert.equal("[[]]", IMVU.repr([[]]));
+        assert.equal("[true, false, undefined]", IMVU.repr([true, false, undefined]));
+    });
 });
