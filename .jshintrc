@@ -10,6 +10,7 @@
         "imvuMustBeDefined",
 
         // imvu.js libraries
+        "IMVU",
         "$",
         "Backbone",
         "_",
@@ -33,9 +34,9 @@
     "loopfunc": true, // we get this right with .bind
     "undef": true,
     "nonstandard": true,
-    
+    "supernew": true,
     
     // probably we need to fix this
     "proto": true,   // "__proto__" is used in imvujstest.js
-    "evil": true    // "evel" is used in kraken.js
+    "evil": true    // "eval" is used in kraken.js
 }

@@ -1,10 +1,16 @@
 var IMVU = IMVU || {};
 (function() {
     IMVU.repr = function(v) {
+        var t = typeof v;
+
         if (v === undefined) {
             return 'undefined';
         } else if (v === null) {
             return 'null';
+        } else if (v === Infinity) {
+            return '+Infinity';
+        } else if (v === -Infinity) {
+            return '-Infinity';
         }
 
         var t = typeof v;

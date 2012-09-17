@@ -1,5 +1,5 @@
 module({}, function() {
-    function foo() { };
+    function foo() { }
 
     test("Functions have names", function() {
         assert.equal('foo', foo.name);
