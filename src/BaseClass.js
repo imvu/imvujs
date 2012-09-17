@@ -1,6 +1,6 @@
+/*global IMVU*/
 
 (function() {
-
     var BaseClass = function () {};
 
     BaseClass.extend = function (name, def, classDef) {
@@ -12,10 +12,9 @@
 
         // TODO: assert that name matches the rules for identifiers in JS
 
-        var NewClass = eval(
-            "(function " + name + "() {\n" +
-            "    this.initialize.apply(this, arguments);\n" +
-            "});\n");
+        var NewClass = IMVU.createNamedFunction(name, function() {
+            this.initialize.apply(this, arguments);
+        });
         _.extend(NewClass, this, classDef);
 
         NewClass.prototype = Object.create(this.prototype);
