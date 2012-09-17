@@ -6,6 +6,7 @@ var path = require('path');
 var _ = require('../ext/underscore-1.3.3.js');
 var util = require('util');
 
+
 var fix_output = require('../src/fix_output.js');
 fix_output.fixConsole(console);
 global.syncWrite = fix_output.syncWriteStdout;
@@ -43,6 +44,7 @@ function sysinclude(currentPath, includePath, settings) {
 
 global.require = require;
 global.sysinclude = sysinclude;
+sysinclude(__filename, __dirname + '/../src/repr.js');
 sysinclude(__filename, __dirname + '/../src/imvujstest.js');
 sysinclude(__filename, __dirname + '/../out/imvu.node.js');
 sysinclude(__filename, __dirname + '/../src/node-kraken.js');

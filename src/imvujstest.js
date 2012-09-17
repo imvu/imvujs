@@ -85,18 +85,6 @@
         }
     }
 
-    function repr(v) {
-        var t = typeof v;
-        if (t === 'object' || t === 'array' || t === 'function') {
-            if (v.constructor === Object || v.constructor === Array) {
-                return JSON.stringify(v);
-            }
-            return v.toString();
-        } else {
-            return JSON.stringify(v);
-        }
-    }
-
     var AssertionError = Error;
 
     function fail(exception, info) {
@@ -112,14 +100,14 @@
 
         'true': function(value) {
             if (!value) {
-                fail(new AssertionError("expected truthy, actual " + repr(value)),
+                fail(new AssertionError("expected truthy, actual " + IMVU.repr(value)),
                      {Value: value});
             }
         },
 
         'false': function(value) {
             if (value) {
-                fail(new AssertionError("expected falsy, actual " + repr(value)),
+                fail(new AssertionError("expected falsy, actual " + IMVU.repr(value)),
                      {Value: value});
             }
         },
@@ -133,14 +121,14 @@
                 return;
             }
             if (expected !== actual) {
-                fail(new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
                      {Expected: expected, Actual: actual});
             }
         },
 
         deepEqual: function(expected, actual) {
             if (!_.isEqual(expected, actual)) {
-                fail(new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
                      {Expected: expected, Actual: actual});
             }
         },
@@ -157,8 +145,8 @@
                 return;
             }
             if( Math.abs(expected - actual) > tolerance ) {
-                fail( new AssertionError('expected: ' + repr(expected) + ', actual: ' + repr(actual) +
-                                         ', tolerance: ' + repr(tolerance) + ', diff: ' + repr(actual-expected) ),
+                fail( new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual) +
+                                         ', tolerance: ' + IMVU.repr(tolerance) + ', diff: ' + IMVU.repr(actual-expected) ),
                       { Expected:expected, Actual:actual, Tolerance:tolerance } );
             }
         },
@@ -172,7 +160,7 @@
                 return;
             }
             if (expected === actual) {
-                fail(new AssertionError('not expected: ' + repr(expected) + ', actual: ' + repr(actual)),
+                fail(new AssertionError('not expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
                      {Expected: expected, Actual: actual});
             }
         },
@@ -184,7 +172,7 @@
                 if (e instanceof exception) {
                     return e;
                 }
-                fail(new AssertionError('expected to throw: "' + repr(exception) + '", actually threw: "' + repr(e) + '"'),
+                fail(new AssertionError('expected to throw: "' + IMVU.repr(exception) + '", actually threw: "' + IMVU.repr(e) + '"'),
                      {Expected: exception, Actual: e});
             }
             throw new AssertionError('did not throw');
@@ -192,7 +180,7 @@
         
         instanceof: function(actual, type) {
             if(!(actual instanceof type)) {
-                fail(new AssertionError(repr(actual) + 'not instance of' + repr(type)),
+                fail(new AssertionError(IMVU.repr(actual) + 'not instance of' + IMVU.repr(type)),
                     {Type: type, Actual: actual});
             }
         },
@@ -211,7 +199,7 @@
     g.test = test;
     g.run_all = run_all;
     g.fixture = fixture;
-    g.repr = repr;
+    g.repr = IMVU.repr;
     g.AssertionError = AssertionError;
     g.assert = assert;
     g.test = test;
