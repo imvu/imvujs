@@ -7,6 +7,7 @@ print "running with -j", GetOption('num_jobs')
 BASE_SOURCES = [
     'ext/underscore-1.3.3.js',
     'src/polyfill.js',
+    'src/es6-collections.js',
     'src/repr.js',
     'src/function.js',
     'src/BaseClass.js',

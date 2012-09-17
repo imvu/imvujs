@@ -24,7 +24,11 @@
         "require",  // for node.js imvujstest
         "exports",  // for node.js imvujstest
         "process", // for node.js imvujstest
-        "test"
+        "test",
+
+        // ES6
+        "Set",
+        "Map"
     ],
     "eqeqeq":true, // require strict equal === and !===
     "es5": true,

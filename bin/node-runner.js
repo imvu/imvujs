@@ -44,10 +44,14 @@ function sysinclude(currentPath, includePath, settings) {
 
 global.require = require;
 global.sysinclude = sysinclude;
-sysinclude(__filename, __dirname + '/../src/repr.js');
-sysinclude(__filename, __dirname + '/../src/imvujstest.js');
-sysinclude(__filename, __dirname + '/../out/imvu.node.js');
-sysinclude(__filename, __dirname + '/../src/node-kraken.js');
+
+[
+  'out/imvu.node.js',
+  'src/node-kraken.js',
+  'src/imvujstest.js',
+].forEach(function(v) {
+  sysinclude(__filename, __dirname + '/../' + v);
+});
 
 function usage() {
     console.log("Please pass a test file");
