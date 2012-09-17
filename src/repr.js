@@ -7,10 +7,10 @@ var IMVU = IMVU || {};
             return 'undefined';
         } else if (v === null) {
             return 'null';
-        } else if (v === Infinity) {
-            return '+Infinity';
-        } else if (v === -Infinity) {
-            return '-Infinity';
+        } else if (t === 'number') {
+            return v.toString();
+        } else if (t === 'string') {
+            return "'" + v.toString() + "'";
         }
 
         var t = typeof v;
