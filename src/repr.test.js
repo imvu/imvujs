@@ -19,4 +19,9 @@ module({}, function() {
         assert.equal("''", IMVU.repr(''));
         assert.equal("'\''", IMVU.repr("'"));
     });
+
+    test("functions", function() {
+        assert.equal("function (){}", IMVU.repr(function(){}));
+        assert.equal("function (x){return x;}", IMVU.repr(function(x){return x;}));
+    });
 });
