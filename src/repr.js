@@ -16,5 +16,5 @@ var IMVU = IMVU || {};
         } else {
             return JSON.stringify(v);
         }
-    }
+    };
 })();

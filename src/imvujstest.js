@@ -1,3 +1,5 @@
+/*global IMVU*/
+
 (function() {
     "use strict";
 
