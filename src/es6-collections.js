@@ -1,5 +1,7 @@
 /*jshint eqeqeq:false*/
 
+// WARNING: This Set() polyfill is O(N)
+
 (function(module) {
   "use strict";
   //!(C) WebReflection - Mit Style License
