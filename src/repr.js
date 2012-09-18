@@ -13,19 +13,31 @@ var IMVU = IMVU || {};
             return "'" + v.toString() + "'";
         } else if (t === 'function') {
             return v.toString();
-        } else if (v instanceof Array) {
-            if (_seen === undefined) {
-                _seen = new Set();
-            }
-            if (_seen.has(v)) {
-                return "<Cycle>";
-            }
-            _seen.add(v);
-            var rv = "[" + v.map(function(v) { return IMVU.repr(v, _seen); }).join(", ") + "]";
-            _seen.delete(v);
-            return rv;
         }
 
-        return JSON.stringify(v);
+        if (_seen === undefined) {
+            _seen = new Set();
+        }
+        if (_seen.has(v)) {
+            return "<Cycle>";
+        }
+
+        _seen.add(v);
+        try {
+            if (v instanceof Array) {
+                return "[" + v.map(function(v) { return IMVU.repr(v, _seen); }).join(", ") + "]";
+            } else {
+                var rv = "{";
+                var first = true;
+                for (var k in v) {
+                    var e = v[k];
+                    rv += (first ? "" : ", ") + k + ": " + IMVU.repr(e, _seen);
+                }
+                return rv += "}";
+            }
+        }
+        finally {
+            _seen.delete(v);
+        }
     };
 })();

@@ -36,4 +36,15 @@ module({}, function() {
         a.push(a);
         assert.equal("[<Cycle>]", IMVU.repr(a));
     });
+
+    test("nested structures", function() {
+        var b = {};
+        assert.equal("[{}, {}]", IMVU.repr([b, b]));
+    });
+
+    test("recursive objects", function() {
+        var a = {x:[]};
+        a.x.push(a);
+        assert.equal("{x: [<Cycle>]}", IMVU.repr(a));
+    });
 });
