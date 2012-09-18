@@ -52,6 +52,7 @@ module({}, function() {
         function Foo() {
             this.field = 10;
         }
+        Foo.prototype.bar = "bar";
         var i = new Foo();
         assert.equal("<#Foo {field: 10}>", IMVU.repr(i));
     });

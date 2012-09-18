@@ -35,9 +35,14 @@ var IMVU = IMVU || {};
                 }
                 rv += "{";
                 var first = true;
-                for (var k in v) {
+                var keys = Object.keys(v);
+                //keys.sort();
+                var keysLength = keys.length;
+                for (var i = 0; i < keysLength; ++i) {
+                    var k = keys[i];
                     var e = v[k];
                     rv += (first ? "" : ", ") + k + ": " + IMVU.repr(e, _seen);
+                    //first = true;
                 }
                 rv += "}";
                 if (Object !== c) {
