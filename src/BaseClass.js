@@ -4,13 +4,9 @@
     var BaseClass = function () {};
 
     BaseClass.extend = function (name, def, classDef) {
-        if (typeof name !== 'string') {
-            classDef = def;
-            def = name;
-            name = 'NewClass';
+        if (typeof name !== "string" || null === name.match(/[a-z_][0-9a-z_]*/i)) {
+            throw new TypeError("First argument to BaseClass.extend must be the class name.  Actual: " + IMVU.repr(name));
         }
-
-        // TODO: assert that name matches the rules for identifiers in JS
 
         var NewClass = IMVU.createNamedFunction(name, function() {
             this.initialize.apply(this, arguments);
