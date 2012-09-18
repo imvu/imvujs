@@ -29,23 +29,27 @@ env = Environment(
     toolpath=['tools'],
     tools=['closure', 'gzip'])
 
+BASE_CLOSURE_FLAGS = ['--language_in', 'ECMASCRIPT5']
+
 targets = []
 
 targets += env.ClosureCompiler(
     'out/imvu.js',
     WEB_SOURCES,
-    CLOSURE_FLAGS=['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
 targets += env.ClosureCompiler(
     'out/imvu.min.js',
-    WEB_SOURCES)
+    WEB_SOURCES,
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS)
 
 targets += env.ClosureCompiler(
     'out/imvu.node.js',
     NODE_SOURCES,
-    CLOSURE_FLAGS=['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
 targets += env.ClosureCompiler(
     'out/imvu.node.min.js',
-    NODE_SOURCES)
+    NODE_SOURCES,
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS)
 
 env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 

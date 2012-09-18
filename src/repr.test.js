@@ -30,4 +30,10 @@ module({}, function() {
         assert.equal("[[]]", IMVU.repr([[]]));
         assert.equal("[true, false, undefined]", IMVU.repr([true, false, undefined]));
     });
+
+    test("recursive arrays", function() {
+        var a = [];
+        a.push(a);
+        assert.equal("[<Cycle>]", IMVU.repr(a));
+    });
 });

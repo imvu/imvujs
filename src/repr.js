@@ -1,6 +1,6 @@
 var IMVU = IMVU || {};
 (function() {
-    IMVU.repr = function(v) {
+    IMVU.repr = function(v, _seen) {
         var t = typeof v;
 
         if (v === undefined) {
@@ -13,10 +13,17 @@ var IMVU = IMVU || {};
             return "'" + v.toString() + "'";
         } else if (t === 'function') {
             return v.toString();
-        }
-
-        if (v instanceof Array) {
-            return "[" + v.map(IMVU.repr).join(", ") + "]";
+        } else if (v instanceof Array) {
+            if (_seen === undefined) {
+                _seen = new Set();
+            }
+            if (_seen.has(v)) {
+                return "<Cycle>";
+            }
+            _seen.add(v);
+            var rv = "[" + v.map(function(v) { return IMVU.repr(v, _seen); }).join(", ") + "]";
+            _seen.delete(v);
+            return rv;
         }
 
         return JSON.stringify(v);
