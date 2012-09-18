@@ -21,6 +21,9 @@
             constructor: { value: NewClass } });
         _.extend(NewClass.prototype, def);
 
+        Object.freeze(NewClass);
+        //Object.freeze(NewClass.prototype);
+
         return NewClass;
     };
 

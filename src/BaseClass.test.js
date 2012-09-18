@@ -1,11 +1,11 @@
 module({}, function() {
     function foo() { }
 
-    test("Functions have names", function() {
+    test("functions have names", function() {
         assert.equal('foo', foo.name);
     });
 
-    test("Instances can get their class names", function() {
+    test("instances can get their class names", function() {
         var f = new foo();
         assert.equal(f.constructor, foo);
     });
@@ -33,6 +33,14 @@ module({}, function() {
         assert.equal(['Bar.method'], calls);
     });
 
+    test("BaseClass classes cannot be monkeypatched", function() {
+        var Foo = BaseClass.extend();
+        Foo.not = 10;
+        assert.equal(undefined, Foo.not);
+        //Foo.prototype.not = 10;
+        //assert.equal(undefined, Foo.prototype.not);
+    });
+
     test("base class methods are accessible from derived classes", function() {
         var calls = [];
         var Foo = BaseClass.extend({
@@ -51,10 +59,11 @@ module({}, function() {
             method: function() {
                 calls.push('Foo.method');
             }
+        }, {
+            staticmethod: function() {
+                calls.push('Foo.staticmethod');
+            }
         });
-        Foo.staticmethod = function() {
-            calls.push('Foo.staticmethod');
-        };
 
         (new Foo).method();
         Foo.staticmethod();
