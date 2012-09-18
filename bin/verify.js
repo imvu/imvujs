@@ -82,7 +82,7 @@ function check(ast) {
             if (v[0] == 'name') {
                 var name = v[1];
                 if (!scope.has(name)) {
-                    errors.push(node);
+                    errors.push(["Assignment to globals is forbidden", node]);
                 }
             }
 
@@ -115,12 +115,15 @@ function main(argv) {
         if (errors.length) {
             console.error("Errors in", fileName);
             errors.forEach(function (e) {
-                //console.log("DOOP", e);
-                if (e[3][0] == 'function') {
+                var message = e[0];
+                var node = e[1];
+                console.error("\t", message);
+
+                if (node[3][0] == 'function') {
                     // special case
-                    console.error(":\t", combine.gen_code(e[2]), " = function(...) {...}");
+                    console.error(":\t", combine.gen_code(node[2]), " = function(...) {...}");
                 } else {
-                    console.error(":\t", combine.gen_code(e));
+                    console.error(":\t", combine.gen_code(node));
                 }
             });
         }
