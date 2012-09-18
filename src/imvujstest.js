@@ -66,17 +66,19 @@
         g.all_tests = [];
     }
 
+    function nul() {}
+
     function fixture(fixtureName, obj) {
-        var nul = function() { };
         var setUp = obj.setUp ? obj.setUp : nul;
         var tearDown = obj.tearDown ? obj.tearDown : nul;
+        var baseFixture = obj.baseFixture ? obj.baseFixture : {};
 
         for (var testName in obj) {
             if (testName.substr(0, 4) !== 'test') {
                 continue;
             } else {
-                var self = {};
-                self.__proto__ = obj;
+                var self = Object.create(baseFixture);
+                _.extend(self, obj);
 
                 test(fixtureName + '.' + testName, function(body) {
                     setUp.call(self);
@@ -85,6 +87,8 @@
                 }.bind({}, obj[testName]));
             }
         }
+
+        return obj;
     }
 
     var AssertionError = Error;
