@@ -86,4 +86,19 @@ module({}, function() {
         e = assert.throws(TypeError, function() { f.foojin(); });
         assert.equal("Property 'foojin' of object #<Foo> is not a function", e.message);
     });
+
+    function allKeys(o) {
+        var rv = [];
+        for (var k in o) {
+            rv.push(k);
+        }
+        return rv;
+    }
+
+    test("instances don't have extra enumerable keys", function() {
+        var Foo = BaseClass.extend('Foo');
+        var f = new Foo();
+        assert.equal([], Object.keys(f));
+        assert.deepEqual(['initialize'], allKeys(f));
+    });
 });

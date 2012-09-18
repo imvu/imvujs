@@ -17,8 +17,8 @@
         });
         _.extend(NewClass, this, classDef);
 
-        NewClass.prototype = Object.create(this.prototype);
-        NewClass.prototype.constructor = NewClass;
+        NewClass.prototype = Object.create(this.prototype, {
+            constructor: { value: NewClass } });
         _.extend(NewClass.prototype, def);
 
         return NewClass;
