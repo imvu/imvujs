@@ -1,6 +1,6 @@
 module({}, function() {
-    var polyfill;
-    polyfill = imvu.polyfill;
+    var polyfill = imvu.polyfill;
+
     test('ObjectKeys', function() {
         var o, proto;
         proto = function() {};
@@ -12,8 +12,9 @@ module({}, function() {
             baz: 3,
             prototype: new proto()
         };
-        return assert.equal(Object.keys(o), polyfill.ObjectKeys(o));
+        assert.deepEqual(Object.keys(o), polyfill.ObjectKeys(o));
     });
+
     test('bind', function() {
         var Point, f, p;
         Point = function() {
@@ -30,10 +31,11 @@ module({}, function() {
         f = polyfill.FunctionBind.call(Point.prototype.set, p, 9);
         f(1);
         assert.equal(1, p.y);
-        return assert.equal(9, p.x);
+        assert.equal(9, p.x);
     });
-    return test('console', function() {
-        return polyfill.console.log("We don't expect this log to do anything, but we want the function to be defined");
+
+    test('console', function() {
+        polyfill.console.log("We don't expect this log to do anything, but we want the function to be defined");
     });
 });
 

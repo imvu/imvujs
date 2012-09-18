@@ -23,18 +23,18 @@ module({}, function() {
 
     test("Can create a BaseClass without a def", function() {
         var calls = [];
-        var Foo = BaseClass.extend();
-        var Bar = Foo.extend({
+        var Foo = BaseClass.extend('Foo');
+        var Bar = Foo.extend('Bar', {
             method: function() {
                 calls.push('Bar.method');
             }
         });
         (new Bar).method();
-        assert.equal(['Bar.method'], calls);
+        assert.deepEqual(['Bar.method'], calls);
     });
 
     test("BaseClass classes cannot be monkeypatched", function() {
-        var Foo = BaseClass.extend();
+        var Foo = BaseClass.extend('Foo');
         Foo.not = 10;
         assert.equal(undefined, Foo.not);
         //Foo.prototype.not = 10;
@@ -43,19 +43,19 @@ module({}, function() {
 
     test("base class methods are accessible from derived classes", function() {
         var calls = [];
-        var Foo = BaseClass.extend({
+        var Foo = BaseClass.extend('Foo', {
             method: function() {
                 calls.push('Foo.method');
             }
         });
-        var Bar = Foo.extend();
+        var Bar = Foo.extend('Bar');
         (new Bar).method();
-        assert.equal(['Foo.method'], calls);
+        assert.deepEqual(['Foo.method'], calls);
     });
 
     test("Can make classes with BaseClass.extend", function() {
         var calls = [];
-        var Foo = BaseClass.extend({
+        var Foo = BaseClass.extend('Foo', {
             method: function() {
                 calls.push('Foo.method');
             }
@@ -68,7 +68,7 @@ module({}, function() {
         (new Foo).method();
         Foo.staticmethod();
         
-        assert.equal(['Foo.method', 'Foo.staticmethod'], calls);
+        assert.deepEqual(['Foo.method', 'Foo.staticmethod'], calls);
     });
 
     test("BaseClasses can be named", function() {
@@ -107,7 +107,7 @@ module({}, function() {
     test("instances don't have extra enumerable keys", function() {
         var Foo = BaseClass.extend('Foo');
         var f = new Foo();
-        assert.equal([], Object.keys(f));
+        assert.deepEqual([], Object.keys(f));
         assert.deepEqual(['initialize'], allKeys(f));
     });
 });

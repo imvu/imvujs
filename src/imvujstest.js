@@ -115,13 +115,6 @@
         },
 
         equal: function(expected, actual) {
-            if (expected instanceof Array && actual instanceof Array) {
-                assert.equal(expected.length, actual.length);
-                for (var i = 0; i < expected.length; ++i) {
-                    assert.equal(expected[i], actual[i]);
-                }
-                return;
-            }
             if (expected !== actual) {
                 fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
                      {Expected: expected, Actual: actual});
