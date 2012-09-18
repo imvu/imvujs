@@ -36,13 +36,13 @@ var IMVU = IMVU || {};
                 rv += "{";
                 var first = true;
                 var keys = Object.keys(v);
-                //keys.sort();
+                keys.sort();
                 var keysLength = keys.length;
                 for (var i = 0; i < keysLength; ++i) {
                     var k = keys[i];
                     var e = v[k];
                     rv += (first ? "" : ", ") + k + ": " + IMVU.repr(e, _seen);
-                    //first = true;
+                    first = false;
                 }
                 rv += "}";
                 if (Object !== c) {

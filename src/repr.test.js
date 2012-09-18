@@ -31,6 +31,10 @@ module({}, function() {
         assert.equal("[true, false, undefined]", IMVU.repr([true, false, undefined]));
     });
 
+    test("objects", function() {
+        assert.equal("{x: 1, y: 2}", IMVU.repr({y: 2, x: 1}));
+    });
+
     test("recursive arrays", function() {
         var a = [];
         a.push(a);
