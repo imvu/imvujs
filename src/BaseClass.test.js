@@ -30,7 +30,7 @@ module({}, function() {
             }
         });
         (new Bar).method();
-        assert.equal(['Bar.method'], calls);
+        assert.deepEqual(['Bar.method'], calls);
     });
 
     test("BaseClass classes cannot be monkeypatched", function() {
@@ -50,7 +50,7 @@ module({}, function() {
         });
         var Bar = Foo.extend('Bar');
         (new Bar).method();
-        assert.equal(['Foo.method'], calls);
+        assert.deepEqual(['Foo.method'], calls);
     });
 
     test("Can make classes with BaseClass.extend", function() {
@@ -68,7 +68,7 @@ module({}, function() {
         (new Foo).method();
         Foo.staticmethod();
         
-        assert.equal(['Foo.method', 'Foo.staticmethod'], calls);
+        assert.deepEqual(['Foo.method', 'Foo.staticmethod'], calls);
     });
 
     test("BaseClasses can be named", function() {
@@ -107,7 +107,7 @@ module({}, function() {
     test("instances don't have extra enumerable keys", function() {
         var Foo = BaseClass.extend('Foo');
         var f = new Foo();
-        assert.equal([], Object.keys(f));
+        assert.deepEqual([], Object.keys(f));
         assert.deepEqual(['initialize'], allKeys(f));
     });
 });
