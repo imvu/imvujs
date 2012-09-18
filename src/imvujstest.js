@@ -73,12 +73,14 @@
         var tearDown = obj.tearDown ? obj.tearDown : nul;
         var baseFixture = obj.baseFixture ? obj.baseFixture : {};
 
+        obj = Object.create(obj);
+        _.extend(obj, baseFixture);
+
         for (var testName in obj) {
             if (testName.substr(0, 4) !== 'test') {
                 continue;
             } else {
-                var self = Object.create(baseFixture);
-                _.extend(self, obj);
+                var self = Object.create(obj);
 
                 test(fixtureName + '.' + testName, function(body) {
                     setUp.call(self);
