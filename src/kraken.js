@@ -109,10 +109,8 @@
                 throw new Error("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
 
-            var evaluated;
             try {
-                var s = "function evaluated() {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url;
-                eval(s);
+                var evaluated = eval("function evaluated() {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url + '\nevaluated\n');
             } catch (e) {
                 console.error("Failed to parse", url);
                 console.groupCollapsed('Source');
