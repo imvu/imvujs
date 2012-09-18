@@ -47,4 +47,12 @@ module({}, function() {
         a.x.push(a);
         assert.equal("{x: [<Cycle>]}", IMVU.repr(a));
     });
+
+    test("object instances", function() {
+        function Foo() {
+            this.field = 10;
+        }
+        var i = new Foo();
+        assert.equal("<#Foo {field: 10}>", IMVU.repr(i));
+    });
 });

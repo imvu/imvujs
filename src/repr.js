@@ -27,13 +27,23 @@ var IMVU = IMVU || {};
             if (v instanceof Array) {
                 return "[" + v.map(function(v) { return IMVU.repr(v, _seen); }).join(", ") + "]";
             } else {
-                var rv = "{";
+                var rv = "";
+
+                var c = v.constructor;
+                if (Object !== c) {
+                    rv += "<#" + c.name + " ";
+                }
+                rv += "{";
                 var first = true;
                 for (var k in v) {
                     var e = v[k];
                     rv += (first ? "" : ", ") + k + ": " + IMVU.repr(e, _seen);
                 }
-                return rv += "}";
+                rv += "}";
+                if (Object !== c) {
+                    rv += ">";
+                }
+                return rv;
             }
         }
         finally {
