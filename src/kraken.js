@@ -1,4 +1,5 @@
 (function() {
+    "use strict";
 
     // https://developer-new.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
     function bind(fn, oThis) {
@@ -8,14 +9,14 @@
         }
 
         var aArgs = Array.prototype.slice.call(arguments, 2);
-        var fNOP = function () {};
+        var FNOP = function () {};
         var fBound = function () {
-            return fn.apply((fn instanceof fNOP && oThis) ? fn : oThis,
+            return fn.apply((fn instanceof FNOP && oThis) ? fn : oThis,
                             aArgs.concat(Array.prototype.slice.call(arguments)));
         };
 
-        fNOP.prototype = fn.prototype;
-        fBound.prototype = new fNOP();
+        FNOP.prototype = fn.prototype;
+        fBound.prototype = new FNOP();
  
         return fBound;
     }
@@ -111,7 +112,7 @@
 
             var evaluated;
             try {
-                evaluated = eval("function evaluated() {'use strict';" + xhr.responseText + '\n}\n\n//@ sourceURL=' + url + '\nevaluated\n');
+                evaluated = eval("function evaluated() {'use strict';" + xhr.responseText + '\n}\nevaluated\n\n//@ sourceURL=' + url);
             } catch (e) {
                 console.error("Failed to parse", url);
                 console.groupCollapsed('Source');
