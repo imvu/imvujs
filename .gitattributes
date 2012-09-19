@@ -2,6 +2,7 @@
 
 *.bat   binary
 *.cmd   binary
+*.exe   binary
 
 *.man   text eol=crlf
 
