@@ -1,2 +1,9 @@
+* text=auto
+
 *.bat   binary
 *.cmd   binary
+
+*.man   text eol=crlf
+
+*.js    text
+
