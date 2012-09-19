@@ -240,9 +240,8 @@
             fToBind = this,
             fNOP = function () {},
             fBound = function () {
-                return fToBind.apply(this instanceof fNOP ? 
-                                     this
-                                     : oThis,
+                // There are a few native objects (like DataView) that have no prototype
+                return fToBind.apply('prototype' in this && this instanceof fNOP ? this : oThis,
                                      aArgs.concat(Array.prototype.slice.call(arguments)));
             };
 

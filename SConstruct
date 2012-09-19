@@ -35,12 +35,15 @@ targets = []
 
 targets += env.ClosureCompiler(
     'out/imvu.js',
-    WEB_SOURCES,
-    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+    ['ext/esprima.js'] + WEB_SOURCES,
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+[
+        '--formatting', 'PRETTY_PRINT',
+        '--compilation_level', 'WHITESPACE_ONLY'])
+
 targets += env.ClosureCompiler(
     'out/imvu.min.js',
     WEB_SOURCES,
-    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS)
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS + ["--define='KRAKEN_DEBUG=false'"])
 
 targets += env.ClosureCompiler(
     'out/imvu.node.js',

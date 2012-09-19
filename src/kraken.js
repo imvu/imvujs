@@ -1,3 +1,13 @@
+/*global esprima */
+
+/**
+ * If true, use esprima to produce nicer error messages.
+ * We turn this off in the optimized build step.
+ * I wish I could make this @const too. :(
+ * @define {boolean}
+ */
+var KRAKEN_DEBUG = true;
+
 (function() {
     "use strict";
 
@@ -118,6 +128,9 @@
                 console.groupCollapsed('Source');
                 console.log(xhr.responseText);
                 console.groupEnd();
+
+                reportSyntaxError(url, xhr.responseText);
+
                 throw e;
             }
 
@@ -208,6 +221,19 @@
         return normalizePath(url);
     }
 
+    function reportSyntaxError(url, code) {
+        if (KRAKEN_DEBUG) {
+            try {
+                var result = esprima.parse(code);
+                console.groupCollapsed("This parse should never succeed");
+                console.log(result);
+                console.groupEnd();
+            } catch (e) {
+                console.error("Parse error in", url + ':', e.message);
+            }
+        }
+    }
+
     /*
      * `define(callback)` shortcut for hacky AMD compatibility
      * Note that the "real" AMD define() signature is roughly
@@ -246,13 +272,13 @@
             completeJs[url] = future;
         }
 
+        var result = {};
+
         var remainingDependencies = getObjectKeys(dependencies).length;
         if (remainingDependencies === 0) {
             complete();
             return;
         }
-
-        var result = {};
 
         for (var key in dependencies) {
             if (!dependencies.hasOwnProperty(key)) {
