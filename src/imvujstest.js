@@ -166,6 +166,19 @@
             }
         },
 
+        inArray: function(expected, array) {
+            var found = false;
+            _.each(array, function(element){
+                if (_.isEqual(expected, element)){
+                    found = true;
+                }
+            });
+            if (!found){
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' not found in array: ' + IMVU.repr(array)),
+                     {Expected: expected, 'Array': array});
+            }
+        },
+
         'throws': function(exception, fn) {
             try {
                 fn();
@@ -178,7 +191,7 @@
             }
             throw new AssertionError('did not throw');
         },
-        
+
         instanceof: function(actual, type) {
             if(!(actual instanceof type)) {
                 fail(new AssertionError(IMVU.repr(actual) + 'not instance of' + IMVU.repr(type)),

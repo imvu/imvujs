@@ -5,7 +5,7 @@
 
             var target = this;
 
-            if (typeof target != "function") {
+            if (typeof target !== "function") {
                 throw new TypeError("Function.prototype.bind called on incompatible " + target);
             }
 
@@ -81,9 +81,10 @@
         lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
     }
 
+    var definePropertyFallback;
     if (Object.defineProperty) {
         var definePropertyWorksOnObject = doesDefinePropertyWork({});
-        var definePropertyWorksOnDom = typeof document == "undefined" ||
+        var definePropertyWorksOnDom = typeof document === "undefined" ||
             doesDefinePropertyWork(document.createElement("div"));
         if (!definePropertyWorksOnObject || !definePropertyWorksOnDom) {
             var definePropertyFallback = Object.defineProperty;
@@ -92,15 +93,15 @@
 
     if (!Object.defineProperty || definePropertyFallback) {
         var ERR_NON_OBJECT_DESCRIPTOR = "Property description must be an object: ";
-        var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: "
+        var ERR_NON_OBJECT_TARGET = "Object.defineProperty called on non-object: ";
         var ERR_ACCESSORS_NOT_SUPPORTED = "getters & setters can not be defined " +
                                           "on this javascript engine";
 
         Object.defineProperty = function defineProperty(object, property, descriptor) {
-            if ((typeof object != "object" && typeof object != "function") || object === null) {
+            if ((typeof object !== "object" && typeof object !== "function") || object === null) {
                 throw new TypeError(ERR_NON_OBJECT_TARGET + object);
             }
-            if ((typeof descriptor != "object" && typeof descriptor != "function") || descriptor === null) {
+            if ((typeof descriptor !== "object" && typeof descriptor !== "function") || descriptor === null) {
                 throw new TypeError(ERR_NON_OBJECT_DESCRIPTOR + descriptor);
             }
             // make a valiant attempt to use the real defineProperty
