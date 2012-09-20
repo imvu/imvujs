@@ -69,12 +69,11 @@
     function nul() {}
 
     function fixture(fixtureName, obj) {
+        obj = Object.create(obj);
+        _.extend(obj, obj.baseFixture);
+
         var setUp = obj.setUp ? obj.setUp : nul;
         var tearDown = obj.tearDown ? obj.tearDown : nul;
-        var baseFixture = obj.baseFixture ? obj.baseFixture : {};
-
-        obj = Object.create(obj);
-        _.extend(obj, baseFixture);
 
         for (var testName in obj) {
             if (testName.substr(0, 4) !== 'test') {
