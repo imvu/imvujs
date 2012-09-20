@@ -128,7 +128,7 @@
 
             var result;
             try {
-                result = evaluated.call(void 0);
+                result = evaluated.call(window);
             } finally {
                 ourUrl = saveUrl;
             }
