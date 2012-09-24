@@ -243,7 +243,11 @@ var KRAKEN_DEBUG = true;
         if (Object.prototype.toString.call(callback) === '[object Array]') {
             callback = arguments[1];
         }
-        module({}, callback);
+        if (1 === arguments.length) {
+            module({}, function() { return callback; });
+        } else {
+            module({}, callback || function() { });
+        }
     }
     define.amd = true;
 
