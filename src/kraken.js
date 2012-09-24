@@ -194,6 +194,7 @@ var KRAKEN_DEBUG = true;
                 continue;
             } else if (s === '..' && i > 0) {
                 segments.splice(i - 1, 2);
+                i -= 1;
                 continue;
             } else {
                 i += 1;
