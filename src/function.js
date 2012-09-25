@@ -5,7 +5,7 @@ var IMVU = IMVU || {};
         return new Function(
             "body",
             "return function " + name + "() {\n" +
-            "    body.apply(this, arguments);\n" +
+            "    return body.apply(this, arguments);\n" +
             "};\n"
         )(body);
     };
