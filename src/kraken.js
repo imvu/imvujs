@@ -247,7 +247,7 @@ var KRAKEN_DEBUG = true;
         if (1 === arguments.length) {
             module({}, function() { return callback; });
         } else {
-            module({}, callback || function() { });
+            module({}, callback);
         }
     }
     define.amd = true;
