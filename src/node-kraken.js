@@ -57,7 +57,7 @@ function module(dependencies, body, settings) {
 }
 
 // AMD compatibility
-function define(dependencies, body) {
+var define = function(dependencies, body) {
     var deps = {};
     for (var i = 0; i < dependencies.length; ++i) {
         var name = dependencies[i];
@@ -71,5 +71,5 @@ function define(dependencies, body) {
         }
         return body.apply(undefined, args);
     });
-}
+};
 define.amd = true;
