@@ -92,7 +92,14 @@ function runTest(testPath) {
     currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
-    run_all();
+    run_all(function (report) {
+        if (report.status === 'running') {
+            syncWrite('* ' + report.name + '...\n');
+        }
+        if (report.status === 'complete') {
+            syncWrite(report.verdict + '\n\n');
+        }
+    });
     syncWrite('\n');
 }
 

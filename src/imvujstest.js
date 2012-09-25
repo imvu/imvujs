@@ -40,12 +40,16 @@
         }
     }
 
-    function run_all() {
+    function run_all(reporter) {
         for (var i = 0; i < g.all_tests.length; ++i) {
             var test = g.all_tests[i];
             var name = test[0];
             var body = test[1];
-            writeRaw('* ' + name + '... ');
+            reporter({
+                name: name,
+                status: 'running',
+                verdict: null
+            });
             var success = false;
             try {
                 runTest(body);
@@ -53,14 +57,22 @@
             }
             catch (e) {
                 if (e instanceof Error) {
-                    console.log("    FAIL\n\n" + e.stack);
+                    reporter({
+                        name: name,
+                        status: 'complete',
+                        verdict: 'FAIL'
+                    });
                     process.exit(1);
                 } else {
                     throw e;
                 }
             }
             if (success) {
-                writeRaw('PASS\n');
+                reporter({
+                    name: name,
+                    status: 'complete',
+                    verdict: 'PASS'
+                });
             }
         }
         g.all_tests = [];
@@ -223,7 +235,9 @@
     g.setInterval = function() {
         throw new AssertionError("Don't call setInterval in tests.  Use fakes.");
     };
-    process.nextTick = function() {
-        throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
-    };
+    if (typeof process !== 'undefined') {
+        process.nextTick = function() {
+            throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
+        };
+    }
 })();

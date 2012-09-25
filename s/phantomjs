@@ -1,0 +1,14 @@
+#!/bin/bash
+
+HERE=`dirname $0`
+SYSTEM=`uname -s`
+if [ "$SYSTEM" == 'Darwin' ]; then
+    exec $HERE/../third-party/phantomjs/builds/osx-10.7.4/phantomjs "$@"
+else
+    echo "Unsupported phantomjs build: $SYSTEM"
+    echo "Please:"
+    echo "1. Add a new build to the phantomjs sub-module."
+    echo "2. Update the imvujs repo to point to the new phantomjs commit."
+    echo "3. Finally, update this script to support your platform."
+    exit 1
+fi
