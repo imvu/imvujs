@@ -5,11 +5,6 @@
 
     var superFixtures = [];
 
-    // TODO: move to a reporter object
-    function writeRaw(data) {
-        g.syncWrite(data);
-    }
-
     function registerSuperFixture(superFixture) {
         superFixtures.push(superFixture);
     }
@@ -46,9 +41,8 @@
             var name = test[0];
             var body = test[1];
             reporter({
-                name: name,
-                status: 'running',
-                verdict: null
+                type: 'test-start',
+                name: name
             });
             var success = false;
             try {
@@ -58,24 +52,26 @@
             catch (e) {
                 if (e instanceof Error) {
                     reporter({
+                        type: 'test-complete',
                         name: name,
-                        status: 'complete',
-                        verdict: 'FAIL'
+                        verdict: 'FAIL',
+                        stack: e.stack
                     });
-                    process.exit(1);
+                    return false;
                 } else {
                     throw e;
                 }
             }
             if (success) {
                 reporter({
+                    type: 'test-complete',
                     name: name,
-                    status: 'complete',
                     verdict: 'PASS'
                 });
             }
         }
         g.all_tests = [];
+        return true;
     }
 
     function nul() {}

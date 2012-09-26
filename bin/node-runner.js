@@ -73,6 +73,8 @@ function runTest(testPath) {
 
     var testContents = loadScript(abspath);
 
+    var testPassed;
+
     // I'd use Object.create here but prototypes don't extend across
     // vm contexts in Node.js.  o_O Known issue with Node.js...
     // http://nodejs.org/api/vm.html#vm_sandboxes
@@ -92,15 +94,21 @@ function runTest(testPath) {
     currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
-    run_all(function (report) {
-        if (report.status === 'running') {
-            syncWrite('* ' + report.name + '...\n');
+    testPassed = run_all(function (report) {
+        if (report.type === 'test-start') {
+            syncWrite('* ' + report.name + '...');
         }
-        if (report.status === 'complete') {
-            syncWrite(report.verdict + '\n\n');
+        if (report.type === 'test-complete') {
+            syncWrite(report.verdict + '\n');
+            if (report.stack) {
+                syncWrite(report.stack);
+            }
         }
     });
     syncWrite('\n');
+    if (!testPassed) {
+        process.exit(1);
+    }
 }
 
 function main() {

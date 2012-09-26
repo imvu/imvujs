@@ -1,76 +1,78 @@
-function parseMessage(message) {
-    return (message.substr(0, 10) === 'phantomjs:') ? JSON.parse(message.substr(10)) : null;
-}
-
-function handleMessage(message) {
-    var parsed = parseMessage(message);
-    if (parsed !== null) {
-        handleResult(parsed);
-    } else {
-        console.log(message);
-    }
-}
-
-function handleResult(result) {
-    var green = '\033[32m',
-        red = '\033[31m',
-        clear = '\033[0m',
-        success;
-    if (typeof result.verdict !== 'undefined') {
-        success = (result.verdict === 'PASS');
-        console.log();
-        console.log('Verdict: ' + (success ? green + 'PASS' : red + 'FAIL') + clear);
-        phantom.exit(success ? 0 : 1);
-    }
-}
-
-function usage() {
-    console.log('Usage: s/phantomjs ' + args[0] + ' <test_script.dom.test.js>');
-    phantom.exit(1);
-}
-
-function launch(status) {
-    if (status === 'success') {
-        page.evaluate(function (test_to_run) {
-            module({
-                test_to_run: test_to_run
-            }, function (imports) {
-                window.process = {
-                    exit: function (rc) {
-                        console.log('phantomjs:' + JSON.stringify({
-                            verdict: (rc === 0) ? 'PASS' : 'FAIL'
-                        }));
-                    }
-                };
-                window.run_all(function (report) {
-                    var green = '\033[32m',
-                        red = '\033[31m',
-                        clear = '\033[0m';
-                    if (report.status === 'complete') {
-                        console.log(((report.verdict === 'PASS') ? green : red) + report.verdict + clear + ': ' + report.name);
-                        console.log();
-                    }
-                });
-                console.log('phantomjs:' + JSON.stringify({
-                    verdict: 'PASS'
-                }));
-            });
-        }, '/' + test);
-    } else {
-        console.log('Error: unable to load testrunner trampoline: ' + status);
-        phantom.exit(1);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-var page = require('webpage').create(),
+var webpage = require('webpage'),
     args = require('system').args,
-    test = args[1];
+    tests = args.slice(1);
 
-if (args.length != 2) {
-    usage();
+if (args.length < 2) {
+    console.log('Usage: s/phantomjs ' + args[0] + ' <test_script.dom.test.js>');
+    phantom.exit(2);
 }
 
-page.onConsoleMessage = handleMessage;
-page.open('http://localhost:8000/bin/phantom-trampoline.html', launch);
+function init_environment(page) {
+    page.evaluate(function () {
+        window.notify = function (type, data) {
+            console.log('phantomjs:' + JSON.stringify({type: type, data: data}));
+        };
+
+        window.reporter = function (report) {
+            if (report.type === 'test-complete') {
+                var green = '\033[32m', red = '\033[31m', clear = '\033[0m',
+                    pass = (report.verdict === 'PASS'),
+                    color = pass ? green : red;
+
+                if (!pass) {
+                    console.log('');
+                }
+                console.log(color + report.verdict + clear + ': ' + report.name);
+                if (!pass) {
+                    console.log('');
+                    console.log(report.stack);
+                    console.log('');
+                }
+            }
+        };
+    });
+}
+
+function run_next_test() { // modifies the global tests list
+    var test = tests.shift(),
+        page;
+    if (typeof test === 'undefined') {
+        phantom.exit(0);
+    }
+
+    console.log('Running "' + test + '"...');
+    page = webpage.create();
+
+    page.open('http://localhost:8000/bin/phantom-trampoline.html', function (result) {
+        if (result === 'success') {
+            init_environment(page);
+
+            page.onConsoleMessage = function (msg) {
+                var success;
+                if (msg === 'phantomjstest:pass') {
+                    console.log('');
+                    page.release();
+                    run_next_test(); // recurse
+                } else if (msg === 'phantomjstest:fail') {
+                    phantom.exit(1);
+                } else {
+                    console.log(msg);
+                }
+            };
+            page.evaluate(function (path) {
+                document.body.innerHTML = '';
+                module({
+                    dep: path
+                }, function (imports) {
+                    var pass;
+                    pass = window.run_all(window.reporter);
+                    console.log('phantomjstest:' + (pass ? 'pass' : 'fail'));
+                });
+            }, '/' + test);
+        } else {
+            console.log('Error: unable to load testrunner trampoline: ' + result);
+            phantom.exit(2);
+        }
+    });
+}
+run_next_test(); // this will chain
