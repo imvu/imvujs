@@ -16,5 +16,5 @@ git pull -r
 git submodule sync
 git submodule update --init --recursive
 
-cp s/.githooks/* .git/hooks/
+ln -s s/.githooks/* .git/hooks/
 chmod -R +x .git/hooks/
