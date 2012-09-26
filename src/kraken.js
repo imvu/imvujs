@@ -261,20 +261,23 @@ var KRAKEN_DEBUG = true;
 
         moduleWasCalled = true;
 
-        if (!dependencies instanceof Array) {
-            throw new Error("Dependencies must be array");
+        if (!(dependencies instanceof Object)) {
+            throw new Error("Dependencies must be object");
         }
-        if (!body instanceof Function) {
+        if (!(body instanceof Function)) {
             throw new Error("Body must be a function");
         }
 
         var url = ourUrl;
+        var isToplevel = (url === null);
         var future;
         if (completeJs.hasOwnProperty(url)) {
             future = completeJs[url];
         } else {
-            future = new Future("module " + url);
-            completeJs[url] = future;
+            if (isToplevel) {
+                future = new Future("module " + url);
+                completeJs[url] = future;
+            }
         }
 
         var result = {};
@@ -312,7 +315,9 @@ var KRAKEN_DEBUG = true;
         function complete() {
             C.log('evaluating module', url);
             var exportTable = body.call(null, result);
-            future.complete(exportTable);
+            if (!isToplevel) {
+                future.complete(exportTable);
+            }
         }
     }
 
