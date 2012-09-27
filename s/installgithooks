@@ -6,12 +6,12 @@ set -e
 
 # TODO: take an argument for repository root
 REPOSITORY_ROOT="$HERE"
-DOTGIT="$HERE/.git"
+DOTGIT="$REPOSITORY_ROOT/.git"
 
-if [ -f "$REPOSITORY_ROOT/.git" ]; then
-    GITDIR=$REPOSITORY_ROOT/`cat "$REPOSITORY_ROOT/.git" | sed "s/gitdir: //"`
+if [ -f "$DOTGIT" ]; then
+    GITDIR=$REPOSITORY_ROOT/`cat "$DOTGIT" | sed "s/gitdir: //"`
 else
-    GITDIR="$REPOSITORY_ROOT/.git"
+    GITDIR="$DOTGIT"
 fi
 
 for hook in $REPOSITORY_ROOT/githooks/*; do
