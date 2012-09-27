@@ -41,20 +41,6 @@ var KRAKEN_DEBUG = true;
 
     //C = console;
 
-    function getObjectKeys(o) {
-        if (o.keys) {
-            return o.keys();
-        } else {
-            var result = [];
-            for (var k in o) {
-                if (o.hasOwnProperty(k)) {
-                    result.push(k);
-                }
-            }
-            return result;
-        }
-    }
-
     function hasProperties(o) {
         for (var k in o) {
             if (o.hasOwnProperty(k)) {
@@ -282,7 +268,7 @@ var KRAKEN_DEBUG = true;
 
         var result = {};
 
-        var remainingDependencies = getObjectKeys(dependencies).length;
+        var remainingDependencies = Object.keys(dependencies).length;
         if (remainingDependencies === 0) {
             complete();
             return;
@@ -300,7 +286,11 @@ var KRAKEN_DEBUG = true;
                 d = bind(importJs, null, d);
             }
 
-            d(bind(handleResolution, null, key));
+            d(bind(handleResolution, null, key), {
+                getAbsoluteURL: function(url) {
+                    return toAbsoluteUrl(url, ourUrl);
+                }
+            });
         }
 
         function handleResolution(name, value) {
