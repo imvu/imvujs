@@ -1,0 +1,33 @@
+#!/bin/bash
+
+HERE=`dirname "$0"`/..
+
+set -e
+
+function relpath() {
+    python -c "import os.path; print os.path.relpath('$1', '$2')"
+}
+
+function normpath() {
+    python -c "import os.path; print os.path.normpath('$1')"
+}
+
+# TODO: take an argument for repository root
+REPOSITORY_ROOT="$HERE"
+DOTGIT="$HERE/.git"
+
+if [ -f "$REPOSITORY_ROOT/.git" ]; then
+    GITDIR=$REPOSITORY_ROOT/`cat "$REPOSITORY_ROOT/.git" | sed "s/gitdir: //"`
+else
+    GITDIR="$REPOSITORY_ROOT/.git"
+fi
+
+GITHOOKDIR="$GITDIR/hooks"
+MYHOOKS="$REPOSITORY_ROOT/githooks"
+ROOTLINK=$(relpath "$REPOSITORY_ROOT" "$GITHOOKDIR")
+
+GITHOOKDIR=$(normpath "$GITHOOKDIR")
+
+for hook in $MYHOOKS/*; do
+    ln -sf $(normpath "$ROOTLINK/$hook") "$GITHOOKDIR/"
+done
