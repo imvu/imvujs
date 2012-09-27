@@ -1,8 +1,7 @@
 #!/bin/bash
-set -x
+set -e
 
-SCRIPT=`readlink "$0"`
-cd `dirname "$SCRIPT"`/..
+# do pre-commit hooks run in the repository root always?
 
 if
     git diff --cached | egrep '^\+.*	'>/dev/null
