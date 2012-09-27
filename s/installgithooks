@@ -4,14 +4,21 @@ HERE=`dirname "$0"`/..
 
 set -e
 
-# TODO: take an argument for repository root
-REPOSITORY_ROOT="$HERE"
+if [ "$1" ]; then
+    REPOSITORY_ROOT="$1"
+else
+    REPOSITORY_ROOT="$HERE"
+fi
+
 DOTGIT="$REPOSITORY_ROOT/.git"
 
 if [ -f "$DOTGIT" ]; then
     GITDIR=$REPOSITORY_ROOT/`cat "$DOTGIT" | sed "s/gitdir: //"`
-else
+elif [ -d "$DOTGIT" ]; then
     GITDIR="$DOTGIT"
+else
+    echo "Could not find .git directory.  Is '$REPOSITORY_ROOT' a git repository?"
+    exit 1
 fi
 
 for hook in $REPOSITORY_ROOT/githooks/*; do
