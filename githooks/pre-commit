@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 SCRIPT=`readlink "$0"`
 cd `dirname "$SCRIPT"`/..
