@@ -4,6 +4,14 @@ HERE=`dirname "$0"`/..
 
 set -e
 
+function relpath() {
+    python -c "import os.path; print os.path.relpath('$1', '$2')"
+}
+
+function normpath() {
+    python -c "import os.path; print os.path.normpath('$1')"
+}
+
 if [ "$1" ]; then
     REPOSITORY_ROOT="$1"
 else
@@ -21,6 +29,17 @@ else
     exit 1
 fi
 
-for hook in $REPOSITORY_ROOT/githooks/*; do
-    ln -f $hook "$GITDIR/hooks"
+GITHOOKDIR="$GITDIR/hooks"
+MYHOOKS="$REPOSITORY_ROOT/githooks"
+MYHOOKSLINK=$(relpath "$MYHOOKS" "$GITHOOKDIR")
+
+GITHOOKDIR=$(normpath "$GITHOOKDIR")
+
+for hook in $(cd $MYHOOKS && ls); do
+    target="$GITHOOKDIR/$hook"
+    rm -f $target
+    echo "#/bin/bash" > $target
+    echo "HERE=\`dirname \"\$0\"\`" >> $target
+    echo "exec \$HERE/$MYHOOKSLINK/$hook" >> $target
+    chmod +x $target
 done
