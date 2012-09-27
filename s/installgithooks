@@ -40,6 +40,6 @@ for hook in $(cd $MYHOOKS && ls); do
     rm -f $target
     echo "#/bin/bash" > $target
     echo "HERE=\`dirname \"\$0\"\`" >> $target
-    echo "exec \$HERE/$MYHOOKSLINK/$hook" >> $target
+    echo "exec \"\$HERE/$MYHOOKSLINK/$hook\"" >> $target
     chmod +x $target
 done
