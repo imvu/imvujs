@@ -103,7 +103,7 @@ function runTest(testPath, continuation) {
 
     run_all(function (report) {
         if (report.type === 'test-start') {
-            syncWrite('* ' + report.name + '...');
+            syncWrite('* ' + report.name + '... ');
         }
         if (report.type === 'test-complete') {
             if (report.verdict === 'PASS') {
