@@ -77,6 +77,11 @@ function runTest(testPath, continuation) {
 
     var testPassed;
 
+    var green = '\x1b[32m',
+        red = '\x1b[31m',
+        yellow = '\x1b[33m',
+        normal = '\x1b[0m';
+
     // I'd use Object.create here but prototypes don't extend across
     // vm contexts in Node.js.  o_O Known issue with Node.js...
     // http://nodejs.org/api/vm.html#vm_sandboxes
@@ -91,7 +96,7 @@ function runTest(testPath, continuation) {
     //sandbox.__dirname = path.dirname(abspath);
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
-    syncWrite(path.normalize(testPath) + '\n----\n');
+    syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
     global.testPath = abspath;
     currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
@@ -101,7 +106,11 @@ function runTest(testPath, continuation) {
             syncWrite('* ' + report.name + '...');
         }
         if (report.type === 'test-complete') {
-            syncWrite(report.verdict + '\n');
+            if (report.verdict === 'PASS') {
+                syncWrite(green + report.verdict + normal + '\n');
+            } else {
+                syncWrite(red + report.verdict + normal + '\n');
+            }
             if (report.stack) {
                 syncWrite(report.stack);
             }
