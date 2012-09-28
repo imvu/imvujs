@@ -11,4 +11,5 @@ module({}, function() {
             assert.equal(10, this.helper());
         }
     });
+    console.log('ok');
 });

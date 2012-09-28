@@ -45,6 +45,8 @@ function sysinclude(currentPath, includePath, settings) {
 global.require = require;
 global.sysinclude = sysinclude;
 
+var oldSetTimeout = setTimeout;
+
 [
   'out/imvu.node.js',
   'src/node-kraken.js',
@@ -68,7 +70,7 @@ function loadSuperFixture(superfixture) {
     vm.runInThisContext(testContents, abspath);
 }
 
-function runTest(testPath) {
+function runTest(testPath, continuation) {
     var abspath = path.resolve(testPath);
 
     var testContents = loadScript(abspath);
@@ -94,7 +96,7 @@ function runTest(testPath) {
     currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
-    testPassed = run_all(function (report) {
+    run_all(function (report) {
         if (report.type === 'test-start') {
             syncWrite('* ' + report.name + '...');
         }
@@ -104,11 +106,7 @@ function runTest(testPath) {
                 syncWrite(report.stack);
             }
         }
-    });
-    syncWrite('\n');
-    if (!testPassed) {
-        process.exit(1);
-    }
+    }, continuation);
 }
 
 function main() {
@@ -133,7 +131,32 @@ function main() {
         loadSuperFixture(superfixtures[i]);
     }
 
-    tests.forEach(runTest);
+    function sequence(list, action, continuation) {
+        function next(index) {
+            if (index < list.length) {
+                action(list[index], next.bind(null, index + 1));
+            } else {
+                continuation();
+            }
+        }
+        next(0);
+    }
+
+    sequence(tests, function (test, next) {
+        syncWrite('\n');
+        runTest(test, function (failed) {
+            if (failed) {
+                syncWrite('\n');
+                process.exit(1);
+            } else {
+                next();
+            }
+        });
+    }, function () {
+        process.exit(0);
+    });
+
+    throw new Error('Test failure do to incomplete asynchronous test. Did you forget to call the onComplete() parameter to an asynchronous test?');
 }
 
 main();

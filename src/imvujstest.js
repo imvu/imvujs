@@ -1,7 +1,17 @@
 /*global IMVU*/
-
 (function() {
     "use strict";
+
+    function sequence(list, action, continuation) {
+        function next(index) {
+            if (index < list.length) {
+                action(list[index], next.bind(null, index + 1));
+            } else {
+                continuation();
+            }
+        }
+        next(0);
+    }
 
     var superFixtures = [];
 
@@ -9,74 +19,85 @@
         superFixtures.push(superFixture);
     }
 
+    function asyncTest(name, func) {
+        g.all_tests.push([name, func]);
+    }
     function test() {
+        function sync(fn) {
+            return function (onComplete) {
+                fn.call(this);
+                onComplete();
+            };
+        }
         if (arguments.length === 1) {
             var fn = arguments[0];
-            g.all_tests.push([fn.name, fn]);
+            g.all_tests.push([fn.name, sync(fn)]);
         } else if (arguments.length === 2) {
-            g.all_tests.push([arguments[0], arguments[1]]);
+            g.all_tests.push([arguments[0], sync(arguments[1])]);
         } else {
             throw new TypeError("test requires 1 or 2 arguments");
         }
     }
 
-    function runTest(body) {
+    function runTest(body, continuation) {
         var objs = [];
-        for (var i = 0; i < superFixtures.length; ++i) {
-            var obj = {};
-            objs.push(obj);
-            superFixtures[i].beforeTest.call(obj);
-        }
+        try {
+            for (var i = 0; i < superFixtures.length; ++i) {
+                var obj = {};
+                objs.push(obj);
+                superFixtures[i].beforeTest.call(obj);
+            }
 
-        body.call({});
-
-        for (var i = superFixtures.length - 1; i >= 0; --i) {
-            superFixtures[i].afterTest.call(objs[i]);
+            body.call({}, function () {
+                for (var i = superFixtures.length - 1; i >= 0; --i) {
+                    superFixtures[i].afterTest.call(objs[i]);
+                }
+                continuation(false, null);
+            });
+        } catch (e) {
+            continuation(true, e.stack);
         }
     }
 
-    function run_all(reporter) {
-        for (var i = 0; i < g.all_tests.length; ++i) {
-            var test = g.all_tests[i];
-            var name = test[0];
-            var body = test[1];
+    function run_all(reporter, continuation) {
+        sequence(g.all_tests, function (test, next) {
+            var name = test[0],
+                body = test[1];
+
             reporter({
                 type: 'test-start',
                 name: name
             });
-            var success = false;
-            try {
-                runTest(body);
-                success = true;
-            }
-            catch (e) {
-                if (e instanceof Error) {
+
+            runTest(body, function (failed, stack) {
+                if (failed) {
                     reporter({
                         type: 'test-complete',
                         name: name,
                         verdict: 'FAIL',
-                        stack: e.stack
+                        stack: stack
                     });
-                    return false;
+                    continuation(true); // short-circuit
                 } else {
-                    throw e;
+                    reporter({
+                        type: 'test-complete',
+                        name: name,
+                        verdict: 'PASS'
+                    });
+                    next();
                 }
-            }
-            if (success) {
-                reporter({
-                    type: 'test-complete',
-                    name: name,
-                    verdict: 'PASS'
-                });
-            }
-        }
-        g.all_tests = [];
-        return true;
+            });
+        }, function () {
+            g.all_tests = [];
+            continuation(false);
+        });
     }
 
-    function nul() {}
+    function nul(continuation) {
+        continuation();
+    }
 
-    function fixture(fixtureName, obj) {
+    function registerFixture(fixtureName, obj, wrap) {
         obj = Object.create(obj);
         _.extend(obj, obj.baseFixture);
 
@@ -89,15 +110,34 @@
             } else {
                 var self = Object.create(obj);
 
-                test(fixtureName + '.' + testName, function(body) {
-                    setUp.call(self);
-                    body.call(self);
-                    tearDown.call(self);
-                }.bind({}, obj[testName]));
+                asyncTest(fixtureName + '.' + testName, wrap(obj, setUp, obj[testName], tearDown));
             }
         }
 
         return obj;
+    }
+
+    function fixture(fixtureName, obj) {
+        return registerFixture(fixtureName, obj, function (fixture, setUp, body, tearDown) {
+            return function (continuation) {
+                setUp.call(fixture, function () {});
+                body.call(fixture);
+                tearDown.call(fixture, function () {});
+                continuation();
+            };
+        });
+    }
+
+    function asyncFixture(fixtureName, obj) {
+        return registerFixture(fixtureName, obj, function (fixture, setUp, body, tearDown) {
+            return function (continuation) {
+                setUp.call(fixture, function () {
+                    body.call(fixture, function () {
+                        tearDown.call(fixture, continuation);
+                    });
+                });
+            };
+        });
     }
 
     var AssertionError = Error;
@@ -224,6 +264,8 @@
     g.AssertionError = AssertionError;
     g.assert = assert;
     g.test = test;
+    g.asyncTest = asyncTest;
+    g.asyncFixture = asyncFixture;
 
     g.setTimeout = function() {
         throw new AssertionError("Don't call setTimeout in tests.  Use fakes.");

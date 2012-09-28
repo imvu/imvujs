@@ -25,6 +25,8 @@
         "exports",  // for node.js imvujstest
         "process", // for node.js imvujstest
         "test",
+        "asyncTest",
+        "asyncFixture",
 
         // ES6
         "Set",
