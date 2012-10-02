@@ -245,6 +245,21 @@
                     {Type: type, Actual: actual});
             }
         },
+
+        // TODO: lift into separate file?
+        dom: {
+            hasClass: function(className, selector) {
+                assert.true($(selector).hasClass(className));
+            },
+
+            notHasClass: function(className, selector) {
+                assert.false($(selector).hasClass(className));
+            },
+
+            text: function(expected, selector) {
+                assert.equal(expected, $(selector).text());
+            },
+        },
     };
 
     var g = 'undefined' === typeof window ? global : window;
