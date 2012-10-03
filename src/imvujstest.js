@@ -14,13 +14,14 @@
     }
 
     var superFixtures = [];
+    var allTests = [];
 
     function registerSuperFixture(superFixture) {
         superFixtures.push(superFixture);
     }
 
     function asyncTest(name, func) {
-        g.all_tests.push([name, func]);
+        allTests.push([name, func]);
     }
     function test(name, fn) {
         function invoke(onComplete) {
@@ -31,7 +32,7 @@
         if (arguments.length !== 2) {
             throw new TypeError("test requires 1 or 2 arguments");
         }
-        g.all_tests.push([name, invoke]);
+        allTests.push([name, invoke]);
     }
 
     function runTest(body, continuation) {
@@ -55,7 +56,7 @@
     }
 
     function run_all(reporter, continuation) {
-        sequence(g.all_tests, function (test, next) {
+        sequence(allTests, function (test, next) {
             var name = test[0],
                 body = test[1];
 
@@ -83,7 +84,7 @@
                 }
             });
         }, function () {
-            g.all_tests = [];
+            allTests = [];
             continuation(false);
         });
     }
@@ -289,7 +290,6 @@
     assert['null'] = assert.equal.bind(null, null);
     assert.notNull = assert.notEqual.bind(null, null);
 
-    g.all_tests = [];
     g.registerSuperFixture = registerSuperFixture;
     g.test = test;
     g.run_all = run_all;
