@@ -259,6 +259,18 @@
             text: function(expected, selector) {
                 assert.equal(expected, $(selector).text());
             },
+
+            count: function(elementCount, selector) {
+                assert.equal(elementCount, $(selector).length);
+            },
+
+            visible: function(selector) {
+                assert.true($(selector).is(':visible'));
+            },
+
+            notVisible: function(selector) {
+                assert.false($(selector).is(':visible'));
+            },
         },
     };
 
