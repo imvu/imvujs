@@ -22,21 +22,16 @@
     function asyncTest(name, func) {
         g.all_tests.push([name, func]);
     }
-    function test() {
-        function sync(fn) {
-            return function (onComplete) {
-                fn.call(this);
-                onComplete();
-            };
+    function test(name, fn) {
+        function invoke(onComplete) {
+            /*jshint validthis:true*/
+            fn.call(this);
+            onComplete();
         }
-        if (arguments.length === 1) {
-            var fn = arguments[0];
-            g.all_tests.push([fn.name, sync(fn)]);
-        } else if (arguments.length === 2) {
-            g.all_tests.push([arguments[0], sync(arguments[1])]);
-        } else {
+        if (arguments.length !== 2) {
             throw new TypeError("test requires 1 or 2 arguments");
         }
+        g.all_tests.push([name, invoke]);
     }
 
     function runTest(body, continuation) {

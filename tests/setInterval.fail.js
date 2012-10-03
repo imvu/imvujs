@@ -1,3 +1,3 @@
-test(function cannot_call_setInterval() {
+test("cannot call setInterval", function() {
     setInterval(function(){}, 10);
 });

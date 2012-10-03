@@ -6,7 +6,7 @@ module({include: 'includes/include.js'}, function(imports) {
     test("explicit name", function() {
     });
 
-    test(function foo() {
+    test("foo", function() {
         assert.true(true);
         assert.false(false);
         //assert.true(0);
@@ -18,7 +18,7 @@ module({include: 'includes/include.js'}, function(imports) {
         this.foo = 10;
     });
 
-    test(function bar() {
+    test("bar", function() {
         assert.equal(undefined, this.foo);
     });
 

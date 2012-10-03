@@ -1,3 +1,3 @@
-test(function cannot_call_setTimeout() {
+test("cannot call setTimeout", function() {
     setTimeout(function(){}, 10);
 });

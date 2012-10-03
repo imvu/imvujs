@@ -1,3 +1,3 @@
-test(function cannot_call_process_nextTick() {
+test("cannot call process.nextTick", function() {
     process.nextTick(function(){});
 });
