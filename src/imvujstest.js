@@ -260,6 +260,10 @@
                 assert.equal(expected, $(selector).text());
             },
 
+            value: function(expected, selector) {
+                assert.equal(expected, $(selector).val());
+            },
+
             count: function(elementCount, selector) {
                 assert.equal(elementCount, $(selector).length);
             },
