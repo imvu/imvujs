@@ -275,6 +275,14 @@
             notVisible: function(selector) {
                 assert.false($(selector).is(':visible'));
             },
+
+            focused: function(selector) {
+                var expected = $(selector)[0];
+                var actual = document.activeElement;
+                if (expected !== actual) {
+                    throw new AssertionError(actual.outerHTML + ' has focus. expected: ' + expected.outerHTML);
+                }
+            },
         },
     };
 
