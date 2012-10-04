@@ -286,11 +286,7 @@ function emitModules(rootPath, modules) {
     return body;
 }
 
-function ScriptError(message) {
-    this.message = message;
-}
-
-ScriptError.prototype = new Error();
+var ScriptError = SyntaxError;
 
 function combine(rootPath) {
     var m = readModules(rootPath);

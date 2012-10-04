@@ -22,26 +22,22 @@ module({include: 'includes/include.js'}, function(imports) {
         assert.equal(undefined, this.foo);
     });
 
-    fixture("Fixture", {
-        setUp: function() {
+    fixture("Fixture", function() {
+        this.setUp(function() {
             this.foo = 10; 
-        },
+        });
         
-        "test foo is big": function() {
+        test("foo is big", function() {
             assert.notNull(this.foo);
             assert.equal(10, this.foo);
-        },
-
-        "This isn't a test, so it had better not run": function() {
-            assert.notNull(null);
-        }
+        });
     });
 
-    fixture("Has a teardown", {
-        tearDown: function() {
-        },
+    fixture("Has a teardown", function() {
+        this.tearDown(function() {
+        });
 
-        "test tearDown": function() {
-        }
+        test("tearDown", function() {
+        });
     });
 });

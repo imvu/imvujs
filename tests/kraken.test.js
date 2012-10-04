@@ -1,7 +1,7 @@
 module({
 }, function(imports) {
-    fixture("Fixture", {
-        setUp: function() {
+    fixture("Fixture", function() {
+        this.setUp(function() {
             this.criticalErrorOccurred = false;
             this.sysincludeCalls = [];
             this.sysincludeModuleDep = null;
@@ -29,26 +29,26 @@ module({
             this.fakeModuleBody = function(param) {
                 this.bodyCallParam = param;
             }.bind(this);
-        },
+        });
         
-        "test include module with correct path": function() {
+        test("include module with correct path", function() {
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             assert.equal(1, this.sysincludeCalls.length);
             assert.equal('fake_dir/a.js', this.sysincludeCalls[0]);
             assert.false(this.criticalErrorOccurred);
-        },
+        });
         
-        "test call body with module after all dependencies resolved": function() {
+        test("call body with module after all dependencies resolved", function() {
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             var imports = this.bodyCallParam;
             assert.true(imports.hasOwnProperty('depA'));
             assert.false(this.criticalErrorOccurred);
-        },
+        }),
 
-        "test handle circular dependency": function() {
+        test("handle circular dependency", function() {
             this.sysincludeModuleDep = true;
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             assert.true(this.criticalErrorOccurred);
-        },     
+        });
     });
 });

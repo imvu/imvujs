@@ -13,18 +13,27 @@
         next(0);
     }
 
+    // { beforeTest: function,
+    //   afterTest: function }
     var superFixtures = [];
-    var allTests = [];
 
     function registerSuperFixture(superFixture) {
         superFixtures.push(superFixture);
     }
 
+    // { fixtureStack: linked list of fixture objects
+    //   name: string,
+    //   body: function(onComplete) }
+    var allTests = [];
+
     function asyncTest(name, func) {
-        allTests.push([name, func]);
+        allTests.push({
+            name: name,
+            body: func,
+        });
     }
     function test(name, fn) {
-        function invoke(onComplete) {
+        function sync(onComplete) {
             /*jshint validthis:true*/
             fn.call(this);
             onComplete();
@@ -32,21 +41,46 @@
         if (arguments.length !== 2) {
             throw new TypeError("test requires 1 or 2 arguments");
         }
-        allTests.push([name, invoke]);
+        allTests.push({
+            name: name,
+            body: sync,
+            fixtureStack: fixtureStack.top(),
+        });
     }
 
-    function runTest(body, continuation) {
-        var objs = [];
+    function runTest(test, continuation) {
         try {
+            var afterTests = [];
+
             for (var i = 0; i < superFixtures.length; ++i) {
-                var obj = {};
-                objs.push(obj);
-                superFixtures[i].beforeTest.call(obj);
+                var superFixture = superFixtures[i];
+
+                var superScope = {};
+                superFixture.beforeTest.call(superScope);
+                afterTests.push(superFixture.afterTest.bind(superScope));
             }
 
-            body.call({}, function () {
-                for (var i = superFixtures.length - 1; i >= 0; --i) {
-                    superFixtures[i].afterTest.call(objs[i]);
+            var testScope;
+            if (test.fixtureStack) {
+                testScope = Object.create(test.fixtureStack.fixtureObject.scope);
+            } else {
+                testScope = {}; // TODO: Object.create from the fixture scope?
+            }
+
+            var fixture = test.fixtureStack;
+            while (undefined !== fixture) {
+                var fixtureObject = fixture.fixtureObject;
+                while (undefined !== fixtureObject) {
+                    fixtureObject.setUp.call(testScope);
+                    afterTests.push(fixtureObject.tearDown.bind(testScope));
+                    fixtureObject = fixtureObject.parent;
+                }
+                fixture = fixture.next;
+            }
+
+            test.body.call(testScope, function () {
+                while (afterTests.length) {
+                    afterTests.pop()();
                 }
                 continuation(false, null);
             });
@@ -57,19 +91,16 @@
 
     function run_all(reporter, continuation) {
         sequence(allTests, function (test, next) {
-            var name = test[0],
-                body = test[1];
-
             reporter({
                 type: 'test-start',
-                name: name
+                name: test.name
             });
 
-            runTest(body, function (failed, stack) {
+            runTest(test, function (failed, stack) {
                 if (failed) {
                     reporter({
                         type: 'test-complete',
-                        name: name,
+                        name: test.name,
                         verdict: 'FAIL',
                         stack: stack
                     });
@@ -77,7 +108,7 @@
                 } else {
                     reporter({
                         type: 'test-complete',
-                        name: name,
+                        name: test.name,
                         verdict: 'PASS'
                     });
                     next();
@@ -113,15 +144,87 @@
         return obj;
     }
 
-    function fixture(fixtureName, obj) {
-        return registerFixture(fixtureName, obj, function (fixture, setUp, body, tearDown) {
-            return function (continuation) {
-                setUp.call(fixture, function () {});
-                body.call(fixture);
-                tearDown.call(fixture, function () {});
-                continuation();
+    var fixtureStack = {
+        push: function(fo) {
+            this._top = {
+                fixtureObject: fo,
+                next: this._top
             };
-        });
+        },
+        pop: function() {
+            this._top = this._top.next;
+        },
+        top: function() {
+            return this._top;
+        },
+        _top: undefined,
+    };
+
+    function FixtureObject(parent) {
+        this.parent = parent;
+
+        if (this.parent === undefined) {
+            this.scope = {
+                setUp: function(setUp) {
+                    this.setUp = setUp;
+                }.bind(this),
+                tearDown: function(tearDown) {
+                    this.tearDown = tearDown;
+                }.bind(this),
+            };
+        } else {
+            this.scope = this.parent.scope;
+        }
+    }
+    FixtureObject.prototype.setUp = function defaultSetUp() {
+    };
+    FixtureObject.prototype.tearDown = function defaultTearDown() {
+    };
+
+    FixtureObject.prototype.extend = function(fixtureName, definition) {
+        if (!(definition instanceof Function)) {
+            throw new TypeError("fixture's 2nd argument must be a function");
+        }
+
+        var fixtureObject = new FixtureObject(this);
+
+        fixtureStack.push(fixtureObject);
+        try {
+            definition.call(fixtureObject.scope);
+        }
+        finally {
+            fixtureStack.pop();
+        }
+
+        return fixtureObject;
+    };
+
+    fixture = FixtureObject.prototype.extend.bind(undefined);
+
+    function fixture(fixtureName, definition) {
+        if (!(definition instanceof Function)) {
+            throw new TypeError("fixture's 2nd argument must be a function");
+        }
+
+        var scope = {
+            setUp: function(setUp) {
+                fixtureObject.setUp = setUp;
+            },
+            tearDown: function(tearDown) {
+                fixtureObject.tearDown = tearDown;
+            },
+        };
+        var fixtureObject = new FixtureObject(undefined, scope);
+
+        fixtureStack.push(fixtureObject);
+        try {
+            definition.call(fixtureObject.scope);
+        }
+        finally {
+            fixtureStack.pop();
+        }
+
+        return fixtureObject;
     }
 
     function asyncFixture(fixtureName, obj) {
