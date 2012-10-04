@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<script src="../../../src/BaseClass.js"></script>
+<script src="../../../src/kraken.js"></script>
+<body>
+<script>
+  window.trace = [];
+  var expected = 3;
+  var received = 0;
+  var failures = 0;
+
+  function gate() {
+      received++;
+      if (received == expected) {
+          success();
+      }
+  }
+
+  function success() {
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
+  }
+
+  try {
+      module({}, function(imports) {
+          gate();
+      });
+      module({}, function(imports) {
+          gate();
+      });
+  } catch (e) {
+    failures += 1;
+    console.log('TODO: add the ability to support two module() calls in a document');
+    gate();
+  }
+</script>
+</body>
+</html>
