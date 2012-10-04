@@ -282,6 +282,14 @@
                 assert.false($(selector).hasClass(className));
             },
 
+            hasAttribute: function(attributeName, selector) {
+                assert.true($(selector).is('[' + attributeName + ']'));
+            },
+
+            notHasAttribute: function(attributeName, selector) {
+                assert.false($(selector).is('[' + attributeName + ']'));
+            },
+
             text: function(expected, selector) {
                 assert.equal(expected, $(selector).text());
             },
