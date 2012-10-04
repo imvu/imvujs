@@ -64,12 +64,15 @@
                 Object.create(test.fixture.scope) :
                 {};
 
-            var fixtureObject = test.fixture;
-            while (undefined !== fixtureObject) {
+            var runSetUp = function(fixtureObject) {
+                if (undefined === fixtureObject) {
+                    return;
+                }
+                runSetUp(fixtureObject.parent);
                 fixtureObject.setUp.call(testScope);
                 afterTests.push(fixtureObject.tearDown.bind(testScope));
-                fixtureObject = fixtureObject.parent;
-            }
+            };
+            runSetUp(test.fixture);
 
             test.body.call(testScope, function () {
                 while (afterTests.length) {
@@ -142,18 +145,14 @@
     function Fixture(parent) {
         this.parent = parent;
 
-        if (this.parent === undefined) {
-            this.scope = {
-                setUp: function(setUp) {
-                    this.setUp = setUp;
-                }.bind(this),
-                tearDown: function(tearDown) {
-                    this.tearDown = tearDown;
-                }.bind(this),
-            };
-        } else {
-            this.scope = this.parent.scope;
-        }
+        var scope = (this.parent === undefined ? {} : Object.create(this.parent.scope));
+        scope.setUp = function(setUp) {
+            this.setUp = setUp;
+        }.bind(this);
+        scope.tearDown = function(tearDown) {
+            this.tearDown = tearDown;
+        }.bind(this);
+        this.scope = scope;
     }
     Fixture.prototype.setUp = function defaultSetUp() {
     };
