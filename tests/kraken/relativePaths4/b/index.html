@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<script src="../../../../src/BaseClass.js"></script>
+<script src="../../../../src/kraken.js"></script>
+</head>
+<body>
+<script>
+
+  window.trace = [];
+
+  module({a: '../a/b/c/d.js'}, function(imports) {
+      imports.a.invoke();
+
+      var failures = 0;
+      if (JSON.stringify(window.trace) !== JSON.stringify(['e', 'a', 'd'])) {
+          ++failures;
+      }
+
+      var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
+      var tt = document.createElement('tt');
+      tt.appendChild(document.createTextNode(message));
+      document.body.appendChild(tt);
+  });
+
+</script>
+</body>
+</html>

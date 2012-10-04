@@ -66,7 +66,7 @@ var KRAKEN_DEBUG = true;
         xhr.send();
     }
 
-    var ourUrl = null;
+    var ourUrl = window.location.pathname;
 
     var completeJs = {}; // url : Future<exportTable>
 
@@ -191,7 +191,7 @@ var KRAKEN_DEBUG = true;
     }
 
     function toAbsoluteUrl(url, relativeTo) {
-        if (url[0] === '/' || typeof relativeTo !== 'string') {
+        if (url[0] === '/') {
             return url;
         }
 
