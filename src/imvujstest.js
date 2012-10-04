@@ -39,13 +39,19 @@
             onComplete();
         }
         if (arguments.length !== 2) {
-            throw new TypeError("test requires 1 or 2 arguments");
+            throw new TypeError("test requires 2 arguments");
         }
-        allTests.push({
-            name: name,
-            body: sync,
-            fixture: activeFixture,
-        });
+
+        if (undefined !== activeFixture && activeFixture.abstract) {
+            activeFixture.abstractTests.push({
+                name: name,
+                body: sync });
+        } else {
+            allTests.push({
+                name: name,
+                body: sync,
+                fixture: activeFixture });
+        }
     }
 
     function runTest(test, continuation) {
@@ -142,45 +148,70 @@
 
     var activeFixture;
 
-    function Fixture(parent) {
-        this.parent = parent;
+    function Fixture(parent, definition, abstract) {
+        if (!(definition instanceof Function)) {
+            throw new TypeError("fixture's 2nd argument must be a function");
+        }
 
-        var scope = (this.parent === undefined ? {} : Object.create(this.parent.scope));
-        scope.setUp = function(setUp) {
+        this.parent = parent;
+        this.abstract = abstract;
+        if (this.abstract) {
+            // { name: string,
+            //   body: function }
+            this.abstractTests = [];
+        }
+
+        if (this.parent !== undefined) {
+            this.parent.addAbstractTests(this);
+        }
+
+        this.scope = (this.parent === undefined ? {} : Object.create(this.parent.scope));
+        this.scope.setUp = function(setUp) {
             this.setUp = setUp;
         }.bind(this);
-        scope.tearDown = function(tearDown) {
+        this.scope.tearDown = function(tearDown) {
             this.tearDown = tearDown;
         }.bind(this);
-        this.scope = scope;
+
+        if (undefined !== activeFixture) {
+            throw new TypeError("Cannot define a fixture within another fixture");
+        }
+
+        activeFixture = this;
+        try {
+            definition.call(this.scope);
+        }
+        finally {
+            activeFixture = undefined;
+        }
     }
     Fixture.prototype.setUp = function defaultSetUp() {
     };
     Fixture.prototype.tearDown = function defaultTearDown() {
     };
+    Fixture.prototype.addAbstractTests = function(concreteFixture) {
+        if (this.abstract) {
+            for (var i = 0; i < this.abstractTests.length; ++i) {
+                var test = this.abstractTests[i];
+                allTests.push({
+                    name: test.name,
+                    body: test.body,
+                    fixture: concreteFixture});
+            }
+        }
+        if (this.parent) {
+            this.parent.addAbstractTests(concreteFixture);
+        }
+    };
 
     Fixture.prototype.extend = function(fixtureName, definition) {
-        if (!(definition instanceof Function)) {
-            throw new TypeError("fixture's 2nd argument must be a function");
-        }
-
-        var fixtureObject = new Fixture(this);
-
-        if (undefined !== activeFixture) {
-            throw new TypeError("Cannot define a fixture within another fixture");
-        }
-        activeFixture = fixtureObject;
-        try {
-            definition.call(fixtureObject.scope);
-        }
-        finally {
-            activeFixture = undefined;
-        }
-
-        return fixtureObject;
+        return new Fixture(this, definition, false);
     };
 
     var fixture = Fixture.prototype.extend.bind(undefined);
+    fixture.abstract = function(fixtureName, definition) {
+        return new Fixture(undefined, definition, true);
+    };
 
     function asyncFixture(fixtureName, obj) {
         return registerFixture(fixtureName, obj, function (fixture, setUp, body, tearDown) {
