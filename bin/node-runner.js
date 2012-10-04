@@ -101,7 +101,7 @@ function runTest(testPath, continuation) {
     currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
-    run_all(function (report) {
+    return run_all(function (report) {
         if (report.type === 'test-start') {
             syncWrite('* ' + report.name + '... ');
         }
@@ -115,7 +115,7 @@ function runTest(testPath, continuation) {
                 syncWrite(report.stack);
             }
         }
-    }, continuation);
+    });
 }
 
 function main() {
@@ -140,32 +140,15 @@ function main() {
         loadSuperFixture(superfixtures[i]);
     }
 
-    function sequence(list, action, continuation) {
-        function next(index) {
-            if (index < list.length) {
-                action(list[index], next.bind(null, index + 1));
-            } else {
-                continuation();
-            }
-        }
-        next(0);
-    }
-
-    sequence(tests, function (test, next) {
+    for (var i = 0; i < tests.length; ++i) {
+        var test = tests[i];
         syncWrite('\n');
-        runTest(test, function (failed) {
-            if (failed) {
-                syncWrite('\n');
-                process.exit(1);
-            } else {
-                next();
-            }
-        });
-    }, function () {
-        process.exit(0);
-    });
-
-    throw new Error('Test failure do to incomplete asynchronous test. Did you forget to call the onComplete() parameter to an asynchronous test?');
+        if (!runTest(test)) {
+            syncWrite('\n');
+            process.exit(1);
+        }
+    }
+    process.exit(0);
 }
 
 main();

@@ -2,17 +2,6 @@
 (function() {
     "use strict";
 
-    function sequence(list, action, continuation) {
-        function next(index) {
-            if (index < list.length) {
-                action(list[index], next.bind(null, index + 1));
-            } else {
-                continuation();
-            }
-        }
-        next(0);
-    }
-
     // { beforeTest: function,
     //   afterTest: function }
     var superFixtures = [];
@@ -23,21 +12,10 @@
 
     // { fixture: Fixture instance,
     //   name: string,
-    //   body: function(onComplete) }
+    //   body: function() }
     var allTests = [];
 
-    function asyncTest(name, func) {
-        allTests.push({
-            name: name,
-            body: func,
-        });
-    }
     function test(name, fn) {
-        function sync(onComplete) {
-            /*jshint validthis:true*/
-            fn.call(this);
-            onComplete();
-        }
         if (arguments.length !== 2) {
             throw new TypeError("test requires 2 arguments");
         }
@@ -45,11 +23,11 @@
         if (undefined !== activeFixture && activeFixture.abstract) {
             activeFixture.abstractTests.push({
                 name: name,
-                body: sync });
+                body: fn });
         } else {
             allTests.push({
                 name: name,
-                body: sync,
+                body: fn,
                 fixture: activeFixture });
         }
     }
@@ -80,70 +58,43 @@
             };
             runSetUp(test.fixture);
 
-            test.body.call(testScope, function () {
-                while (afterTests.length) {
-                    afterTests.pop()();
-                }
-                continuation(false, null);
-            });
+            test.body.call(testScope);
+            while (afterTests.length) {
+                afterTests.pop()();
+            }
+            return false;
         } catch (e) {
-            continuation(true, e.stack);
+            return {stack: e.stack};
         }
     }
 
-    function run_all(reporter, continuation) {
-        sequence(allTests, function (test, next) {
+    function run_all(reporter) {
+        for (var i = 0; i < allTests.length; ++i) {
+            var test = allTests[i];
             reporter({
                 type: 'test-start',
                 name: test.name
             });
 
-            runTest(test, function (failed, stack) {
-                if (failed) {
-                    reporter({
-                        type: 'test-complete',
-                        name: test.name,
-                        verdict: 'FAIL',
-                        stack: stack
-                    });
-                    continuation(true); // short-circuit
-                } else {
-                    reporter({
-                        type: 'test-complete',
-                        name: test.name,
-                        verdict: 'PASS'
-                    });
-                    next();
-                }
-            });
-        }, function () {
-            allTests = [];
-            continuation(false);
-        });
-    }
-
-    function nul(continuation) {
-        continuation();
-    }
-
-    function registerFixture(fixtureName, obj, wrap) {
-        obj = Object.create(obj);
-        _.extend(obj, obj.baseFixture);
-
-        var setUp = obj.setUp ? obj.setUp : nul;
-        var tearDown = obj.tearDown ? obj.tearDown : nul;
-
-        for (var testName in obj) {
-            if (testName.substr(0, 4) !== 'test') {
-                continue;
+            var failed = runTest(test);
+            if (failed) {
+                reporter({
+                    type: 'test-complete',
+                    name: test.name,
+                    verdict: 'FAIL',
+                    stack: failed.stack
+                });
+                return false;
             } else {
-                var self = Object.create(obj);
-
-                asyncTest(fixtureName + '.' + testName, wrap(obj, setUp, obj[testName], tearDown));
+                reporter({
+                    type: 'test-complete',
+                    name: test.name,
+                    verdict: 'PASS'
+                });
             }
         }
-
-        return obj;
+        allTests = [];
+        return true;
     }
 
     var activeFixture;
@@ -214,18 +165,6 @@
     fixture.abstract = function(fixtureName, definition) {
         return new Fixture(undefined, definition, true);
     };
-
-    function asyncFixture(fixtureName, obj) {
-        return registerFixture(fixtureName, obj, function (fixture, setUp, body, tearDown) {
-            return function (continuation) {
-                setUp.call(fixture, function () {
-                    body.call(fixture, function () {
-                        tearDown.call(fixture, continuation);
-                    });
-                });
-            };
-        });
-    }
 
     var AssertionError = Error;
 
@@ -389,8 +328,6 @@
     g.AssertionError = AssertionError;
     g.assert = assert;
     g.test = test;
-    g.asyncTest = asyncTest;
-    g.asyncFixture = asyncFixture;
 
     g.setTimeout = function() {
         throw new AssertionError("Don't call setTimeout in tests.  Use fakes.");
