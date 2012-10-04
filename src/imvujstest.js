@@ -208,7 +208,9 @@
         return new Fixture(this, definition, false);
     };
 
-    var fixture = Fixture.prototype.extend.bind(undefined);
+    function fixture(fixtureName, definition) {
+        return new Fixture(undefined, definition, false);
+    }
     fixture.abstract = function(fixtureName, definition) {
         return new Fixture(undefined, definition, true);
     };
