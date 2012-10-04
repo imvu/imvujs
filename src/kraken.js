@@ -255,15 +255,12 @@ var KRAKEN_DEBUG = true;
         }
 
         var url = ourUrl;
-        var isToplevel = (url === null);
         var future;
         if (completeJs.hasOwnProperty(url)) {
             future = completeJs[url];
         } else {
-            if (isToplevel) {
-                future = new Future("module " + url);
-                completeJs[url] = future;
-            }
+            future = new Future("module " + url);
+            completeJs[url] = future;
         }
 
         var result = {};
@@ -305,9 +302,7 @@ var KRAKEN_DEBUG = true;
         function complete() {
             C.log('evaluating module', url);
             var exportTable = body.call(null, result);
-            if (!isToplevel) {
-                future.complete(exportTable);
-            }
+            future.complete(exportTable);
         }
     }
 
