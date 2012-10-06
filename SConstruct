@@ -27,7 +27,7 @@ NODE_SOURCES = BASE_SOURCES + [
 env = Environment(
     ENV=os.environ,
     toolpath=['tools'],
-    tools=['closure', 'gzip'])
+    tools=['closure', 'gzip', 'kraken_combine'])
 
 BASE_CLOSURE_FLAGS = ['--language_in', 'ECMASCRIPT5']
 
@@ -55,6 +55,9 @@ targets += env.ClosureCompiler(
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS)
 
 env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
+
+imvu_fakes_js = env.KrakenCombine('out/imvu.fakes.js', 'fakes/Package.js')
+env.ClosureCompiler('out/imvu.fakes.min.js', imvu_fakes_js)
 
 if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)
