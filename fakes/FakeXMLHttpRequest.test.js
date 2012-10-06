@@ -6,12 +6,20 @@ module({
             this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory
         });
 
+        this.tearDown(function() {
+            assert.true(this.FakeXMLHttpRequest._areAllResolved());
+        });
+
         test('unexpected request', function () {
-            var xhr = new this.FakeXMLHttpRequest();
+            var calls = [];
+            var xhr = new this.FakeXMLHttpRequest;
+            xhr.onreadystatechange = function() {
+                calls.push('readyState ' + this.readyState);
+            };
             xhr.open('GET', '/foo/bar/baz');
-            assert.throws(Error, function () {
-                xhr.send();
-            });
+            xhr.send();
+            this.FakeXMLHttpRequest._respond('GET', '/foo/bar/baz');
+            assert.deepEqual(['readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
         });
 
         test('expected request', function () {

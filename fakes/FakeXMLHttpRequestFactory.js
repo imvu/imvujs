@@ -4,6 +4,7 @@ module({
 }, function (imports) {
     function FakeXMLHttpRequestFactory() {
         var expectations = {};
+        var pending = {};
 
         function FakeXMLHttpRequest() {
             this.requestHeaders = {};
@@ -58,17 +59,40 @@ module({
             };
         };
 
+        FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
+            var key = method + ' ' + url;
+            if (!pending[key]) {
+                throw new Error('Request never sent: ' + key);
+            }
+
+            var p = pending[key];
+            delete pending[key];
+
+            var xhr = p.xhr;
+
+            xhr.status = responseCode;
+            xhr.responseHeaders = responseHeaders;
+            xhr.readyState = xhr.HEADERS_RECEIVED;
+            xhr.onreadystatechange();
+            xhr.readyState = xhr.LOADING;
+            xhr.onreadystatechange();
+            xhr.responseText = responseBody;
+            xhr.readyState = xhr.DONE;
+            xhr.onreadystatechange();
+        };
+
         FakeXMLHttpRequest._areAllResolved = function () {
             return Object.keys(expectations).length === 0;
         };
 
         FakeXMLHttpRequest._triggerExpectation = function (xhr, body) {
-            var key = xhr.method + ' ' + xhr.url,
-            expectation;
+            var key = xhr.method + ' ' + xhr.url;
             if (!expectations[key]) {
-                throw new Error('Unexpected XHR sent: ' + key);
+                pending[key] = {
+                    xhr: xhr,
+                };
             } else {
-                expectation = expectations[key];
+                var expectation = expectations[key];
                 delete expectations[key];
                 xhr.status = expectation.code;
                 xhr.responseHeaders = expectation.headers;
