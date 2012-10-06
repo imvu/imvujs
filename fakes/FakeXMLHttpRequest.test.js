@@ -1,15 +1,13 @@
 module({
-    FakeXMLHttpRequest: 'FakeXMLHttpRequest.js'
+    FakeXMLHttpRequestFactory: 'FakeXMLHttpRequestFactory.js'
 }, function (imports) {
-    var FakeXMLHttpRequest = imports.FakeXMLHttpRequest;
-
     fixture('FakeXMLHttpRequest', function() {
         this.setUp(function () {
-            FakeXMLHttpRequest.resetExpectations();
+            this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory
         });
 
         test('unexpected request', function () {
-            var xhr = new FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
             assert.throws(Error, function () {
                 xhr.send();
@@ -17,9 +15,9 @@ module({
         });
 
         test('expected request', function () {
-            var xhr = new FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
-            FakeXMLHttpRequest.expect('GET', '/foo/bar/baz', 200, {
+            this.FakeXMLHttpRequest._expect('GET', '/foo/bar/baz', 200, {
                 "Content-Type": "text/plain"
             }, 'Huzzah!');
             xhr.send();
@@ -29,9 +27,9 @@ module({
         });
 
         test('getAllResponseHeaders', function () {
-            var xhr = new FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/ok');
-            FakeXMLHttpRequest.expect('GET', '/ok', 200, {
+            this.FakeXMLHttpRequest._expect('GET', '/ok', 200, {
                 a: 'b',
                 c: 'd'
             }, 'k');
@@ -41,26 +39,26 @@ module({
         });
 
         test('all resolved', function () {
-            assert.true(FakeXMLHttpRequest.allResolved());
-            FakeXMLHttpRequest.expect('GET', '/foo/bar/baz', 200, {
+            assert.true(this.FakeXMLHttpRequest._areAllResolved());
+            this.FakeXMLHttpRequest._expect('GET', '/foo/bar/baz', 200, {
                 "Content-Type": "text/plain"
             }, 'Huzzah!');
-            assert.false(FakeXMLHttpRequest.allResolved());
+            assert.false(this.FakeXMLHttpRequest._areAllResolved());
 
-            var xhr = new FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
             xhr.send();
 
-            assert.true(FakeXMLHttpRequest.allResolved());
+            assert.true(this.FakeXMLHttpRequest._areAllResolved());
         });
 
         test('readyStateChange', function () {
-            FakeXMLHttpRequest.expect('POST', '/foo/bar', 201, {
+            this.FakeXMLHttpRequest._expect('POST', '/foo/bar', 201, {
                 'x-thing': 'thang'
             }, 'yup');
 
-            var xhr = new FakeXMLHttpRequest(),
-                states = [];
+            var xhr = new this.FakeXMLHttpRequest();
+            var states = [];
             xhr.open('POST', '/foo/bar');
             xhr.onreadystatechange = function () {
                 states.push(xhr.readyState);
@@ -80,11 +78,11 @@ module({
         });
 
         test('case insensitive headers', function () {
-            FakeXMLHttpRequest.expect('GET', '/foo/bar', 404, {
+            this.FakeXMLHttpRequest._expect('GET', '/foo/bar', 404, {
                 'HeaDeR': 'taco sauce'
             }, 'yup');
 
-            var xhr = new FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar');
             xhr.send();
             assert.equal(xhr.getResponseHeader('hEAdEr'), 'taco sauce');
