@@ -11,36 +11,84 @@ module({
             this.readyState = this.UNSENT;
         }
 
-        FakeXMLHttpRequest.prototype.UNSENT = 0;
-        FakeXMLHttpRequest.prototype.OPENED = 1;
-        FakeXMLHttpRequest.prototype.HEADERS_RECEIVED = 2;
-        FakeXMLHttpRequest.prototype.LOADING = 3;
-        FakeXMLHttpRequest.prototype.DONE = 4;
+        function defaultEventHandler() {
+        }
 
-        FakeXMLHttpRequest.prototype.onreadystatechange = function () {};
-        FakeXMLHttpRequest.prototype.open = function (method, url) {
-            this.method = method;
-            this.url = url;
-            this.readyState = this.OPENED;
-            this.onreadystatechange();
-        };
-        FakeXMLHttpRequest.prototype.withCredentials = false;
-        FakeXMLHttpRequest.prototype.setRequestHeader = function (key, value) {
-            this.requestHeaders[key.toLowerCase()] = value;
-        };
-        FakeXMLHttpRequest.prototype.send = function (body) {
-            FakeXMLHttpRequest._triggerExpectation(this, body);
-        };
-        FakeXMLHttpRequest.prototype.getResponseHeader = function (key) {
-            return this.responseHeaders[key.toLowerCase()];
-        };
-        FakeXMLHttpRequest.prototype.getAllResponseHeaders = function () {
-            var str = '';
-            Object.keys(this.responseHeaders).forEach(function (header) {
-                str += header + ': ' + this.responseHeaders[header] + '\r\n';
-            }.bind(this));
-            return str;
-        };
+        _.extend(FakeXMLHttpRequest.prototype, {
+            UNSENT: 0,
+            OPENED: 1,
+            HEADERS_RECEIVED: 2,
+            LOADING: 3,
+            DONE: 4,
+
+            _error: false,
+            withCredentials: false,
+            
+            onloadstart: defaultEventHandler,
+            onprogress: defaultEventHandler,
+            onabort: defaultEventHandler,
+            onerror: defaultEventHandler,
+            onload: defaultEventHandler,
+            ontimeout: defaultEventHandler,
+            onloadend: defaultEventHandler,
+
+            onreadystatechange: defaultEventHandler,
+
+            open: function(method, url) {
+                this.method = method;
+                this.url = url;
+                this._changeReadyState(this.OPENED);
+            },
+            setRequestHeader: function(key, value) {
+                this.requestHeaders[key.toLowerCase()] = value;
+            },
+            send: function(body) {
+                FakeXMLHttpRequest._triggerExpectation(this, body);
+            },
+            getResponseHeader: function(key) {
+                return this.responseHeaders[key.toLowerCase()];
+            },
+            getAllResponseHeaders: function() {
+                var str = '';
+                Object.keys(this.responseHeaders).forEach(function (header) {
+                    str += header + ': ' + this.responseHeaders[header] + '\r\n';
+                }.bind(this));
+                return str;
+            },
+
+            _triggerAbortError: function() {
+                this._error = true;
+                this._changeReadyState(this.DONE);
+                this.onerror(); // TODO: need argument?
+                this.onloadend(); // TODO: need argument?
+            },
+
+            _triggerNetworkError: function() {
+                this._error = true;
+                this._changeReadyState(this.DONE);
+                this.onerror(); // TODO: need argument?
+                this.onloadend(); // TODO: need argument?
+            },
+
+            _changeReadyState: function(state) {
+                this.readyState = state;
+                this.onreadystatechange();
+            },
+        });
+
+        Object.defineProperty(FakeXMLHttpRequest.prototype, 'status', {
+            get: function() {
+                if (
+                    this.readyState === this.UNSENT ||
+                    this.readyState === this.OPENED ||
+                    this._error
+                ) {
+                    return 0;
+                } else {
+                    return this._status;
+                }
+            },
+        });
 
         FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, callback) {
             var normalizedHeaders = {};
@@ -59,18 +107,30 @@ module({
             };
         };
 
-        FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
+        FakeXMLHttpRequest._beginResponse = function(method, url) {
             var key = method + ' ' + url;
-            if (!pending[key]) {
+
+            var p = pending[key];
+            if (!p) {
                 throw new Error('Request never sent: ' + key);
             }
 
+            delete pending[key];
+            return p.xhr;
+        };
+
+        FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
+            var key = method + ' ' + url;
             var p = pending[key];
+            if (!p) {
+                throw new Error('Request never sent: ' + key);
+            }
+
             delete pending[key];
 
             var xhr = p.xhr;
 
-            xhr.status = responseCode;
+            xhr._status = responseCode;
             xhr.responseHeaders = responseHeaders;
             xhr.readyState = xhr.HEADERS_RECEIVED;
             xhr.onreadystatechange();
@@ -94,7 +154,7 @@ module({
             } else {
                 var expectation = expectations[key];
                 delete expectations[key];
-                xhr.status = expectation.code;
+                xhr._status = expectation.code;
                 xhr.responseHeaders = expectation.headers;
                 xhr.readyState = xhr.HEADERS_RECEIVED;
                 xhr.onreadystatechange();
