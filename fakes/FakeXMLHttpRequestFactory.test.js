@@ -95,5 +95,24 @@ module({
             xhr.send();
             assert.equal(xhr.getResponseHeader('hEAdEr'), 'taco sauce');
         });
+
+        test('FakeXHR has status fields', function() {
+            assert.equal(0, this.FakeXMLHttpRequest.UNSENT);
+            assert.equal(1, this.FakeXMLHttpRequest.OPENED);
+            assert.equal(2, this.FakeXMLHttpRequest.HEADERS_RECEIVED);
+            assert.equal(3, this.FakeXMLHttpRequest.LOADING);
+            assert.equal(4, this.FakeXMLHttpRequest.DONE);
+
+            var xhr = new this.FakeXMLHttpRequest;
+            assert.equal(0, xhr.UNSENT);
+            assert.equal(1, xhr.OPENED);
+            assert.equal(2, xhr.HEADERS_RECEIVED);
+            assert.equal(3, xhr.LOADING);
+            assert.equal(4, xhr.DONE);
+        });
+
+        test('can cause error after headers are received', function() {
+            
+        });
     });
 });

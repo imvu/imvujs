@@ -2,6 +2,14 @@
 
 module({
 }, function (imports) {
+    var commonProperties = {
+        UNSENT: 0,
+        OPENED: 1,
+        HEADERS_RECEIVED: 2,
+        LOADING: 3,
+        DONE: 4,
+    };
+
     function FakeXMLHttpRequestFactory() {
         var expectations = {};
         var pending = {};
@@ -14,13 +22,10 @@ module({
         function defaultEventHandler() {
         }
 
-        _.extend(FakeXMLHttpRequest.prototype, {
-            UNSENT: 0,
-            OPENED: 1,
-            HEADERS_RECEIVED: 2,
-            LOADING: 3,
-            DONE: 4,
+        _.extend(FakeXMLHttpRequest, commonProperties);
+        _.extend(FakeXMLHttpRequest.prototype, commonProperties);
 
+        _.extend(FakeXMLHttpRequest.prototype, {
             _error: false,
             withCredentials: false,
             
