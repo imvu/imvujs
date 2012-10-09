@@ -161,22 +161,11 @@ module({
         };
 
         FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
-            var key = method + ' ' + url;
-            var xhr = pending[key];
-            if (!xhr) {
-                throw new Error('Request never sent: ' + key);
-            }
-            delete pending[key];
+            var xhr = FakeXMLHttpRequest._beginResponse(method, url);
 
-            xhr._status = responseCode;
-            xhr.responseHeaders = responseHeaders;
-            xhr.readyState = xhr.HEADERS_RECEIVED;
-            xhr.onreadystatechange();
-            xhr.readyState = xhr.LOADING;
-            xhr.onreadystatechange();
-            xhr.responseText = responseBody;
-            xhr.readyState = xhr.DONE;
-            xhr.onreadystatechange();
+            xhr._headersReceived(responseCode, '', responseHeaders);
+            xhr._dataReceived(responseBody);
+            xhr._done();
         };
 
         FakeXMLHttpRequest._areAllResolved = function () {
