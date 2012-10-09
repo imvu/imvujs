@@ -111,7 +111,7 @@ module({
             assert.equal(4, xhr.DONE);
         });
 
-        test('event flow', function() {
+        test('event flow: happy path', function() {
             var calls = [];
             function callback(name) {
                 return function() {
@@ -156,9 +156,29 @@ module({
                   readyState: xhr.OPENED },
             ]);
 
-            
-            //assert.equal(1, xhr.
-            //xhr._advanceState(
+            xhr._headersReceived(200, 'status text', {});
+            expectCalls([
+                { name: 'readystatechange',
+                  readyState: xhr.HEADERS_RECEIVED },
+            ]);
+            assert.equal(200, xhr.status);
+            assert.equal('status text', xhr.statusText);
+
+            xhr._dataReceived('');
+            expectCalls([
+                { name: 'readystatechange',
+                  readyState: xhr.LOADING },
+            ]);
+
+            xhr._done();
+            expectCalls([
+                { name: 'readystatechange',
+                  readyState: xhr.DONE },
+                { name: 'load',
+                  readyState: xhr.DONE },
+                { name: 'loadend',
+                  readyState: xhr.DONE },
+            ]);
         });
     });
 });

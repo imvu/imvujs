@@ -46,35 +46,32 @@ module({
 
                 this.method = method;
                 this.url = url;
-                this._changeReadyState(this.OPENED);
+                this.__changeReadyState(this.OPENED);
             },
             setRequestHeader: function(key, value) {
                 this.requestHeaders[key.toLowerCase()] = value;
             },
             send: function(body) {
-                var xhr = this;
-                var key = xhr.method + ' ' + xhr.url;
+                var key = this.method + ' ' + this.url;
                 if (expectations[key]) {
                     var expectation = expectations[key];
                     delete expectations[key];
-                    xhr._status = expectation.code;
-                    xhr.responseHeaders = expectation.headers;
-                    xhr.readyState = xhr.HEADERS_RECEIVED;
-                    xhr.onreadystatechange();
-                    xhr.readyState = xhr.LOADING;
-                    xhr.onreadystatechange();
-                    xhr.responseText = expectation.body;
-                    xhr.readyState = xhr.DONE;
-                    xhr.onreadystatechange();
-                    expectation.callback(xhr, body);
+                    this._status = expectation.code;
+                    this.responseHeaders = expectation.headers;
+                    this.readyState = this.HEADERS_RECEIVED;
+                    this.onreadystatechange();
+                    this.readyState = this.LOADING;
+                    this.onreadystatechange();
+                    this.responseText = expectation.body;
+                    this.readyState = this.DONE;
+                    this.onreadystatechange();
+                    expectation.callback(this, body);
                     return;
                 }
                 
                 this.onreadystatechange();
                 this.onloadstart();
-                pending[key] = {
-                    xhr: xhr,
-                };
+                pending[key] = this;
             },
             getResponseHeader: function(key) {
                 return this.responseHeaders[key.toLowerCase()];
@@ -87,21 +84,37 @@ module({
                 return str;
             },
 
+            _headersReceived: function(statusCode, statusText, responseHeaders) {
+                this._status = statusCode;
+                this.statusText = statusText;
+                this.__changeReadyState(this.HEADERS_RECEIVED);
+            },
+
+            _dataReceived: function() {
+                this.__changeReadyState(this.LOADING);
+            },
+
+            _done: function() {
+                this.__changeReadyState(this.DONE);
+                this.onload();
+                this.onloadend();
+            },
+
             _triggerAbortError: function() {
                 this._error = true;
-                this._changeReadyState(this.DONE);
+                this.__changeReadyState(this.DONE);
                 this.onerror(); // TODO: need argument?
                 this.onloadend(); // TODO: need argument?
             },
 
             _triggerNetworkError: function() {
                 this._error = true;
-                this._changeReadyState(this.DONE);
+                this.__changeReadyState(this.DONE);
                 this.onerror(); // TODO: need argument?
                 this.onloadend(); // TODO: need argument?
             },
 
-            _changeReadyState: function(state) {
+            __changeReadyState: function(state) {
                 this.readyState = state;
                 this.onreadystatechange();
             },
@@ -141,25 +154,22 @@ module({
         FakeXMLHttpRequest._beginResponse = function(method, url) {
             var key = method + ' ' + url;
 
-            var p = pending[key];
-            if (!p) {
+            var xhr = pending[key];
+            if (!xhr) {
                 throw new Error('Request never sent: ' + key);
             }
-
             delete pending[key];
-            return p.xhr;
+
+            return xhr;
         };
 
         FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
             var key = method + ' ' + url;
-            var p = pending[key];
-            if (!p) {
+            var xhr = pending[key];
+            if (!xhr) {
                 throw new Error('Request never sent: ' + key);
             }
-
             delete pending[key];
-
-            var xhr = p.xhr;
 
             xhr._status = responseCode;
             xhr.responseHeaders = responseHeaders;
