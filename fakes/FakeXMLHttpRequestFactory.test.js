@@ -190,5 +190,20 @@ module({
                   readyState: this.xhr.DONE },
             ]);
         });
+
+        test("abort triggers abort error", function() {
+            this.xhr.open('POST', 'http://url');
+            this.xhr.send();
+            this.xhr._triggerAbortError();
+
+            assert.deepEqual(
+                [ 'readystatechange',
+                  'readystatechange',
+                  'loadstart',
+                  'readystatechange',
+                  'abort',
+                  'loadend' ],
+                this.calls.map(function(value) { return value.name }));
+        });
     });
 });
