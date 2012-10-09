@@ -19,7 +19,7 @@ module({
             xhr.open('GET', '/foo/bar/baz');
             xhr.send();
             this.FakeXMLHttpRequest._respond('GET', '/foo/bar/baz');
-            assert.deepEqual(['readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
+            assert.deepEqual(['readyState 1', 'readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
         });
 
         test('expected request', function () {
@@ -111,8 +111,54 @@ module({
             assert.equal(4, xhr.DONE);
         });
 
-        test('can cause error after headers are received', function() {
+        test('event flow', function() {
+            var calls = [];
+            function callback(name) {
+                return function() {
+                    calls.push({
+                        name: name,
+                        readyState: this.readyState,
+                    });
+                };
+            }
+
+            function expectCalls(expected) {
+                assert.deepEqual(expected, calls);
+                calls = [];
+            }
+
+            var xhr = new this.FakeXMLHttpRequest;
+            xhr.onloadstart = callback('loadstart');
+            xhr.onprogress = callback('progress');
+            xhr.onabort = callback('abort');
+            xhr.onerror = callback('error');
+            xhr.onload = callback('load');
+            xhr.ontimeout = callback('timeout');
+            xhr.onloadend = callback('loadend');
+            xhr.onreadystatechange = callback('readystatechange');
+
+            assert.equal(0, xhr.readyState);
+            expectCalls([]);
+
+            xhr.open('POST', 'http://url');
+            expectCalls([
+                { name: 'readystatechange',
+                  readyState: xhr.OPENED },
+            ]);
+
+            xhr.send();
+
+            expectCalls([
+                // historical event
+                { name: 'readystatechange',
+                  readyState: xhr.OPENED },
+                { name: 'loadstart',
+                  readyState: xhr.OPENED },
+            ]);
+
             
+            //assert.equal(1, xhr.
+            //xhr._advanceState(
         });
     });
 });

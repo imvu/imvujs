@@ -39,7 +39,11 @@ module({
 
             onreadystatechange: defaultEventHandler,
 
-            open: function(method, url) {
+            open: function(method, url, async) {
+                if (async !== undefined && async !== true) {
+                    throw new TypeError("Synchronous XMLHttpRequest is disallowed.");
+                }
+
                 this.method = method;
                 this.url = url;
                 this._changeReadyState(this.OPENED);
@@ -48,7 +52,29 @@ module({
                 this.requestHeaders[key.toLowerCase()] = value;
             },
             send: function(body) {
-                FakeXMLHttpRequest._triggerExpectation(this, body);
+                var xhr = this;
+                var key = xhr.method + ' ' + xhr.url;
+                if (expectations[key]) {
+                    var expectation = expectations[key];
+                    delete expectations[key];
+                    xhr._status = expectation.code;
+                    xhr.responseHeaders = expectation.headers;
+                    xhr.readyState = xhr.HEADERS_RECEIVED;
+                    xhr.onreadystatechange();
+                    xhr.readyState = xhr.LOADING;
+                    xhr.onreadystatechange();
+                    xhr.responseText = expectation.body;
+                    xhr.readyState = xhr.DONE;
+                    xhr.onreadystatechange();
+                    expectation.callback(xhr, body);
+                    return;
+                }
+                
+                this.onreadystatechange();
+                this.onloadstart();
+                pending[key] = {
+                    xhr: xhr,
+                };
             },
             getResponseHeader: function(key) {
                 return this.responseHeaders[key.toLowerCase()];
@@ -148,28 +174,6 @@ module({
 
         FakeXMLHttpRequest._areAllResolved = function () {
             return Object.keys(expectations).length === 0;
-        };
-
-        FakeXMLHttpRequest._triggerExpectation = function (xhr, body) {
-            var key = xhr.method + ' ' + xhr.url;
-            if (!expectations[key]) {
-                pending[key] = {
-                    xhr: xhr,
-                };
-            } else {
-                var expectation = expectations[key];
-                delete expectations[key];
-                xhr._status = expectation.code;
-                xhr.responseHeaders = expectation.headers;
-                xhr.readyState = xhr.HEADERS_RECEIVED;
-                xhr.onreadystatechange();
-                xhr.readyState = xhr.LOADING;
-                xhr.onreadystatechange();
-                xhr.responseText = expectation.body;
-                xhr.readyState = xhr.DONE;
-                xhr.onreadystatechange();
-                expectation.callback(xhr, body);
-            }
         };
 
         return FakeXMLHttpRequest;
