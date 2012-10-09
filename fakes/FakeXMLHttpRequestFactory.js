@@ -100,7 +100,7 @@ module({
             _triggerAbortError: function() {
                 this._error = true;
                 this.__changeReadyState(this.DONE);
-                this.onerror(); // TODO: need argument?
+                this.onabort(); // TODO: need argument?
                 this.onloadend(); // TODO: need argument?
             },
 

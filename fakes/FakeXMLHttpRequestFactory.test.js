@@ -3,7 +3,7 @@ module({
 }, function (imports) {
     fixture('FakeXMLHttpRequest', function() {
         this.setUp(function () {
-            this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory
+            this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory;
         });
 
         this.tearDown(function() {
@@ -110,74 +110,84 @@ module({
             assert.equal(3, xhr.LOADING);
             assert.equal(4, xhr.DONE);
         });
+    });
+
+    fixture("event flows", function() {
+        this.setUp(function() {
+            this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory;
+            this.calls = [];
+            
+            this.xhr = new this.FakeXMLHttpRequest;
+
+            this.xhr.onloadstart = this.callback('loadstart');
+            this.xhr.onprogress = this.callback('progress');
+            this.xhr.onabort = this.callback('abort');
+            this.xhr.onerror = this.callback('error');
+            this.xhr.onload = this.callback('load');
+            this.xhr.ontimeout = this.callback('timeout');
+            this.xhr.onloadend = this.callback('loadend');
+            this.xhr.onreadystatechange = this.callback('readystatechange');
+        });
+
+        this.callback = function(name) {
+            var calls = this.calls;
+            return function() {
+                calls.push({
+                    name: name,
+                    readyState: this.readyState,
+                });
+            };
+        };
+        
+        this.expectCalls = function(expected) {
+            assert.deepEqual(expected, this.calls);
+            while (this.calls.length) {
+                this.calls.pop();
+            }
+        }
 
         test('event flow: happy path', function() {
-            var calls = [];
-            function callback(name) {
-                return function() {
-                    calls.push({
-                        name: name,
-                        readyState: this.readyState,
-                    });
-                };
-            }
+            assert.equal(0, this.xhr.readyState);
+            this.expectCalls([]);
 
-            function expectCalls(expected) {
-                assert.deepEqual(expected, calls);
-                calls = [];
-            }
-
-            var xhr = new this.FakeXMLHttpRequest;
-            xhr.onloadstart = callback('loadstart');
-            xhr.onprogress = callback('progress');
-            xhr.onabort = callback('abort');
-            xhr.onerror = callback('error');
-            xhr.onload = callback('load');
-            xhr.ontimeout = callback('timeout');
-            xhr.onloadend = callback('loadend');
-            xhr.onreadystatechange = callback('readystatechange');
-
-            assert.equal(0, xhr.readyState);
-            expectCalls([]);
-
-            xhr.open('POST', 'http://url');
-            expectCalls([
+            this.xhr.open('POST', 'http://url');
+            this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: xhr.OPENED },
+                  readyState: this.xhr.OPENED },
             ]);
 
-            xhr.send();
+            this.xhr.send();
 
-            expectCalls([
+            this.expectCalls([
                 // historical event
                 { name: 'readystatechange',
-                  readyState: xhr.OPENED },
+                  readyState: this.xhr.OPENED },
                 { name: 'loadstart',
-                  readyState: xhr.OPENED },
+                  readyState: this.xhr.OPENED },
             ]);
 
-            xhr._headersReceived(200, 'status text', {});
-            expectCalls([
+            this.xhr._headersReceived(200, 'status text', {});
+            this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: xhr.HEADERS_RECEIVED },
+                  readyState: this.xhr.HEADERS_RECEIVED },
             ]);
-            assert.equal(200, xhr.status);
-            assert.equal('status text', xhr.statusText);
+            assert.equal(200, this.xhr.status);
+            assert.equal('status text', this.xhr.statusText);
 
-            xhr._dataReceived('');
-            expectCalls([
+            this.xhr._dataReceived('');
+            this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: xhr.LOADING },
+                  readyState: this.xhr.LOADING },
             ]);
 
-            xhr._done();
-            expectCalls([
+            this.xhr._done();
+            this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: xhr.DONE },
+                  readyState: this.xhr.DONE },
                 { name: 'load',
-                  readyState: xhr.DONE },
+                  readyState: this.xhr.DONE },
                 { name: 'loadend',
-                  readyState: xhr.DONE },
+                  readyState: this.xhr.DONE },
             ]);
         });
     });
