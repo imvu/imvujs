@@ -56,15 +56,10 @@ module({
                 if (expectations[key]) {
                     var expectation = expectations[key];
                     delete expectations[key];
-                    this._status = expectation.code;
-                    this.responseHeaders = expectation.headers;
-                    this.readyState = this.HEADERS_RECEIVED;
-                    this.onreadystatechange();
-                    this.readyState = this.LOADING;
-                    this.onreadystatechange();
-                    this.responseText = expectation.body;
-                    this.readyState = this.DONE;
-                    this.onreadystatechange();
+                    
+                    this._headersReceived(expectation.code, {}, expectation.headers);
+                    this._dataReceived(expectation.body);
+                    this._done();
                     expectation.callback(this, body);
                     return;
                 }
@@ -87,10 +82,12 @@ module({
             _headersReceived: function(statusCode, statusText, responseHeaders) {
                 this._status = statusCode;
                 this.statusText = statusText;
+                this.responseHeaders = responseHeaders;
                 this.__changeReadyState(this.HEADERS_RECEIVED);
             },
 
-            _dataReceived: function() {
+            _dataReceived: function(data) {
+                this.responseText = data;
                 this.__changeReadyState(this.LOADING);
             },
 
