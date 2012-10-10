@@ -7,6 +7,9 @@ module({}, function(imports) {
     }
 
     FakeTimer.prototype.setTimeout = function(func, delay) {
+        if (!(func instanceof Function)) {
+            throw new TypeError("We don't support setTimeout with a string due to eval concerns.");
+        }
         this._timeouts.push([
             func,
             this._currentTime + delay / 1000.0]);
