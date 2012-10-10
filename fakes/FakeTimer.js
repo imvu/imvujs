@@ -16,7 +16,6 @@ module({}, function(imports) {
 
     FakeTimer.prototype.setTimeout = function(func, timeout) {
         var remaining = Array.prototype.slice.call(arguments, 2);
-        timeout = timeout / 1000.0;
 
         if (!(func instanceof Function)) {
             throw new TypeError("We don't support setTimeout with a string because it's eval.");
@@ -36,7 +35,6 @@ module({}, function(imports) {
 
     FakeTimer.prototype.setInterval = function(func, timeout) {
         var remaining = Array.prototype.slice.call(arguments, 2);
-        timeout = timeout / 1000.0;
 
         if (!(func instanceof Function)) {
             throw new TypeError("We don't support setInterval with a string because it's eval.");

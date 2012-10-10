@@ -25,11 +25,11 @@ module({
             var calls = [];
             this.timer.setTimeout(function() { calls.push(this); }, 500);
             assert.deepEqual([], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([global], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([global], calls);
         });
 
@@ -48,7 +48,7 @@ module({
             this.timer.setTimeout(function() {
                 calls.push(Array.prototype.slice.call(arguments, 0));
             }, 500, 'arg1', 2);
-            this.timer._advance(1.0);
+            this.timer._advance(1000);
             assert.deepEqual([['arg1', 2]], calls);
         });
     });
@@ -69,13 +69,13 @@ module({
             var calls = [];
             this.timer.setInterval(function() { calls.push(this); }, 500);
             assert.deepEqual([], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([global], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([global], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([global, global], calls);
         });
 
@@ -83,7 +83,7 @@ module({
             var calls = [];
             var handle = this.timer.setInterval(function() { calls.push(this); }, 500);
             this.timer.clearInterval(handle);
-            this.timer._advance(1.0);
+            this.timer._advance(1000);
             assert.deepEqual([], calls);
         });
 
@@ -92,7 +92,7 @@ module({
             this.timer.setInterval(function() {
                 calls.push(Array.prototype.slice.call(arguments, 0));
             }, 600, 'arg1', 2);
-            this.timer._advance(1.0);
+            this.timer._advance(1000);
             assert.deepEqual([['arg1', 2]], calls);
         });
     });
