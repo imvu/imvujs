@@ -2,6 +2,9 @@
 
 module({
 }, function (imports) {
+    // Implemented per
+    // http://www.w3.org/TR/XMLHttpRequest/
+
     var commonProperties = {
         UNSENT: 0,
         OPENED: 1,

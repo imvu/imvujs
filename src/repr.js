@@ -31,7 +31,7 @@ var IMVU = IMVU || {};
 
                 var c = v.constructor;
                 if (Object !== c) {
-                    rv += "<#" + c.name + " ";
+                    rv += "<#" + (c === undefined ? 'undefined' : c.name) + " ";
                 }
                 rv += "{";
                 var first = true;
