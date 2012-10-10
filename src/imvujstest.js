@@ -207,6 +207,30 @@
             }
         },
 
+        greater: function(lhs, rhs) {
+            if (lhs <= rhs) {
+                fail(new AssertionError(IMVU.repr(lhs) + ' not greater than ' + IMVU.repr(rhs)));
+            }
+        },
+
+        less: function(lhs, rhs) {
+            if (lhs >= rhs) {
+                fail(new AssertionError(IMVU.repr(lhs) + ' not less than ' + IMVU.repr(rhs)));
+            }
+        },
+
+        greaterOrEqual: function(lhs, rhs) {
+            if (lhs < rhs) {
+                fail(new AssertionError(IMVU.repr(lhs) + ' not greater than or equal to ' + IMVU.repr(rhs)));
+            }
+        },
+
+        lessOrEqual: function(lhs, rhs) {
+            if (lhs > rhs) {
+                fail(new AssertionError(IMVU.repr(lhs) + ' not less than or equal to ' + IMVU.repr(rhs)));
+            }
+        },
+
         nearEqual: function( expected, actual, tolerance ) {
             if( tolerance === undefined ) {
                 tolerance = 0.0;
@@ -265,7 +289,7 @@
             throw new AssertionError('did not throw');
         },
 
-        instanceof: function(actual, type) {
+        'instanceof': function(actual, type) {
             if(!(actual instanceof type)) {
                 fail(new AssertionError(IMVU.repr(actual) + 'not instance of' + IMVU.repr(type)),
                     {Type: type, Actual: actual});
@@ -275,19 +299,19 @@
         // TODO: lift into separate file?
         dom: {
             hasClass: function(className, selector) {
-                assert.true($(selector).hasClass(className));
+                assert['true']($(selector).hasClass(className));
             },
 
             notHasClass: function(className, selector) {
-                assert.false($(selector).hasClass(className));
+                assert['false']($(selector).hasClass(className));
             },
 
             hasAttribute: function(attributeName, selector) {
-                assert.true($(selector).is('[' + attributeName + ']'));
+                assert['true']($(selector).is('[' + attributeName + ']'));
             },
 
             notHasAttribute: function(attributeName, selector) {
-                assert.false($(selector).is('[' + attributeName + ']'));
+                assert['false']($(selector).is('[' + attributeName + ']'));
             },
 
             text: function(expected, selector) {
@@ -303,19 +327,19 @@
             },
 
             visible: function(selector) {
-                assert.true($(selector).is(':visible'));
+                assert['true']($(selector).is(':visible'));
             },
 
             notVisible: function(selector) {
-                assert.false($(selector).is(':visible'));
+                assert['false']($(selector).is(':visible'));
             },
 
             disabled: function(selector) {
-                assert.true($(selector).is(':disabled'));
+                assert['true']($(selector).is(':disabled'));
             },
 
             enabled: function(selector) {
-                assert.true($(selector).is(':enabled'));
+                assert['true']($(selector).is(':enabled'));
             },
 
             focused: function(selector) {
@@ -324,8 +348,8 @@
                 if (expected !== actual) {
                     throw new AssertionError(actual.outerHTML + ' has focus. expected: ' + expected.outerHTML);
                 }
-            },
-        },
+            }
+        }
     };
 
     var g = 'undefined' === typeof window ? global : window;

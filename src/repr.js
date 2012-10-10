@@ -52,7 +52,7 @@ var IMVU = IMVU || {};
             }
         }
         finally {
-            _seen.delete(v);
+            _seen['delete'](v);
         }
     };
 })();

@@ -33,7 +33,7 @@
         "Map"
     ],
     "eqeqeq":true, // require strict equal === and !===
-    "es5": true,
+    "es5": false,
     "browser": true,
     "shadow": true, // we like to write: for (var i = 0; i < foo.length; ++i)
     "multistr": true, // disable when we move HTML out of JavaScript
