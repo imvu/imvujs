@@ -14,6 +14,10 @@ module({}, function(imports) {
         this._intervals = {};
     }
 
+    FakeTimer.prototype.now = function() {
+        return this._currentTime;
+    };
+
     FakeTimer.prototype.setTimeout = function(func, timeout) {
         var remaining = Array.prototype.slice.call(arguments, 2);
 

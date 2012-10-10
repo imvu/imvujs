@@ -9,6 +9,18 @@ module({
         });
     });
 
+    base.extend("now", function() {
+        test("initial time is greater than zero", function() {
+            assert.greater(this.timer.now(), 0);
+        });
+
+        test("_advance increases now", function() {
+            var start = this.timer.now();
+            this.timer._advance(100);
+            assert.equal(100, this.timer.now() - start);
+        });
+    });
+
     base.extend("timeout", function() {
         test("handle is greater than zero", function() {
             var handle = this.timer.setTimeout(function() {}, 500);
