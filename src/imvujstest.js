@@ -310,6 +310,14 @@
                 assert.false($(selector).is(':visible'));
             },
 
+            disabled: function(selector) {
+                assert.true($(selector).is(':disabled'));
+            },
+
+            enabled: function(selector) {
+                assert.true($(selector).is(':enabled'));
+            },
+
             focused: function(selector) {
                 var expected = $(selector)[0];
                 var actual = document.activeElement;
