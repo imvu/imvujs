@@ -15,6 +15,7 @@ module({}, function(imports) {
     }
 
     FakeTimer.prototype.setTimeout = function(func, timeout) {
+        var remaining = Array.prototype.slice.call(arguments, 2);
         timeout = timeout / 1000.0;
 
         if (!(func instanceof Function)) {
@@ -23,7 +24,7 @@ module({}, function(imports) {
 
         var handle = this._currentTimeoutHandle++;
         this._timeouts[handle] = {
-            func: func,
+            func: function() { func.apply(undefined, remaining); },
             endTime: this._currentTime + timeout
         };
         return handle;
@@ -34,6 +35,7 @@ module({}, function(imports) {
     };
 
     FakeTimer.prototype.setInterval = function(func, timeout) {
+        var remaining = Array.prototype.slice.call(arguments, 2);
         timeout = timeout / 1000.0;
 
         if (!(func instanceof Function)) {
@@ -42,7 +44,7 @@ module({}, function(imports) {
 
         var handle = this._currentIntervalHandle++;
         this._intervals[handle] = {
-            func: func,
+            func: function() { func.apply(undefined, remaining); },
             timeout: timeout,
             nextTime: this._currentTime + timeout
         };
@@ -59,7 +61,7 @@ module({}, function(imports) {
         for (var handle in this._timeouts) {
             var timeout = this._timeouts[handle];
             if (this._currentTime >= timeout.endTime) {
-                timeout.func.call(undefined);
+                timeout.func();
                 delete this._timeouts[handle];
             }
         }
@@ -67,7 +69,7 @@ module({}, function(imports) {
         for (var handle in this._intervals) {
             var interval = this._intervals[handle];
             if (this._currentTime >= interval.nextTime) {
-                interval.func.call(undefined);
+                interval.func();
                 interval.nextTime += interval.timeout;
             }
         }

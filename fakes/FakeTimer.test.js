@@ -42,6 +42,15 @@ module({
 
             this.timer.clearTimeout(handle);
         });
+
+        test("setTimeout arguments are passed through", function() {
+            var calls = [];
+            this.timer.setTimeout(function() {
+                calls.push(Array.prototype.slice.call(arguments, 0));
+            }, 500, 'arg1', 2);
+            this.timer._advance(1.0);
+            assert.deepEqual([['arg1', 2]], calls);
+        });
     });
 
     base.extend("interval", function() {
@@ -76,6 +85,15 @@ module({
             this.timer.clearInterval(handle);
             this.timer._advance(1.0);
             assert.deepEqual([], calls);
+        });
+
+        test("setInterval arguments are passed through", function() {
+            var calls = [];
+            this.timer.setInterval(function() {
+                calls.push(Array.prototype.slice.call(arguments, 0));
+            }, 600, 'arg1', 2);
+            this.timer._advance(1.0);
+            assert.deepEqual([['arg1', 2]], calls);
         });
     });
 });
