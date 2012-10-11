@@ -93,6 +93,11 @@
                 });
             }
         }
+
+        reporter({
+            type: 'all-tests-complete'
+        });
+
         allTests = [];
         return true;
     }
