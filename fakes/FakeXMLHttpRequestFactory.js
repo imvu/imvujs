@@ -51,9 +51,11 @@ module({
                 this.url = url;
                 this.__changeReadyState(this.OPENED);
             },
+
             setRequestHeader: function(key, value) {
                 this.requestHeaders[key.toLowerCase()] = value;
             },
+
             send: function(body) {
                 var key = this.method + ' ' + this.url;
                 if (expectations[key]) {
@@ -71,9 +73,19 @@ module({
                 this.onloadstart();
                 pending[key] = this;
             },
+
+            abort: function() {
+                this._error = true;
+                this.__changeReadyState(this.DONE);
+                this.onabort();
+                this.onloadend();
+                this.readyState = this.UNSENT;
+            },
+
             getResponseHeader: function(key) {
                 return this.responseHeaders[key.toLowerCase()];
             },
+
             getAllResponseHeaders: function() {
                 var str = '';
                 Object.keys(this.responseHeaders).forEach(function (header) {

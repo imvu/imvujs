@@ -205,5 +205,36 @@ module({
                   'loadend' ],
                 this.calls.map(function(value) { return value.name }));
         });
+
+        test("client can abort request", function() {
+            this.xhr.open('POST', 'http://url');
+            this.xhr.send();
+            this.xhr._headersReceived(200, '', {});
+
+            this.expectCalls([
+                { name: 'readystatechange',
+                  readyState: 1 },
+                { name: 'readystatechange',
+                  readyState: 1 },
+                { name: 'loadstart',
+                  readyState: 1 },
+                { name: 'readystatechange',
+                  readyState: 2 },
+            ]);
+
+            assert.equal(200, this.xhr.status);
+            this.xhr.abort();
+            assert.equal(0, this.xhr.status);
+            this.expectCalls([
+                { name: 'readystatechange',
+                  readyState: 4 },
+                { name: 'abort',
+                  readyState: 4 },
+                { name: 'loadend',
+                  readyState: 4 },
+            ]);
+
+            assert.equal(0, this.xhr.readyState);
+        });
     });
 });
