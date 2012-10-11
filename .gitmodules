@@ -5,6 +5,3 @@
 [submodule "third-party/es5-shim"]
     path = third-party/es5-shim
     url = git@github.com:imvu/es5-shim.git
-[submodule "third-party/leprechaun-binaries"]
-	path = third-party/leprechaun-binaries
-	url = git@github.com:imvu/leprechaun-binaries.git
