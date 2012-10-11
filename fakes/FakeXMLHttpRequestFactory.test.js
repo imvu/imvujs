@@ -7,7 +7,7 @@ module({
         });
 
         this.tearDown(function() {
-            assert.true(this.FakeXMLHttpRequest._areAllResolved());
+            assert.true_(this.FakeXMLHttpRequest._areAllResolved());
         });
 
         test('unexpected request', function () {
@@ -47,17 +47,17 @@ module({
         });
 
         test('all resolved', function () {
-            assert.true(this.FakeXMLHttpRequest._areAllResolved());
+            assert.true_(this.FakeXMLHttpRequest._areAllResolved());
             this.FakeXMLHttpRequest._expect('GET', '/foo/bar/baz', 200, {
                 "Content-Type": "text/plain"
             }, 'Huzzah!');
-            assert.false(this.FakeXMLHttpRequest._areAllResolved());
+            assert.false_(this.FakeXMLHttpRequest._areAllResolved());
 
             var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
             xhr.send();
 
-            assert.true(this.FakeXMLHttpRequest._areAllResolved());
+            assert.true_(this.FakeXMLHttpRequest._areAllResolved());
         });
 
         test('readyStateChange', function () {
@@ -134,7 +134,7 @@ module({
             return function() {
                 calls.push({
                     name: name,
-                    readyState: this.readyState,
+                    readyState: this.readyState
                 });
             };
         };
@@ -144,7 +144,7 @@ module({
             while (this.calls.length) {
                 this.calls.pop();
             }
-        }
+        };
 
         test('event flow: happy path', function() {
             assert.equal(0, this.xhr.readyState);
@@ -153,7 +153,7 @@ module({
             this.xhr.open('POST', 'http://url');
             this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: this.xhr.OPENED },
+                  readyState: this.xhr.OPENED }
             ]);
 
             this.xhr.send();
@@ -163,13 +163,13 @@ module({
                 { name: 'readystatechange',
                   readyState: this.xhr.OPENED },
                 { name: 'loadstart',
-                  readyState: this.xhr.OPENED },
+                  readyState: this.xhr.OPENED }
             ]);
 
             this.xhr._headersReceived(200, 'status text', {});
             this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: this.xhr.HEADERS_RECEIVED },
+                  readyState: this.xhr.HEADERS_RECEIVED }
             ]);
             assert.equal(200, this.xhr.status);
             assert.equal('status text', this.xhr.statusText);
@@ -177,7 +177,7 @@ module({
             this.xhr._dataReceived('');
             this.expectCalls([
                 { name: 'readystatechange',
-                  readyState: this.xhr.LOADING },
+                  readyState: this.xhr.LOADING }
             ]);
 
             this.xhr._done();
@@ -187,7 +187,7 @@ module({
                 { name: 'load',
                   readyState: this.xhr.DONE },
                 { name: 'loadend',
-                  readyState: this.xhr.DONE },
+                  readyState: this.xhr.DONE }
             ]);
         });
 
@@ -203,7 +203,7 @@ module({
                   'readystatechange',
                   'abort',
                   'loadend' ],
-                this.calls.map(function(value) { return value.name }));
+                this.calls.map(function(value) { return value.name; }));
         });
 
         test("client can abort request", function() {
@@ -219,7 +219,7 @@ module({
                 { name: 'loadstart',
                   readyState: 1 },
                 { name: 'readystatechange',
-                  readyState: 2 },
+                  readyState: 2 }
             ]);
 
             assert.equal(200, this.xhr.status);
@@ -231,7 +231,7 @@ module({
                 { name: 'abort',
                   readyState: 4 },
                 { name: 'loadend',
-                  readyState: 4 },
+                  readyState: 4 }
             ]);
 
             assert.equal(0, this.xhr.readyState);

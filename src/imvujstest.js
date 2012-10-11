@@ -360,6 +360,10 @@
     assert['null'] = assert.equal.bind(null, null);
     assert.notNull = assert.notEqual.bind(null, null);
 
+    // ES3 synonyms
+    assert.false_ = assert['false'];
+    assert.true_ = assert['true'];
+
     g.registerSuperFixture = registerSuperFixture;
     g.test = test;
     g.run_all = run_all;

@@ -5,12 +5,14 @@ module({
     // Implemented per
     // http://www.w3.org/TR/XMLHttpRequest/
 
+    var InvalidStateError = Error; // ???
+
     var commonProperties = {
         UNSENT: 0,
         OPENED: 1,
         HEADERS_RECEIVED: 2,
         LOADING: 3,
-        DONE: 4,
+        DONE: 4
     };
 
     function FakeXMLHttpRequestFactory() {
@@ -95,6 +97,9 @@ module({
             },
 
             _headersReceived: function(statusCode, statusText, responseHeaders) {
+                if (this.readyState !== this.OPENED) {
+                    throw new InvalidStateError('send() must have been called before _headersReceived');
+                }
                 this._status = statusCode;
                 this.statusText = statusText;
                 this.responseHeaders = responseHeaders;
@@ -102,17 +107,26 @@ module({
             },
 
             _dataReceived: function(data) {
+                if (this.readyState !== this.HEADERS_RECEIVED) {
+                    throw new InvalidStateError('_headersReceived must have been called before _dataReceived');
+                }
                 this.responseText = data;
                 this.__changeReadyState(this.LOADING);
             },
 
             _done: function() {
+                if (this.readyState !== this.HEADERS_RECEIVED && this.readyState !== this.LOADING) {
+                    throw new InvalidStateError('_headersReceived must have been called before _done.  actual: ' + this.readyState);
+                }
                 this.__changeReadyState(this.DONE);
                 this.onload();
                 this.onloadend();
             },
 
             _triggerAbortError: function() {
+                if (this.readyState === this.UNSENT || this.readyState === this.DONE) {
+                    throw new InvalidStateError('abort errors cannot occur before sent or after done');
+                }
                 this._error = true;
                 this.__changeReadyState(this.DONE);
                 this.onabort(); // TODO: need argument?
@@ -120,6 +134,9 @@ module({
             },
 
             _triggerNetworkError: function() {
+                if (this.readyState === this.UNSENT || this.readyState === this.DONE) {
+                    throw new InvalidStateError('network errors cannot occur before sent or after done');
+                }
                 this._error = true;
                 this.__changeReadyState(this.DONE);
                 this.onerror(); // TODO: need argument?
@@ -129,7 +146,7 @@ module({
             __changeReadyState: function(state) {
                 this.readyState = state;
                 this.onreadystatechange();
-            },
+            }
         });
 
         Object.defineProperty(FakeXMLHttpRequest.prototype, 'status', {
@@ -143,7 +160,7 @@ module({
                 } else {
                     return this._status;
                 }
-            },
+            }
         });
 
         FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, callback) {

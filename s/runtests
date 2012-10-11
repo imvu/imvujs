@@ -18,9 +18,9 @@ if [ "$@" ]; then
 else
     echo "Running jshint..."
     if [ .$MSYSTEM = .MINGW32 ]; then
-        find src -iname '*.js' -exec $NODEJS $JSHINT {} \;  || fail
+        find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} \;  || fail
     else
-        find src -iname '*.js' -exec $NODEJS $JSHINT {} + || fail
+        find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} + || fail
     fi
     TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
