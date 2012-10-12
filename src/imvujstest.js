@@ -389,4 +389,7 @@
             throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
         };
     }
+    Math.random = function() {
+        throw new AssertionError("Don't call Math.random in tests.  Use fakes.");
+    };
 })();
