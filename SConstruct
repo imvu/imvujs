@@ -13,6 +13,7 @@ BASE_SOURCES = [
     'src/function.js',
     'src/BaseClass.js',
     'ext/backbone-0.9.2.js',
+    'src/Random.js',
 ]
 
 WEB_SOURCES = [
