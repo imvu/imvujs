@@ -1,0 +1,22 @@
+#!/bin/bash
+
+cd `dirname "$0"`/..
+
+SRCDIR="out"
+OUTDIR=$1
+
+USAGE="Usage: s/deploy <directory>"
+ERROR_BADDIR="Error: Directory $OUTDIR doesn't exist."
+MISSING_FILE="Error: File missing: "
+
+[ ! $OUTDIR ] && { echo $USAGE; exit 1; }
+[ ! -d $OUTDIR ] && { echo $ERROR_BADDIR; echo $USAGE; exit 1; }
+
+echo "Deploying to $OUTDIR..."
+
+for FILE in "imvu.js" "imvu.min.js" "imvu.fakes.js" "imvu.fakes.min.js"
+  do
+    [ -f $SRCDIR/$FILE ] || { echo $MISSING_FILE$SRCDIR$FILE; exit 1; }
+    echo "  $SRCDIR/$FILE -> $OUTDIR/$FILE"
+    cp $SRCDIR/$FILE $OUTDIR
+done
