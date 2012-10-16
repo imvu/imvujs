@@ -353,6 +353,9 @@
                 if (expected !== actual) {
                     throw new AssertionError(actual.outerHTML + ' has focus. expected: ' + expected.outerHTML);
                 }
+            },
+            html: function(expected, selector) {
+                assert.equal(expected, $(selector).html());
             }
         }
     };
