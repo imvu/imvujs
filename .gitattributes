@@ -1,10 +1,8 @@
-* text=auto
+* eol=lf
 
 *.bat   binary
 *.cmd   binary
 *.exe   binary
 
-*.man   text eol=crlf
-
-*.js    text
+*.man   eol=crlf
 
