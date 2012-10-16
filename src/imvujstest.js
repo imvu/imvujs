@@ -378,7 +378,11 @@
     g.assert = assert;
     g.test = test;
 
-    g.setTimeout = function() {
+    g.setTimeout = function(fn, time) {
+        if (time === 1 || time === 0){
+            fn();
+            return 0;
+        }
         throw new AssertionError("Don't call setTimeout in tests.  Use fakes.");
     };
     g.setInterval = function() {
