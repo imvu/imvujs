@@ -356,6 +356,9 @@
             },
             html: function(expected, selector) {
                 assert.equal(expected, $(selector).html());
+            },
+            css: function(expected, propertyName, selector) {
+                assert.equal(expected, $(selector).css(propertyName));
             }
         }
     };
