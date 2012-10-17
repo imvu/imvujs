@@ -25,8 +25,9 @@
                 name: name,
                 body: fn });
         } else {
+            var fixtureName = (undefined !== activeFixture)? activeFixture.name + ': ' : '';
             allTests.push({
-                name: name,
+                name: fixtureName + name,
                 body: fn,
                 fixture: activeFixture });
         }
@@ -104,11 +105,12 @@
 
     var activeFixture;
 
-    function Fixture(parent, definition, abstract) {
+    function Fixture(parent, name, definition, abstract) {
         if (!(definition instanceof Function)) {
             throw new TypeError("fixture's 2nd argument must be a function");
         }
 
+        this.name = name;
         this.parent = parent;
         this.abstract = abstract;
         if (this.abstract) {
@@ -150,7 +152,7 @@
             for (var i = 0; i < this.abstractTests.length; ++i) {
                 var test = this.abstractTests[i];
                 allTests.push({
-                    name: test.name,
+                    name: concreteFixture.name + ': ' + test.name,
                     body: test.body,
                     fixture: concreteFixture});
             }
@@ -161,14 +163,14 @@
     };
 
     Fixture.prototype.extend = function(fixtureName, definition) {
-        return new Fixture(this, definition, false);
+        return new Fixture(this, fixtureName, definition, false);
     };
 
     function fixture(fixtureName, definition) {
-        return new Fixture(undefined, definition, false);
+        return new Fixture(undefined, fixtureName, definition, false);
     }
     fixture.abstract = function(fixtureName, definition) {
-        return new Fixture(undefined, definition, true);
+        return new Fixture(undefined, fixtureName, definition, true);
     };
 
     var AssertionError = Error;
@@ -370,7 +372,6 @@
             notEmpty: function(selector) {
                 assert['false']($(selector).is(':empty'));
             }
-
         }
     };
 
@@ -404,14 +405,17 @@
         }
         throw new AssertionError("Don't call setTimeout in tests.  Use fakes.");
     };
+
     g.setInterval = function() {
         throw new AssertionError("Don't call setInterval in tests.  Use fakes.");
     };
+
     if (typeof process !== 'undefined') {
         process.nextTick = function() {
             throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
         };
     }
+
     Math.random = function() {
         throw new AssertionError("Don't call Math.random in tests.  Use fakes.");
     };
