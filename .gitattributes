@@ -1,8 +1,13 @@
-* eol=lf
 
 *.bat   binary
 *.cmd   binary
 *.exe   binary
+
+*.js    eol=lf
+*.html  eol=lf
+*.py    eol=lf
+*.md    eol=lf
+*.txt    eol=lf
 
 *.man   eol=crlf
 
