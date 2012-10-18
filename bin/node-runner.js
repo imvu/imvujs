@@ -3,7 +3,7 @@
 var fs = require('fs');
 var vm = require('vm');
 var path = require('path');
-var _ = require('../ext/underscore-1.3.3.js');
+var _ = require('../ext/underscore-1.4.2.js');
 var util = require('util');
 
 
