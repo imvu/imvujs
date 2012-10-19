@@ -3,6 +3,7 @@ var IMVU = IMVU || {};
     IMVU.Timer = {
         now: Date.now.bind(Date),
         setTimeout: window.setTimeout.bind(window),
-        setInterval: window.setInterval.bind(window)
+        setInterval: window.setInterval.bind(window),
+        clearTimeout: window.clearTimeout.bind(window)
     };
 })();
