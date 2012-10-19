@@ -283,6 +283,18 @@
             }
         },
 
+        hasKey: function (key, object) {
+            if (!(key in object)) {
+                fail(new AssertionError('Key ' + IMVU.repr(key) + ' is not in object: ' + IMVU.repr(object)));
+            }
+        },
+
+        notHasKey: function (key, object) {
+            if (key in object) {
+                fail(new AssertionError('Unexpected key ' + IMVU.repr(key) + ' is found in object: ' + IMVU.repr(object)));
+            }
+        },
+
         'throws': function(exception, fn) {
             try {
                 fn();
