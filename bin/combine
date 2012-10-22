@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ .$MSYSTEM = .MINGW32 ]; then
-    MYDIR=third-party/imvujs
+    MYDIR="$0"/../..
 else
     MYDIR=`dirname "$0"`/..
 fi
