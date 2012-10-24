@@ -423,13 +423,6 @@
         throw new AssertionError("Don't call setInterval in tests.  Use fakes.");
     };
 
-    g.Date = function() {
-        throw new AssertionError("Don't call Date in tests.  Use fakes.");
-    };
-    g.Date.now = function() {
-        throw new AssertionError("Don't call Date.now in tests.  Use fakes.");
-    };
-
     if (typeof process !== 'undefined') {
         process.nextTick = function() {
             throw new AssertionError("Don't call process.nextTick in tests.  Use fakes.");
