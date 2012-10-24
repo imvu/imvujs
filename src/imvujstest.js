@@ -65,7 +65,7 @@
             }
             return false;
         } catch (e) {
-            return {stack: e.stack};
+            return {stack: e.stack, e: e};
         }
     }
 
@@ -83,7 +83,8 @@
                     type: 'test-complete',
                     name: test.name,
                     verdict: 'FAIL',
-                    stack: failed.stack
+                    stack: failed.stack, 
+                    e: failed.e
                 });
                 return false;
             } else {
