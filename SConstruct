@@ -21,6 +21,7 @@ WEB_SOURCES = [
 ] + BASE_SOURCES + [
     'src/kraken.js',
     'src/Timer.js',
+    'src/Date.js',
 ]
 
 NODE_SOURCES = BASE_SOURCES + [
