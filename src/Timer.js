@@ -1,19 +1,9 @@
 var IMVU = IMVU || {};
 (function() {
-    if (_.isFunction(window.setTimeout.bind)) {
-        IMVU.Timer = {
-            now: Date.now.bind(Date),
-            setTimeout: window.setTimeout.bind(window),
-            setInterval: window.setInterval.bind(window),
-            clearTimeout: window.clearTimeout.bind(window)
-        };
-    } else {
-        // for unsolved problem in IE8 (selenium test)
-        IMVU.Timer = {
-            now: Date.now.bind(Date),
-            setTimeout: window,
-            setInterval: window,
-            clearTimeout: window.clearTimeout
-        };
-    }
+    IMVU.Timer = {
+        now: Date.now.bind(Date),
+        setTimeout: function(a, b) { return window.setTimeout(a, b); },     // using bind on setTimeout causes trouble in IE8
+        setInterval: function(a, b) { return window.setInterval(a, b); },
+        clearTimeout: function(a, b) { return window.clearTimeout(a, b); }
+    };
 })();
