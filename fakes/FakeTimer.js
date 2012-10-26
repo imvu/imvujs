@@ -3,9 +3,9 @@ module({}, function(imports) {
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#timers
 
     var START_TIME = 1234;
-
+    
     function FakeTimer() {
-        this._currentTime = START_TIME;
+        this._currentTimeMsec = START_TIME * 1000;
 
         this._currentTimeoutHandle = 1;
         this._timeouts = {};
@@ -15,7 +15,20 @@ module({}, function(imports) {
     }
 
     FakeTimer.prototype.now = function() {
-        return this._currentTime;
+        return this._currentTimeMsec / 1000;
+    };
+
+    FakeTimer.prototype.getTime = function() {
+        return this._currentTimeMsec;
+    };
+
+    FakeTimer.prototype.setTime = function(t) {
+        // fake object of Date
+        return {
+            now: function() { return t / 1000; },
+            getTime: function() { return t; },
+            toUTCString: function() { return "fake_UTC_" + t; }
+        };
     };
 
     FakeTimer.prototype.setTimeout = function(func, timeout) {
@@ -28,7 +41,7 @@ module({}, function(imports) {
         var handle = this._currentTimeoutHandle++;
         this._timeouts[handle] = {
             func: function() { func.apply(undefined, remaining); },
-            endTime: this._currentTime + timeout
+            endTimeMsec: this._currentTimeMsec + timeout
         };
         return handle;
     };
@@ -47,8 +60,8 @@ module({}, function(imports) {
         var handle = this._currentIntervalHandle++;
         this._intervals[handle] = {
             func: function() { func.apply(undefined, remaining); },
-            timeout: timeout,
-            nextTime: this._currentTime + timeout
+            timeoutMsec: timeout,
+            nextTimeMsec: this._currentTimeMsec + timeout
         };
         return handle;
     };
@@ -58,11 +71,11 @@ module({}, function(imports) {
     };
 
     FakeTimer.prototype._advance = function(seconds) {
-        this._currentTime += seconds;
+        this._currentTimeMsec += seconds * 1000;
 
         for (var handle in this._timeouts) {
             var timeout = this._timeouts[handle];
-            if (this._currentTime >= timeout.endTime) {
+            if (this._currentTimeMsec >= timeout.endTimeMsec) {
                 timeout.func();
                 delete this._timeouts[handle];
             }
@@ -70,9 +83,9 @@ module({}, function(imports) {
 
         for (var handle in this._intervals) {
             var interval = this._intervals[handle];
-            if (this._currentTime >= interval.nextTime) {
+            if (this._currentTimeMsec >= interval.nextTimeMsec) {
                 interval.func();
-                interval.nextTime += interval.timeout;
+                interval.nextTimeMsec += interval.timeoutMsec;
             }
         }
     };
