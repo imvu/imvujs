@@ -17,7 +17,7 @@ BASE_SOURCES = [
 ]
 
 WEB_SOURCES = [
-    'ext/jquery-1.7.2.js'
+    'ext/jquery-1.8.2.js'
 ] + BASE_SOURCES + [
     'src/kraken.js',
     'src/Timer.js',
