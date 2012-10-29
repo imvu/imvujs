@@ -8,15 +8,24 @@ var IMVU = IMVU || {};
         // 2. to add to current time
         //    var nextDayDate = IMVU.Timer.setTime(curTimeMsec + 24*60*60*1000);
         //    var nextDayTimeMsec = nextDayDate.getTime();
-        getTime: function() { return (new Date()).getTime(); }, 
+        getTime: function() {
+            return (new Date()).getTime();
+        },
         setTime: function(t) {
             var date = new Date();
             date.setTime(t);
             return date;
-            },
-            
-        setTimeout: function(a, b) { return window.setTimeout(a, b); },     // using bind on setTimeout causes trouble in IE8
-        setInterval: function(a, b) { return window.setInterval(a, b); },
-        clearTimeout: function(a) { return window.clearTimeout(a); }
+        },
+          
+        // using bind on setTimeout causes trouble in IE8
+        setTimeout: function(a, b) {
+            return window.setTimeout(a, b);
+        },
+        setInterval: function(a, b) {
+            return window.setInterval(a, b);
+        },
+        clearTimeout: function(a) {
+            return window.clearTimeout(a);
+        }
     };
 })();
