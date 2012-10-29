@@ -60,7 +60,6 @@ targets += env.ClosureCompiler(
 env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 
 targets += env.KrakenCombine('out/imvu.fakes.js', 'fakes/Package.js')
-targets += env.ClosureCompiler('out/imvu.fakes.min.js', 'out/imvu.fakes.js')
 
 if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)
