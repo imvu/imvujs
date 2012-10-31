@@ -354,11 +354,15 @@
             },
 
             hasClass: function(className, selector) {
-                assert['true']($(selector).hasClass(className));
+                if (!$(selector).hasClass(className)){
+                    fail(new AssertionError('Selector: ' + IMVU.repr(selector) + ' expected to have class '+ IMVU.repr(className)));
+                }
             },
 
             notHasClass: function(className, selector) {
-                assert['false']($(selector).hasClass(className));
+                if ($(selector).hasClass(className)){
+                    fail(new AssertionError('Selector: ' + IMVU.repr(selector) + ' expected NOT to have class '+ IMVU.repr(className)));
+                }
             },
 
             hasAttribute: function(attributeName, selector) {

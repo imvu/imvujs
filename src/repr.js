@@ -15,6 +15,10 @@ var IMVU = IMVU || {};
             return v.toString();
         }
 
+        if (!_.isUndefined(v.jquery)){
+            return "$('"+ v.selector + "')";
+        }
+
         if (_seen === undefined) {
             _seen = new Set();
         }
