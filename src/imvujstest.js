@@ -271,6 +271,20 @@
             }
         },
 
+        inString: function(expected, string){
+            if (-1 === string.indexOf(expected)){
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' not in string: ' + IMVU.repr(string)),
+                     {Expected: expected, 'String': string});
+            }
+        },
+
+        notInString: function(expected, string){
+            if (-1 !== string.indexOf(expected)){
+                fail(new AssertionError('unexpected: ' + IMVU.repr(expected) + ' in string: ' + IMVU.repr(string)),
+                     {Expected: expected, 'String': string});
+            }
+        },
+
         inArray: function(expected, array) {
             var found = false;
             _.each(array, function(element){
@@ -280,6 +294,19 @@
             });
             if (!found){
                 fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' not found in array: ' + IMVU.repr(array)),
+                     {Expected: expected, 'Array': array});
+            }
+        },
+
+        notInArray: function(expected, array) {
+            var found = false;
+            _.each(array, function(element){
+                if (_.isEqual(expected, element)){
+                    found = true;
+                }
+            });
+            if (found){
+                fail(new AssertionError('unexpected: ' + IMVU.repr(expected) + ' found in array: ' + IMVU.repr(array)),
                      {Expected: expected, 'Array': array});
             }
         },
@@ -318,6 +345,14 @@
 
         // TODO: lift into separate file?
         dom: {
+            present: function(selector){
+                assert.notEqual(0, $(selector).length);
+            },
+
+            notPresent: function(selector){
+                assert.equal(0, $(selector).length);
+            },
+
             hasClass: function(className, selector) {
                 assert['true']($(selector).hasClass(className));
             },
