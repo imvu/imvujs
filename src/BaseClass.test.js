@@ -35,7 +35,9 @@ module({}, function() {
 
     test("BaseClass classes cannot be monkeypatched", function() {
         var Foo = BaseClass.extend('Foo');
-        Foo.not = 10;
+        assert.throws(TypeError, function() {
+            Foo.not = 10;
+        });
         assert.equal(undefined, Foo.not);
         //Foo.prototype.not = 10;
         //assert.equal(undefined, Foo.prototype.not);

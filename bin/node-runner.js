@@ -18,7 +18,7 @@ function endsWith(str, suffix) {
 function loadScript(path, settings) {
     var testContents = fs.readFileSync(path, 'utf-8');
     if (settings !== undefined && settings.strictMode) {
-        testContents = '"use strict";' + testContents;
+        testContents = '"use strict";' + testContents; // so line numbers match up
     }
     return testContents;
 }
@@ -38,7 +38,6 @@ function sysinclude(currentPath, includePath, settings) {
         process.exit(1);
     }
     var script = loadScript(abspath, settings);
-
     vm.runInThisContext(script, includePath);
 }
 
@@ -73,7 +72,7 @@ function loadSuperFixture(superfixture) {
 function runTest(testPath, continuation) {
     var abspath = path.resolve(testPath);
 
-    var testContents = loadScript(abspath);
+    var testContents = loadScript(abspath, {strictMode: true});
 
     var testPassed;
 
