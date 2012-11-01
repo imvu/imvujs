@@ -53,12 +53,9 @@ function module(dependencies, body, settings) {
         importList[k] = impls[v];
     }
 
-    var impl = body(importList);
-    if (impl instanceof Object) {
-        Object.freeze(impl);
-    }
-    impls[cfp] = impl;
+    impls[cfp] = module._loadBody(body, importList);
 }
+_.extend(module, IMVU.moduleCommon);
 
 // AMD compatibility
 var define = function(dependencies, body) {

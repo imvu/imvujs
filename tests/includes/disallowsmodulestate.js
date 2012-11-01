@@ -1,0 +1,3 @@
+module({}, function() {
+    return {};
+});

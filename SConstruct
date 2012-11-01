@@ -6,14 +6,15 @@ print "running with -j", GetOption('num_jobs')
 
 BASE_SOURCES = [
     'ext/underscore-1.4.2.js',
+    'ext/backbone-0.9.2.js',
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
     'src/repr.js',
     'src/function.js',
     'src/BaseClass.js',
-    'ext/backbone-0.9.2.js',
     'src/Random.js',
+    'src/module-common.js',
 ]
 
 WEB_SOURCES = [
