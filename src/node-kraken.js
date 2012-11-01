@@ -54,7 +54,7 @@ function module(dependencies, body, settings) {
     }
 
     var impl = body(importList);
-    if (typeof impl === 'object') {
+    if (impl instanceof Object) {
         Object.freeze(impl);
     }
     impls[cfp] = impl;
