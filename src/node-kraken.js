@@ -53,7 +53,11 @@ function module(dependencies, body, settings) {
         importList[k] = impls[v];
     }
 
-    impls[cfp] = body(importList);
+    var impl = body(importList);
+    if (typeof impl === 'object') {
+        Object.freeze(impl);
+    }
+    impls[cfp] = impl;
 }
 
 // AMD compatibility

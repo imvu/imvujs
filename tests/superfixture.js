@@ -5,7 +5,7 @@ module({
         beforeTest: function() {
         },
         afterTest: function() {
-            assert.false(imports.ShouldFail.shouldFail);
+            assert.false(imports.ShouldFail.state.shouldFail);
         }
     });
     return {};

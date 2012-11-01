@@ -1,5 +1,7 @@
 module({}, function() {
     return {
-        shouldFail: false
+        state: {
+            shouldFail: false
+        }
     };
 });
