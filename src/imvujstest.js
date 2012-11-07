@@ -373,6 +373,13 @@
                 assert['false']($(selector).is('[' + attributeName + ']'));
             },
 
+            attributeValues: function (values, selector) {
+                var $el = $(selector);
+                _(values).each(function (val, key) {
+                    assert.equal(val, $el.attr(key));
+                });
+            },
+
             text: function(expected, selector) {
                 assert.equal(expected, $(selector).text());
             },
