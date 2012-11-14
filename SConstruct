@@ -11,6 +11,7 @@ BASE_SOURCES = [
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
     'src/repr.js',
+    'src/new.js',
     'src/function.js',
     'src/BaseClass.js',
     'src/Random.js',
