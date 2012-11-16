@@ -182,10 +182,17 @@
     }
 
     var assert = {
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // GENERAL STATUS
+
         fail: function(info) {
             info = info || "assert.fail()";
             fail(new AssertionError(info));
         },
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // BOOLEAN TESTS
 
         'true': function(value) {
             if (!value) {
@@ -201,6 +208,9 @@
             }
         },
 
+        ////////////////////////////////////////////////////////////////////////////////
+        // SCALAR COMPARISON
+
         equal: function(expected, actual) {
             if (expected !== actual) {
                 fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
@@ -208,10 +218,9 @@
             }
         },
 
-        deepEqual: function(expected, actual) {
-            if (!_.isEqual(expected, actual)) {
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
-                     {Expected: expected, Actual: actual});
+        notEqual: function(expected, actual) {
+            if (expected === actual) {
+                fail(new AssertionError('actual was equal to: ' + IMVU.repr(expected)));
             }
         },
 
@@ -239,6 +248,25 @@
             }
         },
 
+        ////////////////////////////////////////////////////////////////////////////////
+        // DEEP COMPARISON
+
+        deepEqual: function(expected, actual) {
+            if (!_.isEqual(expected, actual)) {
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
+                     {Expected: expected, Actual: actual});
+            }
+        },
+
+        notDeepEqual: function(expected, actual) {
+            if (_.isEqual(expected, actual)) {
+                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' and actual: ' + IMVU.repr(actual) + ' were equal'));
+            }
+        },
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // FLOATING POINT
+
         nearEqual: function( expected, actual, tolerance ) {
             if( tolerance === undefined ) {
                 tolerance = 0.0;
@@ -257,19 +285,8 @@
             }
         },
 
-        notEqual: function(expected, actual) {
-            if (expected instanceof Array && actual instanceof Array) {
-                assert.notEqual(expected.length, actual.length);
-                for (var i = 0; i < expected.length; ++i) {
-                    assert.notEqual(expected[i], actual[i]);
-                }
-                return;
-            }
-            if (expected === actual) {
-                fail(new AssertionError('not expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
-                     {Expected: expected, Actual: actual});
-            }
-        },
+        ////////////////////////////////////////////////////////////////////////////////
+        // STRING
 
         inString: function(expected, string){
             if (-1 === string.indexOf(expected)){
@@ -284,6 +301,9 @@
                      {Expected: expected, 'String': string});
             }
         },
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // ARRAY
 
         inArray: function(expected, array) {
             var found = false;
@@ -311,6 +331,9 @@
             }
         },
 
+        ////////////////////////////////////////////////////////////////////////////////
+        // OBJECTS
+
         hasKey: function (key, object) {
             if (!(key in object)) {
                 fail(new AssertionError('Key ' + IMVU.repr(key) + ' is not in object: ' + IMVU.repr(object)));
@@ -322,6 +345,9 @@
                 fail(new AssertionError('Unexpected key ' + IMVU.repr(key) + ' is found in object: ' + IMVU.repr(object)));
             }
         },
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // EXCEPTIONS
 
         'throws': function(exception, fn) {
             try {
@@ -336,12 +362,18 @@
             throw new AssertionError('did not throw');
         },
 
+        ////////////////////////////////////////////////////////////////////////////////
+        // TYPE
+
         'instanceof': function(actual, type) {
             if(!(actual instanceof type)) {
                 fail(new AssertionError(IMVU.repr(actual) + 'not instance of' + IMVU.repr(type)),
                     {Type: type, Actual: actual});
             }
         },
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // DOM ASSERTIONS
 
         // TODO: lift into separate file?
         dom: {
