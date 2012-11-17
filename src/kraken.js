@@ -305,6 +305,7 @@ var KRAKEN_DEBUG = true;
             future.complete(exportTable);
         }
     }
+    _.extend(module, IMVU.moduleCommon);
 
     window.module = module;
     window.define = define;
