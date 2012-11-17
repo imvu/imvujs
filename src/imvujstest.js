@@ -367,7 +367,7 @@
 
         'instanceof': function(actual, type) {
             if(!(actual instanceof type)) {
-                fail(new AssertionError(IMVU.repr(actual) + 'not instance of' + IMVU.repr(type)),
+                fail(new AssertionError(IMVU.repr(actual) + ' not instance of ' + IMVU.repr(type)),
                     {Type: type, Actual: actual});
             }
         },
