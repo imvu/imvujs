@@ -15,7 +15,7 @@ def generate(env):
         os.path.dirname(__file__),
         '..',
         'third-party',
-        'closure-compiler-2079',
+        'closure-compiler-2180',
         'compiler.jar')
     closure = os.path.relpath(
         os.path.normpath(closure),
