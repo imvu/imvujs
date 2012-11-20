@@ -18,10 +18,13 @@ module({
     function FakeXMLHttpRequestFactory() {
         var expectations = {};
         var pending = {};
+        var factory = this;
+        var counter = {num:0};
 
         function FakeXMLHttpRequest() {
             this.requestHeaders = {};
             this.readyState = this.UNSENT;
+            counter.num += 1;
         }
 
         function defaultEventHandler() {
@@ -204,6 +207,9 @@ module({
             return Object.keys(expectations).length === 0;
         };
 
+        FakeXMLHttpRequest.getCount = function () {
+            return counter.num;
+        }
         return FakeXMLHttpRequest;
     }
     return FakeXMLHttpRequestFactory;

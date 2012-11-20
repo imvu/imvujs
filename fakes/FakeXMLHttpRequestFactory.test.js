@@ -110,6 +110,13 @@ module({
             assert.equal(3, xhr.LOADING);
             assert.equal(4, xhr.DONE);
         });
+
+        test("has count of requests", function () {
+            assert.equal(0, this.FakeXMLHttpRequest.getCount());
+            this.xhr = new this.FakeXMLHttpRequest;
+            assert.equal(1, this.FakeXMLHttpRequest.getCount());
+            this.xhr.abort();
+        });
     });
 
     fixture("event flows", function() {
