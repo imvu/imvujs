@@ -11,17 +11,19 @@ HERE=`dirname "$0"`
 NODEJS="$HERE/node"
 JSHINT="$HERE/../third-party/node-jshint/bin/hint"
 
+if [ .$MSYSTEM = .MINGW32 ]; then
+    FINDSUBST="\;"
+else
+    FINDSUBST="+"
+fi
+
 if [ "$@" ]; then
     TESTS="$@"
     echo "Running jshint..."
     $NODEJS $JSHINT $TESTS || exit 1
 else
     echo "Running jshint..."
-    if [ .$MSYSTEM = .MINGW32 ]; then
-        find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} \;  || fail
-    else
-        find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} + || fail
-    fi
+    find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
     TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
 
