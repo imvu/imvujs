@@ -126,13 +126,13 @@ function readModule(path, ast) {
          * We'll pretend that the code was written like so:
          * 
          * module({}, function() {
-         *     var $kraken$exports;
+         *     var $module$exports;
          *     function define(a, b) {
-         *         $kraken$exports = b();
+         *         $module$exports = b();
          *     }
          *     define.amd = true;
          *     themodulebody;
-         *     return $kraken$exports;
+         *     return $module$exports;
          * });
          * 
          * Possible improvement: Scan the module body for references to an "exports" object
@@ -143,9 +143,9 @@ function readModule(path, ast) {
 
         body.unshift(["stat", ["assign", true, ["dot", ["name", "define"], "amd"], ["name", "true"]]]);
         body.unshift(['defun', 'define', ['a', 'b'], [
-            ['stat', ['assign', true, ['name', '$kraken$exports'], ['call', ['name', 'b'], []]]]]]);
-        body.unshift(['var', [['$kraken$exports']]]);
-        body.push(['return', ['name', '$kraken$exports']]);
+            ['stat', ['assign', true, ['name', '$module$exports'], ['call', ['name', 'b'], []]]]]]);
+        body.unshift(['var', [['$module$exports']]]);
+        body.push(['return', ['name', '$module$exports']]);
 
         result = {
             deps: {},
@@ -241,7 +241,7 @@ function emitModules(rootPath, modules) {
 
     var nextIndex = 1;
     function newAlias() {
-        return '$kraken$' + nextIndex++;
+        return '$module$' + nextIndex++;
     }
 
     function emitDependencies(path, module) {

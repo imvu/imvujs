@@ -209,7 +209,8 @@ module({
 
         FakeXMLHttpRequest.getCount = function () {
             return counter.num;
-        }
+        };
+
         return FakeXMLHttpRequest;
     }
     return FakeXMLHttpRequestFactory;
