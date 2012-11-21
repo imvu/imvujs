@@ -14,21 +14,8 @@ module({}, function(imports) {
         this._intervals = {};
     }
 
-    FakeTimer.prototype.now = function() {
-        return this._currentTimeMsec / 1000;
-    };
-
     FakeTimer.prototype.getTime = function() {
         return this._currentTimeMsec;
-    };
-
-    FakeTimer.prototype.setTime = function(t) {
-        // fake object of Date
-        return {
-            now: function() { return t / 1000; },
-            getTime: function() { return t; },
-            toUTCString: function() { return "fake_UTC_" + t; }
-        };
     };
 
     FakeTimer.prototype.setTimeout = function(func, timeout) {
@@ -70,8 +57,8 @@ module({}, function(imports) {
         delete this._intervals[handle];
     };
 
-    FakeTimer.prototype._advance = function(seconds) {
-        this._currentTimeMsec += seconds * 1000;
+    FakeTimer.prototype._advance = function(msec) {
+        this._currentTimeMsec += msec;
 
         for (var handle in this._timeouts) {
             var timeout = this._timeouts[handle];

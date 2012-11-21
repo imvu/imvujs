@@ -11,24 +11,13 @@ module({
 
     base.extend("Date", function() {
         test("initial time is greater than zero", function() {
-            assert.greater(this.timer.now(), 0);
+            assert.greater(this.timer.getTime(), 0);
         });
 
-        test("_advance increases now", function() {
-            var start = this.timer.now();
+        test("_advance increases getTime", function() {
+            var start = this.timer.getTime();
             this.timer._advance(100);
-            assert.equal(100, this.timer.now() - start);
-        });
-        
-        test("getTime returns time in millisec", function() {
-            assert.equal(this.timer.now() * 1000, this.timer.getTime());
-        });
-        
-        test("setTime sets time in millisec", function() {
-            var fakeDate = this.timer.setTime(7878000);
-            assert.equal(7878, fakeDate.now());
-            assert.equal(7878000, fakeDate.getTime());
-            assert.equal("fake_UTC_7878000", fakeDate.toUTCString());
+            assert.equal(100, this.timer.getTime() - start);
         });
     });
 
@@ -48,11 +37,11 @@ module({
             var calls = [];
             this.timer.setTimeout(function() { calls.push(calls.length); }, 500);
             assert.deepEqual([], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([0], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([0], calls);
         });
 
@@ -92,13 +81,13 @@ module({
             var calls = [];
             this.timer.setInterval(function() { calls.push(calls.length); }, 500);
             assert.deepEqual([], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([0], calls);
-            this.timer._advance(0.2);
+            this.timer._advance(200);
             assert.deepEqual([0], calls);
-            this.timer._advance(0.4);
+            this.timer._advance(400);
             assert.deepEqual([0, 1], calls);
         });
 
