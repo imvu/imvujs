@@ -2,6 +2,10 @@ var IMVU = IMVU || {};
 (function() {
     IMVU.Timer = {
         getTime: Date.now.bind(Date),
+
+        getCurrentDate: function() {
+            return new Date;
+        },
         
         // using bind on setTimeout causes trouble in IE8
         setTimeout: function(a, b) {

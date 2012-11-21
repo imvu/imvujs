@@ -19,6 +19,12 @@ module({
             this.timer._advance(100);
             assert.equal(100, this.timer.getTime() - start);
         });
+
+        test('getCurrentDate', function() {
+            var now = this.timer.getTime();
+            var currentData = this.timer.getCurrentDate();
+            assert.equal(now, currentData.getTime());
+        });
     });
 
     base.extend("timeout", function() {

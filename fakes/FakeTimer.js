@@ -14,6 +14,10 @@ module({}, function(imports) {
         this._intervals = {};
     }
 
+    FakeTimer.prototype.getCurrentDate = function() {
+        return new Date(this.getTime());
+    };
+
     FakeTimer.prototype.getTime = function() {
         return this._currentTimeMsec;
     };
