@@ -54,10 +54,6 @@ targets += env.ClosureCompiler(
     'out/imvu.node.js',
     NODE_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
-targets += env.ClosureCompiler(
-    'out/imvu.node.min.js',
-    NODE_SOURCES,
-    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS)
 
 env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 
