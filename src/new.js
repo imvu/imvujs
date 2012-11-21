@@ -2,6 +2,10 @@ var IMVU = IMVU || {};
 (function() {
     var slice = Array.prototype.slice;
 
+    // Function implementation of operator new, per
+    // http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+    // 13.2.2
+
     // ES3
     IMVU['new'] = function new_(constructor) {
         if (!(constructor instanceof Function)) {
