@@ -6,7 +6,7 @@ module({}, function(imports) {
         },
         verifyAndFlush: function() {
             roots.forEach(function(root) {
-                root.verify();
+                root.verifyRoot();
             });
             roots.splice(0);
         }

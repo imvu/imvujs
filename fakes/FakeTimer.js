@@ -67,7 +67,7 @@ module({
         delete this._intervals[handle];
     };
 
-    FakeTimer.prototype.verify = function() {
+    FakeTimer.prototype.verifyRoot = function() {
         for (var key in this._timeouts) {
             var h = this._timeouts[key];
             throw new Error("Test ended while a timeout handler was registered: " + h.debugString);
