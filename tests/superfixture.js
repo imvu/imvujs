@@ -1,5 +1,6 @@
 module({
     ShouldFail: 'ShouldFail.js',
+    RootRegistry: '../fakes/RootRegistry.js',
 }, function(imports) {
     registerSuperFixture({
         beforeTest: function() {
@@ -8,5 +9,13 @@ module({
             assert.false(imports.ShouldFail.state.shouldFail);
         }
     });
-    return {};
+
+    registerSuperFixture({
+        beforeTest: function() {
+            imports.RootRegistry.verifyAndFlush();
+        },
+        afterTest: function() {
+            imports.RootRegistry.verifyAndFlush();
+        }
+    });
 });

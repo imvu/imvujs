@@ -31,6 +31,7 @@ module({
         test("handle is greater than zero", function() {
             var handle = this.timer.setTimeout(function() {}, 500);
             assert.greater(handle, 0);
+            this.timer.clearTimeout(handle);
         });
 
         test("setTimeout throws TypeError if given a string", function() {
@@ -75,6 +76,7 @@ module({
         test("handle is greater than zero", function() {
             var handle = this.timer.setInterval(function() {}, 500);
             assert.greater(handle, 0);
+            this.timer.clearInterval(handle);
         });
 
         test("setInterval throws TypeError if given a string", function() {
@@ -85,7 +87,7 @@ module({
 
         test("setInterval is evaluated over time", function() {
             var calls = [];
-            this.timer.setInterval(function() { calls.push(calls.length); }, 500);
+            var handle = this.timer.setInterval(function() { calls.push(calls.length); }, 500);
             assert.deepEqual([], calls);
             this.timer._advance(400);
             assert.deepEqual([], calls);
@@ -95,6 +97,7 @@ module({
             assert.deepEqual([0], calls);
             this.timer._advance(400);
             assert.deepEqual([0, 1], calls);
+            this.timer.clearInterval(handle);
         });
 
         test("clearInterval", function() {
@@ -107,11 +110,12 @@ module({
 
         test("setInterval arguments are passed through", function() {
             var calls = [];
-            this.timer.setInterval(function() {
+            var handle = this.timer.setInterval(function() {
                 calls.push(Array.prototype.slice.call(arguments, 0));
             }, 600, 'arg1', 2);
             this.timer._advance(1000);
             assert.deepEqual([['arg1', 2]], calls);
+            this.timer.clearInterval(handle);
         });
     });
 });

@@ -1,4 +1,6 @@
-module({}, function(imports) {
+module({
+    RootRegistry: 'RootRegistry.js'
+}, function(imports) {
     // Implemented per
     // http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#timers
 
@@ -12,6 +14,8 @@ module({}, function(imports) {
 
         this._currentIntervalHandle = 1;
         this._intervals = {};
+
+        imports.RootRegistry.addRoot(this);
     }
 
     FakeTimer.prototype.getCurrentDate = function() {
@@ -32,7 +36,8 @@ module({}, function(imports) {
         var handle = this._currentTimeoutHandle++;
         this._timeouts[handle] = {
             func: function() { func.apply(undefined, remaining); },
-            endTimeMsec: this._currentTimeMsec + timeout
+            endTimeMsec: this._currentTimeMsec + timeout,
+            debugString: "timeout: " + timeout + ", func: " + func.toString()
         };
         return handle;
     };
@@ -52,13 +57,26 @@ module({}, function(imports) {
         this._intervals[handle] = {
             func: function() { func.apply(undefined, remaining); },
             timeoutMsec: timeout,
-            nextTimeMsec: this._currentTimeMsec + timeout
+            nextTimeMsec: this._currentTimeMsec + timeout,
+            debugString: "timeout: " + timeout + ", func: " + func.toString()
         };
         return handle;
     };
 
     FakeTimer.prototype.clearInterval = function(handle) {
         delete this._intervals[handle];
+    };
+
+    FakeTimer.prototype.verify = function() {
+        for (var key in this._timeouts) {
+            var h = this._timeouts[key];
+            throw new Error("Test ended while a timeout handler was registered: " + h.debugString);
+        }
+
+        for (var key in this._intervals) {
+            var h = this._intervals[key];
+            throw new Error("Test ended while an interval handler was registered: " + h.debugString);
+        }
     };
 
     FakeTimer.prototype._advance = function(msec) {
