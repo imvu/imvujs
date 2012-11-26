@@ -332,8 +332,6 @@ function main(argv) {
 
     var comment = '';
 
-    console.log(JSON.stringify(argv));
-
     if (5 === argv.length && argv[3] == '--comment') {
         comment = argv[4];
         if (/\/\*/.exec(comment) || /\*\//.exec(comment)) {
