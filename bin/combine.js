@@ -322,14 +322,28 @@ function combine(rootPath) {
 }
 
 function usage() {
-    console.log("usage: combine file.js > newfile.js");
+    console.log('usage: combine file.js > newfile.js');
+    console.log('       combine file.js --comment "Comment to be inserted at the top of the script" > newfile.js')
 }
 
 function main(argv) {
     var fix_output = require('../src/fix_output.js');
     fix_output.fixConsole(console);
 
-    if (3 !== argv.length) {
+    var comment = '';
+
+    console.log(JSON.stringify(argv));
+
+    if (5 === argv.length && argv[3] == '--comment') {
+        comment = argv[4];
+        if (/\/\*/.exec(comment) || /\*\//.exec(comment)) {
+            console.log("Comment option cannot contain /* or */");
+            console.log('');
+            usage();
+            return 1;
+        }
+
+    } else if (3 !== argv.length) {
         usage();
         return 1;
     }
@@ -338,6 +352,13 @@ function main(argv) {
 
     try {
         var newScript = combine(fileName);
+
+        if (comment.length) {
+            console.log("/*");
+            console.log(comment);
+            console.log("*/");
+        }
+
         console.log(uglify.uglify.gen_code(newScript, {beautify: true}));
 
     } catch (e) {

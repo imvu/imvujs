@@ -5,4 +5,4 @@ else
     MYDIR=`dirname "$0"`/..
 fi
 
-"$MYDIR/s/node" "$MYDIR/bin/combine.js" $*
+"$MYDIR/s/node" "$MYDIR/bin/combine.js" "$@"
