@@ -7,7 +7,7 @@ module({
     var START_TIME = 1234;
     
     function FakeTimer() {
-        this._currentTimeMsec = START_TIME * 1000;
+        this._setTimeUnix(START_TIME);
 
         this._currentTimeoutHandle = 1;
         this._timeouts = {};
@@ -24,6 +24,10 @@ module({
 
     FakeTimer.prototype.getTime = function() {
         return this._currentTimeMsec;
+    };
+
+    FakeTimer.prototype._setTimeUnix = function (unixtime) {
+        this._currentTimeMsec = unixtime * 1000;
     };
 
     FakeTimer.prototype.setTimeout = function(func, timeout) {

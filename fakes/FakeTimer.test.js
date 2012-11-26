@@ -25,6 +25,13 @@ module({
             var currentData = this.timer.getCurrentDate();
             assert.equal(now, currentData.getTime());
         });
+
+        test('setTimeUnix', function () {
+            var now = 1234567890; // 2009-02-13 23:31:30
+            this.timer._setTimeUnix(now);
+            var currentDate = this.timer.getCurrentDate();
+            assert.equal('2009-02-13T23:31:30.000Z', currentDate.toISOString());
+        });
     });
 
     base.extend("timeout", function() {
