@@ -61,7 +61,7 @@ fixture('functional', function() {
     });
 
     test('basic functionality', function() {
-        var q = combine.combine('combine/d.js');
+        var q = combine.combine(combine.readModules('combine/d.js'), 'combine/d.js');
         assert.equal(combine.gen_code(q, {
             beautify: true
         }), expected);
@@ -69,7 +69,7 @@ fixture('functional', function() {
 
     test('combine produces error if any modules are missing', function() {
         var exc = assert.throws(combine.ScriptError, function() {
-            combine.combine('combine/has-missing.js');
+            combine.combine(combine.readModules('combine/has-missing.js'), 'combine/has-missing.js');
         });
         assert.equal("Module '" + path.normalize('combine/missing.js') + "' is missing, referred to by: combine/has-missing.js", exc.message);
     });
@@ -124,5 +124,5 @@ test('invalid dependency list produces an error message', function() {
 test('missing return statement produces an error message', function() {
     var ast;
     ast = uglify.parser.parse('module({}, function(imports) { function oh_no_i_have_forgotten_to() { return; } });');
-    assert.throws(combine.ScriptError, combine.combine.bind(null, 'combine/noreturn.js'));
+    assert.throws(combine.ScriptError, combine.combine.bind(null, combine.readModules('combine/noreturn.js'), 'combine/noreturn.js'));
 });

@@ -22,8 +22,11 @@ def generate(env):
 
         return target, source
 
+    def combine(target, source, env, for_signature):
+        return 'bash $KRAKEN_COMBINE $SOURCE > $TARGET'
+    
     KrakenCombine = Builder(
-        action='bash $KRAKEN_COMBINE $SOURCE > $TARGET',
+        generator=combine,
         emitter=depend_on_combiner_and_dependencies)
 
     path = os.path.join(
