@@ -14,6 +14,7 @@ BASE_SOURCES = [
     'src/new.js',
     'src/function.js',
     'src/BaseClass.js',
+    'src/ServiceProvider.js',
     'src/Random.js',
     'src/module-common.js',
 ]
@@ -34,7 +35,22 @@ env = Environment(
     toolpath=['tools'],
     tools=['closure', 'gzip', 'kraken_combine'])
 
-BASE_CLOSURE_FLAGS = ['--language_in', 'ECMASCRIPT5']
+BASE_CLOSURE_FLAGS = [
+    '--language_in', 'ECMASCRIPT5',
+    '--jscomp_error', 'ambiguousFunctionDecl',
+    '--jscomp_error', 'checkDebuggerStatement',
+    '--jscomp_error', 'checkRegExp',
+    '--jscomp_off', 'checkTypes',
+    '--jscomp_error', 'checkVars',
+    '--jscomp_error', 'deprecated',
+    '--jscomp_off', 'duplicate',
+    '--jscomp_error', 'es5Strict',
+    '--jscomp_off', 'missingProperties',
+    '--jscomp_error', 'undefinedNames',
+    '--jscomp_off', 'undefinedVars',
+    '--jscomp_off', 'uselessCode',
+    '--jscomp_error', 'globalThis',
+]
 
 targets = []
 
