@@ -22,5 +22,14 @@ fixture("ServiceProvider", function() {
         assert.equal(timer, instance.timer);
     });
 
-    
+    test("throws error if dependency is not satisfied", function() {
+        function Foo() {
+        }
+        Foo.dependencies = {
+            timer: {}
+        };
+        assert.throws(ReferenceError, function() {
+            this.sp['new'](Foo);
+        }.bind(this));
+    });
 });
