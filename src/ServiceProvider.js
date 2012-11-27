@@ -14,11 +14,12 @@ var IMVU = IMVU || {};
                 _.extend({serviceProvider: this}, options),
                 _.pick(this.services, Object.keys(type.dependencies || {})));
 
-            Object.keys(type.dependencies || {}).forEach(function(name) {
-                if (!options.hasOwnProperty(name)) {
-                    throw new ReferenceError('No service registered or argument specified for "' + name + '" when constructing "' + type.name + '"');
-                }
-            });
+            var missing = _.reject(
+                Object.keys(type.dependencies || {}),
+                _.has.bind(undefined, options));
+            if (missing.length) {
+                throw new ReferenceError('No service registered or argument specified for ' + missing.join(', ') + '" when constructing "' + type.name + '"');
+            }
             return new type(options);
         }
     });
