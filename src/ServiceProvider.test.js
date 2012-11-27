@@ -15,9 +15,7 @@ fixture("ServiceProvider", function() {
         function Foo(options) {
             this.timer = options.timer;
         }
-        Foo.dependencies = {
-            timer: {}
-        };
+        Foo.dependencies = ['timer'];
         var instance = this.sp['new'](Foo);
         assert.equal(timer, instance.timer);
     });
@@ -25,9 +23,7 @@ fixture("ServiceProvider", function() {
     test("throws error if dependency is not satisfied", function() {
         function Foo() {
         }
-        Foo.dependencies = {
-            timer: {}
-        };
+        Foo.dependencies = ['timer'];
         var e = assert.throws(ReferenceError, function() {
             this.sp['new'](Foo);
         }.bind(this));
@@ -41,9 +37,7 @@ fixture("ServiceProvider", function() {
             this.extra = options.extra;
             this.service = options.service;
         }
-        Foo.dependencies = {
-            service: {}
-        };
+        Foo.dependencies = ['service'];
         var instance = this.sp['new'](Foo, {extra: 10});
         assert.equal(service, instance.service);
         assert.equal(10, instance.extra);
@@ -56,9 +50,7 @@ fixture("ServiceProvider", function() {
         function Foo(options) {
             this.service = options.service;
         }
-        Foo.dependencies = {
-            service: {}
-        };
+        Foo.dependencies = ['service'];
         var instance = this.sp['new'](Foo, {service: service2});
         assert.equal(service2, instance.service);
     });

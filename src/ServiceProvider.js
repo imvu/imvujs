@@ -17,12 +17,17 @@ var IMVU = IMVU || {};
         },
 
         'new': function(type, options) {
+            var dependencies = type.dependencies || [];
+            if (!(dependencies instanceof Array)) {
+                throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));
+            }
+
             options = _.defaults(
                 _.extend({serviceProvider: this}, options),
-                _.pick(this.services, Object.keys(type.dependencies || {})));
+                _.pick(this.services, dependencies));
 
             var missing = _.reject(
-                Object.keys(type.dependencies || {}),
+                dependencies,
                 _.has.bind(undefined, options));
             if (missing.length) {
                 throw new ReferenceError('Unsatisfied dependencies "' + missing.join(', ') + '" when constructing ' + type.name);
