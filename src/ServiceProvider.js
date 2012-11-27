@@ -6,7 +6,10 @@ var IMVU = IMVU || {};
         },
 
         get: function(name) {
-            throw new ReferenceError('No service registered for "' + name + '"');
+            if (!this.services.hasOwnProperty(name)) {
+                throw new ReferenceError('No service registered for "' + name + '"');
+            }
+            return this.services[name];
         },
 
         register: function(name, instance) {

@@ -89,4 +89,10 @@ fixture("ServiceProvider", function() {
         }.bind(this));
         assert.equal('No service registered for "service"', e.message);
     });
+
+    test('looking up registered services', function() {
+        var service = {};
+        this.sp.register('service', service);
+        assert.equal(service, this.sp.get('service'));
+    });
 });
