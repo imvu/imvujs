@@ -69,4 +69,16 @@ fixture("ServiceProvider", function() {
         var instance = this.sp['new'](Foo);
         assert.equal(this.sp, instance.serviceProvider);
     });
+
+    test("unnecessary services aren't given", function() {
+        var service = {};
+        this.sp.register('service', service);
+
+        function Foo(options) {
+            this.service = options.service;
+        }
+
+        var instance = this.sp['new'](Foo);
+        assert.equal(undefined, instance.service);
+    });
 });

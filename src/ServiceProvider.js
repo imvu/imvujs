@@ -12,7 +12,7 @@ var IMVU = IMVU || {};
         'new': function(type, options) {
             options = _.defaults(
                 _.extend({serviceProvider: this}, options),
-                this.services);
+                _.pick(this.services, Object.keys(type.dependencies || {})));
 
             Object.keys(type.dependencies || {}).forEach(function(name) {
                 if (!options.hasOwnProperty(name)) {
