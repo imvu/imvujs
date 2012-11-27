@@ -21,6 +21,7 @@ var IMVU = IMVU || {};
             if (!(dependencies instanceof Array)) {
                 throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));
             }
+            Object.freeze(dependencies);
 
             options = _.defaults(
                 _.extend({serviceProvider: this}, options),
