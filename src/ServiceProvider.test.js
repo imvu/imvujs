@@ -20,6 +20,18 @@ fixture("ServiceProvider", function() {
         assert.equal(timer, instance.timer);
     });
 
+    test("dependencies can be specified on prototypes too", function() {
+        var service = {};
+        this.sp.register('service', service);
+
+        function Foo(options) {
+            this.service = options.service;
+        }
+        Foo.prototype.dependencies = ['service'];
+        var instance = this.sp['new'](Foo);
+        assert.equal(service, instance.service);
+    });
+
     test("throws error if dependency is not satisfied", function() {
         function Foo() {
         }

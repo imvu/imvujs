@@ -17,7 +17,7 @@ var IMVU = IMVU || {};
         },
 
         'new': function(type, options) {
-            var dependencies = type.dependencies || [];
+            var dependencies = type.dependencies || type.prototype.dependencies || [];
             if (!(dependencies instanceof Array)) {
                 throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));
             }
