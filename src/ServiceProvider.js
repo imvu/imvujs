@@ -9,14 +9,15 @@ var IMVU = IMVU || {};
             this.services[name] = instance;
         },
 
-        'new': function(type) {
-            var options = {};
-            var services = this.services;
+        'new': function(type, options) {
+            options = _.defaults(
+                _.extend({serviceProvider: this}, options),
+                this.services);
+
             Object.keys(type.dependencies || {}).forEach(function(name) {
-                if (!services.hasOwnProperty(name)) {
-                    throw new ReferenceError('No service registered for "' + name + '" when constructing "' + type.name + '"');
+                if (!options.hasOwnProperty(name)) {
+                    throw new ReferenceError('No service registered or argument specified for "' + name + '" when constructing "' + type.name + '"');
                 }
-                options[name] = services[name];
             });
             return new type(options);
         }
