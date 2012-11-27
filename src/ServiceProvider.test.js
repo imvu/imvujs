@@ -28,9 +28,10 @@ fixture("ServiceProvider", function() {
         Foo.dependencies = {
             timer: {}
         };
-        assert.throws(ReferenceError, function() {
+        var e = assert.throws(ReferenceError, function() {
             this.sp['new'](Foo);
         }.bind(this));
+        assert.equal('Unsatisfied dependencies "timer" when constructing Foo', e.message);
     });
 
     test('passing extra arguments', function() {
@@ -81,4 +82,12 @@ fixture("ServiceProvider", function() {
         var instance = this.sp['new'](Foo);
         assert.equal(undefined, instance.service);
     });
+
+/*
+    test('attempting to get unknown services raises ReferenceError', function() {
+        var e = assert.throws(ReferenceError, function() {
+            this.sp.get('service');
+        });
+    });
+*/
 });

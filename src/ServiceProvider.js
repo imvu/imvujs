@@ -18,7 +18,7 @@ var IMVU = IMVU || {};
                 Object.keys(type.dependencies || {}),
                 _.has.bind(undefined, options));
             if (missing.length) {
-                throw new ReferenceError('No service registered or argument specified for ' + missing.join(', ') + '" when constructing "' + type.name + '"');
+                throw new ReferenceError('Unsatisfied dependencies "' + missing.join(', ') + '" when constructing ' + type.name);
             }
             return new type(options);
         }
