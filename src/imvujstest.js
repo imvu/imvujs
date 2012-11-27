@@ -356,7 +356,7 @@
                 if (e instanceof exception) {
                     return e;
                 }
-                fail(new AssertionError('expected to throw: "' + IMVU.repr(exception) + '", actually threw: "' + IMVU.repr(e) + '"'),
+                fail(new AssertionError('Expected to throw "' + exception.name + '", actually threw: ' + IMVU.repr(e) + ': ' + e.message),
                      {Expected: exception, Actual: e});
             }
             throw new AssertionError('did not throw');

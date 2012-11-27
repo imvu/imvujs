@@ -5,6 +5,10 @@ var IMVU = IMVU || {};
             this.services = {};
         },
 
+        get: function(name) {
+            throw new ReferenceError('No service registered for "' + name + '"');
+        },
+
         register: function(name, instance) {
             this.services[name] = instance;
         },

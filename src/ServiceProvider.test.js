@@ -83,11 +83,10 @@ fixture("ServiceProvider", function() {
         assert.equal(undefined, instance.service);
     });
 
-/*
     test('attempting to get unknown services raises ReferenceError', function() {
         var e = assert.throws(ReferenceError, function() {
             this.sp.get('service');
-        });
+        }.bind(this));
+        assert.equal('No service registered for "service"', e.message);
     });
-*/
 });
