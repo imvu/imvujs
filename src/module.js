@@ -27,7 +27,7 @@ var KRAKEN_DEBUG = true;
 
         FNOP.prototype = fn.prototype;
         fBound.prototype = new FNOP();
- 
+
         return fBound;
     }
 
@@ -72,7 +72,7 @@ var KRAKEN_DEBUG = true;
 
     /* Returns a function which implements memoization and request coallescing
      * for the function 'fn'
-     * 
+     *
      * 'fn' must have the signature function(arg, onComplete)
      * where onComplete is itself a function that takes the result as its sole parameter.
      */
@@ -191,7 +191,8 @@ var KRAKEN_DEBUG = true;
     }
 
     function toAbsoluteUrl(url, relativeTo) {
-        if (url[0] === '/') {
+        var isAbsolute = url[0] === '/' || url.match(/^(http|https):\/\//) !== null;
+        if (isAbsolute) {
             return url;
         }
 
