@@ -21,7 +21,12 @@ fi
 DOTGIT="$REPOSITORY_ROOT/.git"
 
 if [ -f "$DOTGIT" ]; then
-    GITDIR=$REPOSITORY_ROOT/`cat "$DOTGIT" | sed "s/gitdir: //"`
+    if [ x"$REPOSITORY_ROOT" = x"." ]; then
+	PREFIX=
+    else
+	PREFIX=$REPOSITORY_ROOT/
+    fi
+    GITDIR=$PREFIX`cat "$DOTGIT" | sed "s/gitdir: //"`
 elif [ -d "$DOTGIT" ]; then
     GITDIR="$DOTGIT"
 else
