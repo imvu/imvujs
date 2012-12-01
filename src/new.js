@@ -9,7 +9,7 @@ var IMVU = IMVU || {};
     // ES3
     IMVU['new'] = function new_(constructor) {
         if (!(constructor instanceof Function)) {
-            throw new TypeError(typeof(constructor) + " is not a function");
+            throw new TypeError('IMVU.new called with constructor type ' + typeof(constructor) + " which is not a function");
         }
 
         var cp = constructor.prototype;

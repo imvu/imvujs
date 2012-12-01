@@ -67,6 +67,20 @@ fixture("ServiceProvider", function() {
         assert.equal(service2, instance.service);
     });
 
+    test('extra arguments is the last parameter', function() {
+        var service1 = {};
+        this.sp.register('service', service1);
+        var service2 = {};
+        function Foo(thing, options) {
+            this.thing = thing;
+            this.service = options.service;
+        }
+        Foo.dependencies = ['service'];
+        var instance = this.sp['new'](Foo, 'thing', {service: service2});
+        assert.equal('thing', instance.thing);
+        assert.equal(service2, instance.service);
+    });
+
     test('passes itself into options', function() {
         function Foo(options) {
             this.serviceProvider = options.serviceProvider;
