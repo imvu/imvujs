@@ -392,6 +392,7 @@
             },
 
             notHasClass: function(className, selector) {
+                assert.dom.present(selector); // if the selector is empty, .hasClass will always return false
                 if ($(selector).hasClass(className)){
                     fail(new AssertionError('Selector: ' + IMVU.repr(selector) + ' expected NOT to have class '+ IMVU.repr(className)));
                 }
@@ -402,6 +403,7 @@
             },
 
             notHasAttribute: function(attributeName, selector) {
+                assert.dom.present(selector);
                 assert['false']($(selector).is('[' + attributeName + ']'));
             },
 
@@ -465,6 +467,7 @@
             },
 
             notEmpty: function(selector) {
+                assert.dom.present(selector);
                 assert['false']($(selector).is(':empty'));
             }
         }
