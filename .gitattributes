@@ -2,6 +2,7 @@
 *.bat   binary
 *.cmd   binary
 *.exe   binary
+*.jar   binary
 
 *.js    eol=lf
 *.html  eol=lf
