@@ -435,6 +435,7 @@
             },
 
             notVisible: function(selector) {
+                assert.dom.present(selector);
                 assert['false']($(selector).is(':visible'));
             },
 
