@@ -195,6 +195,12 @@ module({
             return xhr;
         };
 
+        FakeXMLHttpRequest._getPending = function (method, url) {
+            var key = method + ' ' + url;
+
+            return pending[key];
+        };
+
         FakeXMLHttpRequest._respond = function (method, url, responseCode, responseHeaders, responseBody) {
             var xhr = FakeXMLHttpRequest._beginResponse(method, url);
 
