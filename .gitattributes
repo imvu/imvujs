@@ -13,3 +13,8 @@
 *.man   eol=crlf
 
 s/*     eol=lf
+
+bin/combine           eol=lf
+bin/scan-dependencies eol=lf
+bin/test              eol=lf
+bin/verify            eol=lf
