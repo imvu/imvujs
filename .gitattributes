@@ -12,3 +12,4 @@
 
 *.man   eol=crlf
 
+s/*     eol=lf
