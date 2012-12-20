@@ -455,6 +455,14 @@
                 }
             },
 
+            notFocused: function(selector) {
+                var expected = $(selector)[0];
+                var actual = document.activeElement;
+                if (expected === actual) {
+                    throw new AssertionError(expected.outerHTML + ' expected not to have focus.');
+                }
+            },
+
             html: function(expected, selector) {
                 assert.equal(expected, $(selector).html());
             },
