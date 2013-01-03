@@ -5,7 +5,9 @@
 
     BaseClass.extend = function (name, def, classDef) {
         if (typeof name !== "string" || null === name.match(/[a-z_][0-9a-z_]*/i)) {
-            throw new TypeError("First argument to BaseClass.extend must be the class name.  Actual: " + IMVU.repr(name));
+            var msg = "First argument to BaseClass.extend must be the class name.  Actual: " + IMVU.repr(name);
+            console.error(msg);
+            throw new TypeError(msg);
         }
 
         var NewClass = IMVU.createNamedFunction(name, function() {
