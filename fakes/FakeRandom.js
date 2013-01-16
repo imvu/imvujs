@@ -7,18 +7,41 @@ module({
         },
 
         getInteger: function(min, max) {
+            if (arguments.length < 2)
+                throw new Error("getInteger expected (min, max)");
+
             var a = this.__values.shift();
             if (a === undefined) {
                 throw new Error("FakeRandom getInteger called without any values.");
             }
+            if (Math.floor(a) !== a) {
+                throw new Error("FakeRandom getInteger called when the set value was a float.");
+            }
+
+            if (a < min) {
+                throw new Error("FakeRandom getInteger called with a min of " + min + " but set value was " + a);
+            } else if (a > max) {
+                throw new Error("FakeRandom getInteger called with a max of " + max + " but set value was " + a);
+            }
+
             return a;
         },
 
         getFloat: function(min, max) {
+            if (arguments.length < 2)
+                throw new Error("getFloat expected (min, max)");
+
             var a = this.__values.shift();
             if (a === undefined) {
                 throw new Error("FakeRandom getFloat called without any values.");
             }
+
+            if (a < min) {
+                throw new Error("FakeRandom getFloat called with a min of " + min + " but set value was " + a);
+            } else if (a > max) {
+                throw new Error("FakeRandom getFloat called with a max of " + max + " but set value was " + a);
+            }
+
             return a;
         },
 

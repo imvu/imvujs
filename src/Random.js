@@ -3,10 +3,16 @@ var IMVU = IMVU || {};
 (function() {
     IMVU.Random = BaseClass.extend('Random', {
         getInteger: function(min, max) {
+            if (arguments.length < 2)
+                throw new Error("getInteger expected (min, max)");
+
             return Math.floor(Math.random() * (max-min)) + min;
         },
 
         getFloat: function(min, max) {
+            if (arguments.length < 2)
+                throw new Error("getFloat expected (min, max)");
+
             var a = Math.random() * (max-min) + min;
             return a;
         },
