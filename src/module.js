@@ -55,7 +55,7 @@ var KRAKEN_DEBUG = true;
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
-        if (!window.kraken.caching) {
+        if (!window.module.caching) {
             xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
         }
         xhr.onreadystatechange = function () {
@@ -311,11 +311,10 @@ var KRAKEN_DEBUG = true;
     window.module = module;
     window.define = define;
 
-    window.kraken = {
-        module: module,
+    _(module).extend({
         importJs: importJs,
         caching: true
-    };
+    });
 
     function Future(name) {
         this.name = name;

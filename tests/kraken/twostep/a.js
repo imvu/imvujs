@@ -2,7 +2,7 @@
 function getB(onComplete) {
     console.log("getjQuery");
 
-    kraken.importJs('b.js', gotB);
+    module.importJs('b.js', gotB);
 
     function gotB() {
         onComplete(null, null);
