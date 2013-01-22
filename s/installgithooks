@@ -5,11 +5,11 @@ HERE=`dirname "$0"`/..
 set -e
 
 function relpath() {
-    python -c "import os.path; print os.path.relpath('$1', '$2')"
+    python "$HERE/bin/relpath.py" "$@"
 }
 
 function normpath() {
-    python -c "import os.path; print os.path.normpath('$1')"
+    python "$HERE/bin/normpath.py" "$@"
 }
 
 if [ "$1" ]; then
