@@ -60,4 +60,16 @@ module({}, function() {
         var i = new Foo();
         assert.equal("<#Foo {field: 10}>", IMVU.repr(i));
     });
+
+    test("global objects", function(){
+        if (typeof global !== 'undefined'){
+            assert.equal('<#global>', IMVU.repr(global));
+        }
+        if (typeof window !== 'undefined'){
+            assert.equal('<#window>', IMVU.repr(window));
+        }
+        if (typeof document !== 'undefined'){
+            assert.equal('<#document>', IMVU.repr(document));
+        }
+    });
 });

@@ -15,6 +15,16 @@ var IMVU = IMVU || {};
             return v.toString();
         }
 
+        if (typeof document !== 'undefined' && v === document){
+            return '<#document>';
+        }
+        if (typeof window !== 'undefined' && v === window){
+            return '<#window>';
+        }
+        if (typeof global !== 'undefined' && v === global){
+            return '<#global>';
+        }
+
         if (!_.isUndefined(v.jquery)){
             return "$('"+ v.selector + "')";
         }
