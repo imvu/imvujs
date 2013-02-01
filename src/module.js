@@ -53,6 +53,11 @@ var KRAKEN_DEBUG = true;
     function fetch(url, callback) {
         var DONE = 4; // IE8 does not define this constant.
 
+        var version = window.module.versionedUrls[url];
+        if (version){
+            url = url + '?v=' + version;
+        }
+
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         if (!window.module.caching) {
@@ -313,7 +318,8 @@ var KRAKEN_DEBUG = true;
 
     _(module).extend({
         importJs: importJs,
-        caching: true
+        caching: true,
+        versionedUrls: {}
     });
 
     function Future(name) {

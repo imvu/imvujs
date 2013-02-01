@@ -25,19 +25,19 @@ module({
                 }.bind(this)
             };
 
-            this.bodyCallParam = null;            
+            this.bodyCallParam = null;
             this.fakeModuleBody = function(param) {
                 this.bodyCallParam = param;
             }.bind(this);
         });
-        
+
         test("include module with correct path", function() {
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             assert.equal(1, this.sysincludeCalls.length);
             assert.equal('fake_dir/a.js', this.sysincludeCalls[0]);
             assert.false(this.criticalErrorOccurred);
         });
-        
+
         test("call body with module after all dependencies resolved", function() {
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             var imports = this.bodyCallParam;
