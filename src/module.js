@@ -54,7 +54,7 @@ var KRAKEN_DEBUG = true;
         var DONE = 4; // IE8 does not define this constant.
 
         // This is an interim solution for a more robust push versioning build system.
-        var version = window.module.versionedUrls[url];
+        var version = window.module.versionedUrls[url] || window.module.versionedUrls['/' + url];
         if (version){
             url = url + '?v=' + version;
         }
