@@ -8,3 +8,6 @@
 [submodule "third-party/leprechaun-binaries"]
 	path = third-party/leprechaun-binaries
 	url = git@github.com:imvu/leprechaun-binaries.git
+[submodule "third-party/UglifyJS2"]
+	path = third-party/UglifyJS2
+	url = git@github.com:imvu/UglifyJS2.git
