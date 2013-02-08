@@ -33,7 +33,7 @@ NODE_SOURCES = BASE_SOURCES + [
 env = Environment(
     ENV=os.environ,
     toolpath=['tools'],
-    tools=['closure', 'gzip', 'kraken_combine'])
+    tools=['closure', 'uglify', 'gzip', 'kraken_combine'])
 
 BASE_CLOSURE_FLAGS = [
     '--language_in', 'ECMASCRIPT5',
@@ -70,6 +70,10 @@ targets += env.ClosureCompiler(
     'out/imvu.node.js',
     NODE_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
+
+#targets += env.UglifyMinify(
+#    'out/imvu.min2.js',
+#    WEB_SOURCES)
 
 env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 
