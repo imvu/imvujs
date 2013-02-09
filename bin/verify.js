@@ -52,7 +52,6 @@ function check(ast) {
 
     function visit(scope, node) {
         if (node instanceof uglify.AST_Var) {
-            console.log('found AST_Var');
             node.definitions.forEach(function(e) {
                 scope.add(e.name.name);
                 if (e.value) {
@@ -119,7 +118,7 @@ function main(argv) {
 
         var ast;
         try {
-            ast = uglify.parser.parse(code);
+            ast = uglify.parse(code);
         } catch (e) {
             combine.errorExit("Error in", fileName, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
         }
