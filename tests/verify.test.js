@@ -4,7 +4,7 @@ verify = require('../bin/verify.js');
 
 uglify = require('uglify-js');
 
-parse = uglify.parser.parse;
+parse = uglify.parse;
 
 reject = function(code) {
     var errors;
@@ -86,7 +86,7 @@ test('function literal as object property', function() {
 
 test('reports multiple errors in a single run', function() {
     var errors;
-    errors = parse('a = b; c = d;');
+    errors = verify.check(parse('a = b; c = d;'));
     assert.equal(2, errors.length);
 });
 

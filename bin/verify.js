@@ -34,12 +34,10 @@ Scope.prototype.has = function(name) {
 
 function leftMostSubExpression(node) {
     //console.error("leftMostSubExpression", node);
-    if (node[0] == 'name') {
+    if (node instanceof uglify.AST_Symbol) {
         return node;
-    } else if (node[0] == 'sub') {
-        return leftMostSubExpression(node[1]);
-    } else if (node[0] == 'dot') {
-        return leftMostSubExpression(node[1]);
+    } else if (node instanceof uglify.AST_PropAccess) {
+        return leftMostSubExpression(node.expression);
     } else {
         return node;
     }
@@ -53,47 +51,62 @@ function check(ast) {
     visit(globalScope, ast);
 
     function visit(scope, node) {
-        var t = node[0];
-        if (t == 'var') {
-            var vars = node[1];
-            vars.forEach(function(e) {
-                scope.add(e[0]);
-                if (e.length > 1) {
-                    visit(scope, e[1]);
+        if (node instanceof uglify.AST_Var) {
+            console.log('found AST_Var');
+            node.definitions.forEach(function(e) {
+                scope.add(e.name.name);
+                if (e.value) {
+                    visit(scope, e.value);
                 }
             });
-        } else if (t == 'defun' || t == 'function') {
-            if (node[1]) {
-                scope.add(node[1]);
+        } else if (node instanceof uglify.AST_Defun || node instanceof uglify.AST_Function) {
+            if (node instanceof uglify.AST_Defun) {
+                scope.add(node.name.name);
             }
 
             var s = new Scope(scope);
 
-            var params = node[2];
-            params.forEach(s.add.bind(s));
+            node.argnames.forEach(function(funarg) {
+                s.add(funarg.name);
+            });
 
-            var statements = node[3];
-            for (var k = 0; k < statements.length; ++k) {
-                visit(s, statements[k]);
-            }
+            node.body.forEach(function(statement) {
+                visit(s, statement);
+            });
 
-        } else if (t == 'assign') {
-            var v = leftMostSubExpression(node[2]);
-            if (v[0] == 'name') {
-                var name = v[1];
+        } else if (node instanceof uglify.AST_Assign) {
+            var v = leftMostSubExpression(node.left);
+            if (v instanceof uglify.AST_Symbol) {
+                var name = v.name;
                 if (!scope.has(name)) {
                     errors.push(["Assignment to globals is forbidden", node]);
                 }
             }
 
-            visit(scope, node[3]);
+            visit(scope, node.right);
 
         } else {
-            node.forEach(function(n) {
-                if (n instanceof Array) {
-                    visit(scope, n);
+            var here = node;
+            var depth = 0;
+            node.walk({
+                _visit: function(node, descend) {
+                    ++depth;
+                    if (depth === 1 || depth === 2) {
+                        if (here !== node) {
+                            visit(scope, node);
+                        }
+                        if (descend) {
+                            descend.call(node);
+                        }
+                    }
+                    --depth;
                 }
             });
+            //node.forEach(function(n) {
+            //    if (n instanceof Array) {
+            //        visit(scope, n);
+            //    }
+            //});
         }
     }
 

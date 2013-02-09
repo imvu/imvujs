@@ -41,7 +41,7 @@ var expected = [
     '    };',
     '    module({}, function() {',
     '        return d_export_table;',
-    '    })',
+    '    });',
     '})();'].join('\n');
 
 function sorted(ls) {
@@ -62,9 +62,9 @@ fixture('functional', function() {
 
     test('basic functionality', function() {
         var q = combine.combine(combine.readModules('combine/d.js'), 'combine/d.js');
-        assert.equal(combine.gen_code(q, {
+        assert.equal(expected, combine.gen_code(q, {
             beautify: true
-        }), expected);
+        }));
     });
 
     test('combine produces error if any modules are missing', function() {
@@ -109,20 +109,20 @@ fixture('functional', function() {
 
 test('invalid source produces an error message', function() {
     var ast, e;
-    ast = uglify.parser.parse('module({}, function(imports) { }());');
+    ast = uglify.parse('module({}, function(imports) { }());');
     e = assert.throws(Error, combine.readModule.bind(null, 'blarp', ast));
     assert.equal('Bad module body', e.message);
 });
 
 test('invalid dependency list produces an error message', function() {
     var ast, e;
-    ast = uglify.parser.parse('module(["a", "b.js"], function(imports) { });');
+    ast = uglify.parse('module(["a", "b.js"], function(imports) { });');
     e = assert.throws(Error, combine.readModule.bind(null, 'blarp', ast));
     assert.equal('Bad deps', e.message);
 });
 
 test('missing return statement produces an error message', function() {
     var ast;
-    ast = uglify.parser.parse('module({}, function(imports) { function oh_no_i_have_forgotten_to() { return; } });');
+    ast = uglify.parse('module({}, function(imports) { function oh_no_i_have_forgotten_to() { return; } });');
     assert.throws(combine.ScriptError, combine.combine.bind(null, combine.readModules('combine/noreturn.js'), 'combine/noreturn.js'));
 });
