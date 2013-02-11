@@ -115,6 +115,7 @@ var KRAKEN_DEBUG = true;
             var evaluated;
             try {
                 evaluated = eval("function evaluated() {'use strict';" + xhr.responseText + '\n}\nevaluated\n\n//@ sourceURL=' + url);
+                evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//@ sourceURL=" + url);
             } catch (e) {
                 console.error("Failed to parse", url);
                 console.groupCollapsed('Source');
