@@ -6,7 +6,6 @@ var path = require('path');
 var _ = require('../ext/underscore-1.4.2.js');
 var util = require('util');
 
-
 var fix_output = require('../src/fix_output.js');
 fix_output.fixConsole(console);
 global.syncWrite = fix_output.syncWriteStdout;

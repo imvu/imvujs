@@ -23,3 +23,23 @@ exports.fixConsole = function(console) {
         exports.syncWriteStdout(util.inspect(object) + '\n');
     };
 };
+
+exports.fixUtil = function(util) {
+    util.puts = function() {
+        for (var i = 0, len = arguments.length; i < len; ++i) {
+            exports.syncWriteStdout(arguments[i] + '\n');
+        }
+    };
+
+    util.debug = function(s) {
+        exports.syncWriteStderr('DEBUG: ' + s + '\n');
+    };
+
+    util.error = function() {
+        for (var i = 0, len = arguments.length; i < len; ++i) {
+            exports.syncWriteStderr(arguments[i] + '\n');
+        }
+    };
+
+    
+};
