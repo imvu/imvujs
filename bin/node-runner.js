@@ -43,8 +43,6 @@ function sysinclude(currentPath, includePath, settings) {
 global.require = require;
 global.sysinclude = sysinclude;
 
-var oldSetTimeout = setTimeout;
-
 [
   'out/imvu.node.js',
   'src/node-kraken.js',
