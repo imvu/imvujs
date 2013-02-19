@@ -526,4 +526,8 @@
     Math.random = function() {
         throw new AssertionError("Don't call Math.random in tests.  Use fakes.");
     };
+
+    g.requestAnimationFrame = function() {
+        throw new AssertionError("Don't call requestAnimationFrame in tests.  Use fakes.");
+    };
 })();
