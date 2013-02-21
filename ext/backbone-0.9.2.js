@@ -1354,9 +1354,12 @@
     if (params.type !== 'GET' && !Backbone.emulateJSON) {
       params.processData = false;
     }
-
+    
     // Make the request, allowing the user to override any Ajax options.
-    return $.ajax(_.extend(params, options));
+    if (Backbone.ajax == null){
+        return $.ajax(_.extend(params, options));
+    }
+    return Backbone.ajax(_.extend(params, options));
   };
 
   // Wrap an optional error callback with a fallback error event.
