@@ -83,7 +83,7 @@
                     type: 'test-complete',
                     name: test.name,
                     verdict: 'FAIL',
-                    stack: failed.stack, 
+                    stack: failed.stack,
                     e: failed.e
                 });
                 return false;
@@ -299,6 +299,12 @@
             if (-1 !== string.indexOf(expected)){
                 fail(new AssertionError('unexpected: ' + IMVU.repr(expected) + ' in string: ' + IMVU.repr(string)),
                      {Expected: expected, 'String': string});
+            }
+        },
+
+        matches: function(re, string) {
+            if (!re.test(string)) {
+                fail(new AssertionError('regexp ' + re + ' does not match: ' + string));
             }
         },
 

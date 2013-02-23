@@ -1,5 +1,4 @@
-/*global IMVU*/
-
+var IMVU = IMVU || {};
 (function() {
     var BaseClass = function () {};
 

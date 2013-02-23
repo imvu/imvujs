@@ -1,14 +1,26 @@
 var IMVU = IMVU || {};
 (function() {
-    // Function implementation of operator new, per
-    // http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
-    // 13.2.2
-
-    // ES3
     IMVU.extendError = function extendError(baseErrorType, errorName) {
-        //if (!()
-        //return IMVU.createNamedFunction(errorName, function() {
-        //    base
-        //});
+        var errorClass = IMVU.createNamedFunction(errorName, function(message) {
+            this.name = errorName;
+            this.message = message;
+
+            var stack = (new Error(message)).stack;
+            if (stack !== undefined) {
+                this.stack = this.toString() + '\n' +
+                    stack.replace(/^Error(:[^\n]*)?\n/, '');
+            }
+        });
+        errorClass.prototype = Object.create(baseErrorType.prototype);
+        errorClass.prototype.constructor = errorClass;
+        errorClass.prototype.toString = function() {
+            if (this.message === undefined) {
+                return this.name;
+            } else {
+                return this.name + ': ' + this.message;
+            }
+        };
+
+        return errorClass;
     };
 })();
