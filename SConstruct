@@ -12,6 +12,8 @@ BASE_SOURCES = [
     'src/es6-collections.js',
     'src/repr.js',
     'src/new.js',
+    'src/error.js',
+    'src/subclass.js',
     'src/function.js',
     'src/BaseClass.js',
     'src/ServiceProvider.js',
