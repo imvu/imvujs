@@ -65,6 +65,7 @@
             }
             return false;
         } catch (e) {
+            console.error('error:', e);
             return {stack: e.stack, e: e};
         }
     }
