@@ -446,8 +446,10 @@
                 assert.equal(elementCount, $(selector).length);
             },
 
-            visible: function(selector) {
-                assert['true']($(selector).is(':visible'));
+            visible: function(domElement) {
+                if (!$(domElement).is(':visible')) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to be visible'));
+                }
             },
 
             notVisible: function(selector) {
