@@ -392,16 +392,23 @@
                 assert.equal(0, $(selector).length);
             },
 
-            hasClass: function(className, selector) {
-                if (!$(selector).hasClass(className)){
-                    fail(new AssertionError('Selector: ' + IMVU.repr(selector) + ' expected to have class '+ IMVU.repr(className)));
+            hasTag: function(tag, domElement) {
+                var elementTag = $(domElement)[0].tagName.toLowerCase();
+                if (elementTag !== tag.toLowerCase()) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have tag name ' + IMVU.repr(tag) + ', was ' + IMVU.repr(elementTag) + ' instead'));
                 }
             },
 
-            notHasClass: function(className, selector) {
-                assert.dom.present(selector); // if the selector is empty, .hasClass will always return false
-                if ($(selector).hasClass(className)){
-                    fail(new AssertionError('Selector: ' + IMVU.repr(selector) + ' expected NOT to have class '+ IMVU.repr(className)));
+            hasClass: function(className, domElement) {
+                if (!$(domElement).hasClass(className)){
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have class '+ IMVU.repr(className) + ', has ' + IMVU.repr($(domElement).attr('class')) + ' instead'));
+                }
+            },
+
+            notHasClass: function(className, domElement) {
+                assert.dom.present(domElement); // if domElement is empty, .hasClass will always return false
+                if ($(domElement).hasClass(className)){
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected NOT to have class '+ IMVU.repr(className)));
                 }
             },
 
@@ -488,6 +495,14 @@
             }
         }
     };
+
+    function decipherDomElement(selectorOrJQueryObject) {
+        if (typeof selectorOrJQueryObject === 'string') {
+            return 'Selector ' + IMVU.repr(selectorOrJQueryObject);
+        } else if (typeof selectorOrJQueryObject === 'object') {
+            return "'" + selectorOrJQueryObject[0] + "'";
+        }
+    }
 
     var g = 'undefined' === typeof window ? global : window;
 
