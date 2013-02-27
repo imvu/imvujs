@@ -384,8 +384,10 @@
 
         // TODO: lift into separate file?
         dom: {
-            present: function(selector){
-                assert.notEqual(0, $(selector).length);
+            present: function(domElement){
+                if (!$(domElement).length) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' should be present'));
+                }
             },
 
             notPresent: function(selector){
