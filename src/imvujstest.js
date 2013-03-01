@@ -452,17 +452,23 @@
                 }
             },
 
-            notVisible: function(selector) {
-                assert.dom.present(selector);
-                assert['false']($(selector).is(':visible'));
+            notVisible: function(domElement) {
+                assert.dom.present(domElement);
+                if ($(domElement).is(':visible')) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to be NOT visible'));
+                }
             },
 
-            disabled: function(selector) {
-                assert['true']($(selector).is(':disabled'));
+            disabled: function(domElement) {
+                if (!$(domElement).is(':disabled')) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to be disabled'));
+                }
             },
 
-            enabled: function(selector) {
-                assert['true']($(selector).is(':enabled'));
+            enabled: function(domElement) {
+                if (!$(domElement).is(':enabled')) {
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to be enabled'));
+                }
             },
 
             focused: function(selector) {
