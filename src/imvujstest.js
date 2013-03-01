@@ -489,13 +489,20 @@
                 assert.equal(expected, $(selector).css(propertyName));
             },
 
-            empty: function(selector) {
-                assert['true']($(selector).is(':empty'));
+            empty: function(selectorOrJQueryObject) {
+                var el = selectorOrJQueryObject;
+                assert.dom.present(el);
+                if (!$(el).is(':empty')) {
+                    fail(new AssertionError(decipherDomElement(el) + ' expected to be empty'));
+                }
             },
 
-            notEmpty: function(selector) {
-                assert.dom.present(selector);
-                assert['false']($(selector).is(':empty'));
+            notEmpty: function(selectorOrJQueryObject) {
+                var el = selectorOrJQueryObject;
+                assert.dom.present(el);
+                if ($(el).is(':empty')) {
+                    fail(new AssertionError(decipherDomElement(el) + ' expected NOT to be empty'));
+                }
             }
         }
     };
