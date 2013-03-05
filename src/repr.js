@@ -29,6 +29,10 @@ var IMVU = IMVU || {};
             return "$('"+ v.selector + "')";
         }
 
+        if (typeof HTMLElement !== 'undefined' && v instanceof HTMLElement){
+            return '<#HTMLElement: ' + v.innerHTML + '>';
+        }
+
         if (_seen === undefined) {
             _seen = new Set();
         }

@@ -72,4 +72,11 @@ module({}, function() {
             assert.equal('<#document>', IMVU.repr(document));
         }
     });
+
+    test("html elements", function(){
+        if (typeof $ !== 'undefined'){
+            var foo = $('<div>bar</div>');
+            assert.equal('<#HTMLElement: <div>bar</div>>', IMVU.repr(foo[0]));
+        }
+    });
 });
