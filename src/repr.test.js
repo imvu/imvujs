@@ -79,4 +79,13 @@ module({}, function() {
             assert.equal('<#HTMLElement: <div>bar</div>>', IMVU.repr(foo[0]));
         }
     });
+
+    test("output cap", function() {
+        assert.equal("'0123", IMVU.repr('0123456789', 5));
+        assert.equal("", IMVU.repr('0123456789', 0));
+        assert.equal("'0123456789'", IMVU.repr('0123456789', 13));
+        assert.equal("[['12", IMVU.repr([['123']], 5));
+        assert.equal("[[1, 2", IMVU.repr([[1, 2, 3]], 6));
+        assert.equal("[{a: 1", IMVU.repr([{a: 1}], 6));
+    });
 });

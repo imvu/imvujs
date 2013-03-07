@@ -1,4 +1,4 @@
-/*global IMVU*/
+/*global IMVU, TEST_MAX_OUTPUT_SIZE*/
 (function() {
     "use strict";
 
@@ -182,6 +182,14 @@
         throw exception;
     }
 
+    var formatTestValue = function(v) {
+        var s = IMVU.repr(v, TEST_MAX_OUTPUT_SIZE + 1);
+        if (s.length <= TEST_MAX_OUTPUT_SIZE) {
+            return s;
+        }
+        return s.substring(0, TEST_MAX_OUTPUT_SIZE) + '...';
+    };
+
     var assert = {
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -197,14 +205,14 @@
 
         'true': function(value) {
             if (!value) {
-                fail(new AssertionError("expected truthy, actual " + IMVU.repr(value)),
+                fail(new AssertionError("expected truthy, actual " + formatTestValue(value)),
                      {Value: value});
             }
         },
 
         'false': function(value) {
             if (value) {
-                fail(new AssertionError("expected falsy, actual " + IMVU.repr(value)),
+                fail(new AssertionError("expected falsy, actual " + formatTestValue(value)),
                      {Value: value});
             }
         },
@@ -214,38 +222,38 @@
 
         equal: function(expected, actual) {
             if (expected !== actual) {
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
+                fail(new AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual)),
                      {Expected: expected, Actual: actual});
             }
         },
 
         notEqual: function(expected, actual) {
             if (expected === actual) {
-                fail(new AssertionError('actual was equal to: ' + IMVU.repr(expected)));
+                fail(new AssertionError('actual was equal to: ' + formatTestValue(expected)));
             }
         },
 
         greater: function(lhs, rhs) {
             if (lhs <= rhs) {
-                fail(new AssertionError(IMVU.repr(lhs) + ' not greater than ' + IMVU.repr(rhs)));
+                fail(new AssertionError(formatTestValue(lhs) + ' not greater than ' + formatTestValue(rhs)));
             }
         },
 
         less: function(lhs, rhs) {
             if (lhs >= rhs) {
-                fail(new AssertionError(IMVU.repr(lhs) + ' not less than ' + IMVU.repr(rhs)));
+                fail(new AssertionError(formatTestValue(lhs) + ' not less than ' + formatTestValue(rhs)));
             }
         },
 
         greaterOrEqual: function(lhs, rhs) {
             if (lhs < rhs) {
-                fail(new AssertionError(IMVU.repr(lhs) + ' not greater than or equal to ' + IMVU.repr(rhs)));
+                fail(new AssertionError(formatTestValue(lhs) + ' not greater than or equal to ' + formatTestValue(rhs)));
             }
         },
 
         lessOrEqual: function(lhs, rhs) {
             if (lhs > rhs) {
-                fail(new AssertionError(IMVU.repr(lhs) + ' not less than or equal to ' + IMVU.repr(rhs)));
+                fail(new AssertionError(formatTestValue(lhs) + ' not less than or equal to ' + formatTestValue(rhs)));
             }
         },
 
@@ -254,14 +262,14 @@
 
         deepEqual: function(expected, actual) {
             if (!_.isEqual(expected, actual)) {
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual)),
+                fail(new AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual)),
                      {Expected: expected, Actual: actual});
             }
         },
 
         notDeepEqual: function(expected, actual) {
             if (_.isEqual(expected, actual)) {
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' and actual: ' + IMVU.repr(actual) + ' were equal'));
+                fail(new AssertionError('expected: ' + formatTestValue(expected) + ' and actual: ' + formatTestValue(actual) + ' were equal'));
             }
         },
 
@@ -280,8 +288,8 @@
                 return;
             }
             if( Math.abs(expected - actual) > tolerance ) {
-                fail( new AssertionError('expected: ' + IMVU.repr(expected) + ', actual: ' + IMVU.repr(actual) +
-                                         ', tolerance: ' + IMVU.repr(tolerance) + ', diff: ' + IMVU.repr(actual-expected) ),
+                fail( new AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual) +
+                                         ', tolerance: ' + formatTestValue(tolerance) + ', diff: ' + formatTestValue(actual-expected) ),
                       { Expected:expected, Actual:actual, Tolerance:tolerance } );
             }
         },
@@ -291,14 +299,14 @@
 
         inString: function(expected, string){
             if (-1 === string.indexOf(expected)){
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' not in string: ' + IMVU.repr(string)),
+                fail(new AssertionError('expected: ' + formatTestValue(expected) + ' not in string: ' + formatTestValue(string)),
                      {Expected: expected, 'String': string});
             }
         },
 
         notInString: function(expected, string){
             if (-1 !== string.indexOf(expected)){
-                fail(new AssertionError('unexpected: ' + IMVU.repr(expected) + ' in string: ' + IMVU.repr(string)),
+                fail(new AssertionError('unexpected: ' + formatTestValue(expected) + ' in string: ' + formatTestValue(string)),
                      {Expected: expected, 'String': string});
             }
         },
@@ -320,7 +328,7 @@
                 }
             });
             if (!found){
-                fail(new AssertionError('expected: ' + IMVU.repr(expected) + ' not found in array: ' + IMVU.repr(array)),
+                fail(new AssertionError('expected: ' + formatTestValue(expected) + ' not found in array: ' + formatTestValue(array)),
                      {Expected: expected, 'Array': array});
             }
         },
@@ -333,7 +341,7 @@
                 }
             });
             if (found){
-                fail(new AssertionError('unexpected: ' + IMVU.repr(expected) + ' found in array: ' + IMVU.repr(array)),
+                fail(new AssertionError('unexpected: ' + formatTestValue(expected) + ' found in array: ' + formatTestValue(array)),
                      {Expected: expected, 'Array': array});
             }
         },
@@ -343,13 +351,13 @@
 
         hasKey: function (key, object) {
             if (!(key in object)) {
-                fail(new AssertionError('Key ' + IMVU.repr(key) + ' is not in object: ' + IMVU.repr(object)));
+                fail(new AssertionError('Key ' + formatTestValue(key) + ' is not in object: ' + formatTestValue(object)));
             }
         },
 
         notHasKey: function (key, object) {
             if (key in object) {
-                fail(new AssertionError('Unexpected key ' + IMVU.repr(key) + ' is found in object: ' + IMVU.repr(object)));
+                fail(new AssertionError('Unexpected key ' + formatTestValue(key) + ' is found in object: ' + formatTestValue(object)));
             }
         },
 
@@ -363,7 +371,7 @@
                 if (e instanceof exception) {
                     return e;
                 }
-                fail(new AssertionError('Expected to throw "' + exception.name + '", actually threw: ' + IMVU.repr(e) + ': ' + e.message),
+                fail(new AssertionError('Expected to throw "' + exception.name + '", actually threw: ' + formatTestValue(e) + ': ' + e.message),
                      {Expected: exception, Actual: e});
             }
             throw new AssertionError('did not throw');
@@ -374,7 +382,7 @@
 
         'instanceof': function(actual, type) {
             if(!(actual instanceof type)) {
-                fail(new AssertionError(IMVU.repr(actual) + ' not instance of ' + IMVU.repr(type)),
+                fail(new AssertionError(formatTestValue(actual) + ' not instance of ' + formatTestValue(type)),
                     {Type: type, Actual: actual});
             }
         },
@@ -397,20 +405,20 @@
             hasTag: function(tag, domElement) {
                 var elementTag = $(domElement)[0].tagName.toLowerCase();
                 if (elementTag !== tag.toLowerCase()) {
-                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have tag name ' + IMVU.repr(tag) + ', was ' + IMVU.repr(elementTag) + ' instead'));
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have tag name ' + formatTestValue(tag) + ', was ' + formatTestValue(elementTag) + ' instead'));
                 }
             },
 
             hasClass: function(className, domElement) {
                 if (!$(domElement).hasClass(className)){
-                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have class '+ IMVU.repr(className) + ', has ' + IMVU.repr($(domElement).attr('class')) + ' instead'));
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected to have class '+ formatTestValue(className) + ', has ' + formatTestValue($(domElement).attr('class')) + ' instead'));
                 }
             },
 
             notHasClass: function(className, domElement) {
                 assert.dom.present(domElement); // if domElement is empty, .hasClass will always return false
                 if ($(domElement).hasClass(className)){
-                    fail(new AssertionError(decipherDomElement(domElement) + ' expected NOT to have class '+ IMVU.repr(className)));
+                    fail(new AssertionError(decipherDomElement(domElement) + ' expected NOT to have class '+ formatTestValue(className)));
                 }
             },
 
@@ -515,7 +523,7 @@
 
     function decipherDomElement(selectorOrJQueryObject) {
         if (typeof selectorOrJQueryObject === 'string') {
-            return 'Selector ' + IMVU.repr(selectorOrJQueryObject);
+            return 'Selector ' + formatTestValue(selectorOrJQueryObject);
         } else if (typeof selectorOrJQueryObject === 'object') {
             return "'" + selectorOrJQueryObject[0] + "'";
         }
@@ -543,6 +551,7 @@
     g.AssertionError = AssertionError;
     g.assert = assert;
     g.test = test;
+    g.TEST_MAX_OUTPUT_SIZE = 1024;
 
     g.setTimeout = function(fn, time) {
         if (time === 1 || time === 0){
