@@ -2,6 +2,7 @@
  * Node.js implementation of the kraken interface.
  */
 
+/*global exports:true*/
 var impls = {}; // path : body
 if (typeof global.implsPending === "undefined") {
     global.implsPending = {};
@@ -13,7 +14,7 @@ function includeModule(modulePath, sysinclude) {
 
     try {
         currentFilePath = modulePath;
-        exports = void 0; // Prevents some modules from figuring out that we're really on NodeJS.
+        exports = undefined; // Prevents some modules from figuring out that we're really on NodeJS.
 
         sysinclude(cfp, modulePath, {strictMode: true});
     } finally {

@@ -14,8 +14,8 @@ module({}, function() {
         assert['false'](IMVU.isSubClass(cls, parent));
     }
 
-    function throws(cls, parent) {
-        assert.throws(TypeError, function() {
+    function throws_(cls, parent) {
+        assert['throws'](TypeError, function() {
             IMVU.isSubClass(cls, parent);
         });
     }
@@ -25,8 +25,8 @@ module({}, function() {
         is(Derived, Derived);
         is(Derived, Base);
         isnot(Base, Derived);
-        throws(new Base, Derived);
-        throws(new Derived, Base);
+        throws_(new Base, Derived);
+        throws_(new Derived, Base);
     });
 
     var BaseClass = IMVU.BaseClass.extend('BaseClass');
@@ -37,17 +37,17 @@ module({}, function() {
         is(DerivedClass, DerivedClass);
         is(DerivedClass, BaseClass);
         isnot(BaseClass, DerivedClass);
-        throws(new BaseClass, DerivedClass);
-        throws(new DerivedClass, BaseClass);
+        throws_(new BaseClass, DerivedClass);
+        throws_(new DerivedClass, BaseClass);
     });
 
     test('throws if class is not a function', function() {
-        throws({}, Object);
-        throws({}, {});
+        throws_({}, Object);
+        throws_({}, {});
     });
 
     test('throws if base is not a function', function() {
-        throws(Object, {});
+        throws_(Object, {});
     });
 
     test('non object prototypes', function() {

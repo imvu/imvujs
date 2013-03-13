@@ -1,3 +1,4 @@
+/*global IMVU:true*/
 var IMVU = IMVU || {};
 (function() {
     var BaseClass = function () {};
@@ -28,6 +29,7 @@ var IMVU = IMVU || {};
 
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
+            /*jshint -W020*/
             exports = module.exports = BaseClass;
         }
         exports.BaseClass = BaseClass;

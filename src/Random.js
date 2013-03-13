@@ -1,3 +1,4 @@
+/*global IMVU:true*/
 var IMVU = IMVU || {};
 
 (function() {

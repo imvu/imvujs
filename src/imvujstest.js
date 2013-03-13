@@ -1,4 +1,4 @@
-/*global IMVU, TEST_MAX_OUTPUT_SIZE*/
+/*global IMVU:true, TEST_MAX_OUTPUT_SIZE*/
 (function() {
     "use strict";
 
@@ -107,14 +107,14 @@
 
     var activeFixture;
 
-    function Fixture(parent, name, definition, abstract) {
+    function Fixture(parent, name, definition, abstract_) {
         if (!(definition instanceof Function)) {
             throw new TypeError("fixture's 2nd argument must be a function");
         }
 
         this.name = name;
         this.parent = parent;
-        this.abstract = abstract;
+        this.abstract = abstract_;
         if (this.abstract) {
             // { name: string,
             //   body: function }

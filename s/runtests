@@ -9,7 +9,7 @@ HERE=`dirname "$0"`
 
 # Run JSHint against any .js file staged in git
 NODEJS="$HERE/node"
-JSHINT="$HERE/../third-party/node-jshint/bin/hint"
+JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
 
 if [ .$MSYSTEM = .MINGW32 ]; then
     FINDSUBST="\;"

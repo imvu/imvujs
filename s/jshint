@@ -3,6 +3,6 @@
 HERE=`dirname "$0"`
 
 NODEJS="$HERE/node"
-JSHINT="$HERE/../third-party/node-jshint/bin/hint"
+JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
 
 "$NODEJS" "$JSHINT" "$@" || exit 1
