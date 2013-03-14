@@ -1,8 +1,13 @@
 #!/bin/bash
 
 function fail() {
-    echo "Failed"
+    printf "\nFailed\n"
     exit 1
+}
+
+function succeed() {
+    printf "\nSuccess!\n"
+    exit 0
 }
 
 HERE=`dirname "$0"`
@@ -10,6 +15,7 @@ HERE=`dirname "$0"`
 # Run JSHint against any .js file staged in git
 NODEJS="$HERE/node"
 JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
+RUNFAILS=1
 
 if [ .$MSYSTEM = .MINGW32 ]; then
     FINDSUBST="\;"
@@ -19,29 +25,28 @@ fi
 
 if [ "$@" ]; then
     TESTS="$@"
-    echo "Running jshint..."
-    $NODEJS $JSHINT $TESTS || exit 1
+    unset RUNFAILS
 else
-    echo "Running jshint..."
-    find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
     TESTS=`find $HERE/.. -iname '*.test.js'`
 fi
 
+echo "Running jshint..."
+find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
+
 "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $TESTS || fail
 
-echo "Now testing failures..."
-# Now test failures!
+if [ "$RUNFAILS" ]; then
+    printf "\nNow testing failures...\n\n"
+    
+    EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js'`
+    for expected in $EXPECTED_FAILS; do
+        echo $expected ...
+        "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $expected > /dev/null
+        if [ "$?" = 0 ]; then
+            echo "$expected passed incorrectly"
+            fail
+        fi
+    done
+fi
 
-EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js'`
-for expected in $EXPECTED_FAILS; do
-    echo $expected ...
-    "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $expected > /dev/null
-    if [ "$?" = 0 ]; then
-        echo "$expected passed incorrectly"
-        exit 1
-    fi
-done
-
-echo
-echo "Success!"
-exit 0
+succeed
