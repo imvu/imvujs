@@ -1,4 +1,3 @@
-
 module({}, function(imports) {
     window.trace.push('c');
     return {

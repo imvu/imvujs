@@ -164,6 +164,17 @@ var KRAKEN_DEBUG = true;
             });
         }
     }
+    
+    function dynamicImport(urls, onComplete /*, TODO onProgress */) {
+        var completionCallback = _.after(urls.length, onComplete);
+        var newImports = [];
+        _.each(urls, function(url) {
+            importJs(url, function(result) {
+                newImports.push(result);
+                completionCallback(newImports);
+            });
+        });
+    }
 
     function splitPath(p) {
         var i = p.lastIndexOf('/');
@@ -318,8 +329,9 @@ var KRAKEN_DEBUG = true;
     window.module = module;
     window.define = define;
 
-    _(module).extend({
+    _.extend(module, {
         importJs: importJs,
+        dynamicImport: dynamicImport,
         caching: true,
         versionedUrls: {}
     });

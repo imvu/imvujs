@@ -1,5 +1,11 @@
 #!/bin/bash
 
+HERE=`dirname "$0"`
+
+NODEJS="$HERE/node"
+JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
+
+
 function fail() {
     printf "\nFailed\n"
     exit 1
@@ -10,43 +16,104 @@ function succeed() {
     exit 0
 }
 
-HERE=`dirname "$0"`
-
-# Run JSHint against any .js file staged in git
-NODEJS="$HERE/node"
-JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
-RUNFAILS=1
-
-if [ .$MSYSTEM = .MINGW32 ]; then
-    FINDSUBST="\;"
-else
-    FINDSUBST="+"
-fi
-
-if [ "$@" ]; then
-    TESTS="$@"
-    unset RUNFAILS
-else
-    TESTS=`find $HERE/.. -iname '*.test.js'`
-fi
-
-echo "Running jshint..."
-find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
-
-"$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $TESTS || fail
-
-if [ "$RUNFAILS" ]; then
-    printf "\nNow testing failures...\n\n"
+function run_jshint() {
+    if [ .$MSYSTEM = .MINGW32 ]; then
+        FINDSUBST="\;"
+    else
+        FINDSUBST="+"
+    fi
     
-    EXPECTED_FAILS=`find $HERE/.. -iname '*.fail.js'`
-    for expected in $EXPECTED_FAILS; do
-        echo $expected ...
-        "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $expected > /dev/null
-        if [ "$?" = 0 ]; then
-            echo "$expected passed incorrectly"
-            fail
+    echo "Running jshint..."
+    find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
+}
+
+function run_node_tests() {
+    local TESTS=`find $HERE/.. -type f -iname '*.test.js' -not -path '*/kraken/*' $TESTMASK`
+    if [ "${#TESTS}" != 0 ]; then
+        echo "Running node tests..."
+        "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $TESTS || fail
+    fi
+}
+
+function launch_server() {
+    cd "$HERE"/..
+    python -m SimpleHTTPServer 8001 >/dev/null 2>&1 &
+    echo "Launched server."
+    
+    SERVER_PID="$!"
+    cd - > /dev/null
+    while true; do
+        nc -n 127.0.0.1 8001 < /dev/null
+        if [ $? -eq 0 ]; then
+            break
         fi
     done
+
+    function cleanup_server() {
+        if [ "$SERVER_PID" ]; then
+            kill -TERM $SERVER_PID 2> /dev/null
+            wait $SERVER_PID 2> /dev/null
+            echo "Tore down server."
+        fi
+    }
+    trap cleanup_server EXIT
+
+    return 0
+}
+
+function run_browser_tests() {
+    local TEST_TYPE=$1
+    local TESTS=`find $HERE/.. -type f -iname "*.test.js" -path "*/tests/kraken/*" $TESTMASK`
+    
+    if [ "${#TESTS}" != 0 ]; then
+        printf "\nRunning browser tests...\n\n"
+        "$HERE"/build
+        
+        OS=`python -c "import sys; print sys.platform"`
+        RUNNER="$HERE/../bin/leprechaun-runner.js"
+        if [ $OS = 'darwin' ]; then
+            LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/leprechaun.app/Contents/MacOS/leprechaun"
+        elif [ $OS = 'linux2' ]; then
+            export LD_LIBRARY_PATH="$HERE/../third-party/leprechaun-binaries/linux"
+            LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/linux/leprechaun"
+        elif [ $OS = 'cygwin' ]; then
+            LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/windows/leprechaun.exe"
+            RUNNER="$HERE\..\bin\leprechaun-runner.js"
+        fi
+    
+        launch_server
+        DISPLAY=:9.0 "$LEPRECHAUN" $RUNNER $TESTS
+        
+        if [ "$?" != 0 ]; then
+            fail
+        fi
+    fi
+}
+
+function run_fail_tests() {
+    local EXPECTED_FAILS=`find $HERE/.. -type f -iname '*.fail.js' $TESTMASK`
+    if [ "${#EXPECTED_FAILS}" != 0 ]; then
+        printf "\nRunning failure tests...\n\n"
+        for expected in $EXPECTED_FAILS; do
+            echo $expected ...
+            "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $expected > /dev/null
+            if [ "$?" = 0 ]; then
+                echo "$expected passed incorrectly"
+                fail
+            fi
+        done
+    fi
+}
+
+
+TESTMASK=""
+if [ "$@" ]; then
+    TESTMASK="-path $HERE/../$@"
 fi
+
+run_jshint
+run_node_tests
+run_browser_tests
+run_fail_tests
 
 succeed
