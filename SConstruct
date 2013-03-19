@@ -19,6 +19,7 @@ BASE_SOURCES = [
     'src/ServiceProvider.js',
     'src/Random.js',
     'src/module-common.js',
+    'src/rest.js',
 ]
 
 WEB_SOURCES = [
