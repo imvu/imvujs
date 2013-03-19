@@ -67,7 +67,6 @@ function run_browser_tests() {
     
     if [ "${#TESTS}" != 0 ]; then
         printf "\nRunning browser tests...\n\n"
-        "$HERE"/build
         
         OS=`python -c "import sys; print sys.platform"`
         RUNNER="$HERE/../bin/leprechaun-runner.js"
@@ -111,6 +110,7 @@ if [ "$@" ]; then
     TESTMASK="-path $HERE/../$@"
 fi
 
+"$HERE"/build
 run_jshint
 run_node_tests
 run_browser_tests
