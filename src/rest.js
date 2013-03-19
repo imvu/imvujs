@@ -14,10 +14,7 @@ var IMVU = IMVU || {};
         ajax: function (arg_jquery_ajax_settings, arg_imvu_ajax_settings) {
             // TODO: evaluate removing dataType:'json'
             var jquery_ajax_settings = $.extend({dataType:'json'}, $.ajaxSettings, arg_jquery_ajax_settings),
-                imvu_ajax_settings = $.extend({ }, IMVU.Rest.ajaxSettings, arg_imvu_ajax_settings),
-                old_before_send = jquery_ajax_settings.beforeSend;
-
-            IMVU.Rest._assert_sauce_required(imvu_ajax_settings);
+                imvu_ajax_settings = $.extend({ }, IMVU.Rest.ajaxSettings, arg_imvu_ajax_settings);
 
             if (imvu_ajax_settings.hasOwnProperty('xhr')) {
                 jquery_ajax_settings.xhr = imvu_ajax_settings.xhr;
@@ -25,13 +22,6 @@ var IMVU = IMVU || {};
                 jquery_ajax_settings.xhr = IMVU.Rest._rpc_xhr;
                 $.support.cors = true; // This causes jQuery to pretend that IE8 supports CORS.  Our custom-written XHR object will make it work. -- andy 30 July 2012
             }
-
-            jquery_ajax_settings.beforeSend = function (xhr, settings) {
-                xhr.setRequestHeader('X-IMVU-Sauce', imvu_ajax_settings.sauce);
-                if (old_before_send) {
-                    old_before_send(xhr, settings);
-                }
-            };
 
             return $.ajax(jquery_ajax_settings);
         },
@@ -140,12 +130,6 @@ var IMVU = IMVU || {};
 
         _is_client_ready: function is_client_ready() {
             return rpc_client !== null;
-        },
-
-        _assert_sauce_required: function assert_sauce_required(dict) {
-            if (!dict.hasOwnProperty('sauce')) {
-                throw new IMVU.Rest.AjaxError("sauce is required; can't use IMVU.Rest.ajax without sauce");
-            }
         },
 
         _rpc_xhr: function rpc_xhr() {

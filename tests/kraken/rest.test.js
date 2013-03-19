@@ -10,8 +10,7 @@ module({
             var options = {
                 xhr: function () {
                     return this.xhr;
-                }.bind(this),
-                sauce: 'sauce'
+                }.bind(this)
             };
             $.ajaxSetup(options);
             IMVU.Rest.ajaxSetup(options);
