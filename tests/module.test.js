@@ -50,26 +50,6 @@ module({
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             assert.true(this.criticalErrorOccurred);
         });
-        
-        //test("dynamicImport loads after module is instantiated", function() {
-        //    this.fakeModuleBody = function(param) {
-        //        this.loadedModule = {
-        //            load: function() {
-        //                console.log(IMVU.repr(module));
-        //                module.dynamicImport(["fake_dir/a.js"]);
-        //            }
-        //        }
-        //    }.bind(this);
-        //    
-        //    module({}, this.fakeModuleBody, this.settings);
-        //    assert.equal(0, this.sysincludeCalls.length);
-        //    assert.notEqual('fake_dir/a.js', this.sysincludeCalls[0]);
-        //    assert.false(this.criticalErrorOccurred);
-        //    
-        //    this.loadedModule.load();
-        //    assert.equal(1, this.sysincludeCalls.length);
-        //    assert.equal('fake_dir/a.js', this.sysincludeCalls[0]);
-        //    assert.false(this.criticalErrorOccurred);
-        //});
+
     });
 });

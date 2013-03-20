@@ -11,6 +11,12 @@ var KRAKEN_DEBUG = true;
 (function() {
     "use strict";
 
+    var XHRFactory = XMLHttpRequest;
+    
+    function setXHRFactory(f) {
+        XHRFactory = f;
+    }    
+
     // https://developer-new.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
     function bind(fn, oThis) {
         if (typeof fn !== "function") {
@@ -58,8 +64,8 @@ var KRAKEN_DEBUG = true;
         if (version){
             url = url + '?v=' + version;
         }
-
-        var xhr = new XMLHttpRequest();
+        
+        var xhr = new XHRFactory();
         xhr.open('GET', url);
         if (!window.module.caching) {
             xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
@@ -105,7 +111,7 @@ var KRAKEN_DEBUG = true;
     var fetchJs = coallescer(function(url, onComplete) {
         C.warn("fetchJs", url);
         fetch(url, onFetched);
-
+        
         function onFetched(xhr) {
             if (xhr.status !== 200) {
                 console.error("Failed to fetch " + url);
@@ -152,7 +158,7 @@ var KRAKEN_DEBUG = true;
             var f = new Future();
             completeJs[url] = f;
             f.register(onComplete);
-
+            
             /* The completion callback here is left empty because a module() invocation is
              * expected to occur while evaluating the JS.  This module() invocation is expected to
              * complete the relevant completeJs[url] future.
@@ -165,13 +171,16 @@ var KRAKEN_DEBUG = true;
         }
     }
     
-    function dynamicImport(urls, onComplete /*, TODO onProgress */) {
-        var completionCallback = _.after(urls.length, onComplete);
+    function dynamicImport(urls, onComplete) {
+        ourUrl = "//";
+        onComplete = onComplete || function() {};
+        /* TODO var progressCallback = onProgress || function() {}; */
+        
         var newImports = [];
-        _.each(urls, function(url) {
+        _.each(urls, function(url, key) {
             importJs(url, function(result) {
-                newImports.push(result);
-                completionCallback(newImports);
+                newImports[key] = result;
+                onComplete(newImports);
             });
         });
     }
@@ -260,7 +269,7 @@ var KRAKEN_DEBUG = true;
     function require() {
         throw new Error('commonjs require modules are not supported');
     }
-
+    
     function module(dependencies, body) {
         C.log("module", ourUrl, dependencies);
 
@@ -332,6 +341,7 @@ var KRAKEN_DEBUG = true;
     _.extend(module, {
         importJs: importJs,
         dynamicImport: dynamicImport,
+        setXHRFactory: setXHRFactory,
         caching: true,
         versionedUrls: {}
     });
