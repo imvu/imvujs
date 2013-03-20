@@ -110,8 +110,8 @@ if [ "$@" ]; then
     TESTMASK="-path $HERE/../$@"
 fi
 
-"$HERE"/build
 run_jshint
+"$HERE"/build
 run_node_tests
 run_browser_tests
 run_fail_tests
