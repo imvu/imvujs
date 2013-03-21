@@ -23,7 +23,7 @@ module({}, function() {
 
     test("Can create a BaseClass without a def", function() {
         var calls = [];
-        var Foo = IMVU.BaseClass.extend('Foo');
+        var Foo = BaseClass.extend('Foo');
         var Bar = Foo.extend('Bar', {
             method: function() {
                 calls.push('Bar.method');
@@ -34,7 +34,7 @@ module({}, function() {
     });
 
     test("BaseClass classes cannot be monkeypatched", function() {
-        var Foo = IMVU.BaseClass.extend('Foo');
+        var Foo = BaseClass.extend('Foo');
         assert.throws(TypeError, function() {
             Foo.not = 10;
         });
@@ -45,7 +45,7 @@ module({}, function() {
 
     test("base class methods are accessible from derived classes", function() {
         var calls = [];
-        var Foo = IMVU.BaseClass.extend('Foo', {
+        var Foo = BaseClass.extend('Foo', {
             method: function() {
                 calls.push('Foo.method');
             }
@@ -57,7 +57,7 @@ module({}, function() {
 
     test("Can make classes with BaseClass.extend", function() {
         var calls = [];
-        var Foo = IMVU.BaseClass.extend('Foo', {
+        var Foo = BaseClass.extend('Foo', {
             method: function() {
                 calls.push('Foo.method');
             }
@@ -74,7 +74,7 @@ module({}, function() {
     });
 
     test("BaseClasses can be named", function() {
-        var Foo = IMVU.BaseClass.extend('Foo', {
+        var Foo = BaseClass.extend('Foo', {
             method: function() {
                 return 10;
             }
@@ -87,7 +87,7 @@ module({}, function() {
     });
 
     test("Exceptions thrown by calling methods on BaseClass objects include the class name", function() {
-        var Foo = IMVU.BaseClass.extend('Foo');
+        var Foo = BaseClass.extend('Foo');
         var f = new Foo();
 
         var e = assert.throws(TypeError, function() { f.foojin(); });
@@ -107,7 +107,7 @@ module({}, function() {
     }
 
     test("instances don't have extra enumerable keys", function() {
-        var Foo = IMVU.BaseClass.extend('Foo');
+        var Foo = BaseClass.extend('Foo');
         var f = new Foo();
         assert.deepEqual([], Object.keys(f));
         assert.deepEqual(['initialize'], allKeys(f));

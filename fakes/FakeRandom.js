@@ -1,6 +1,6 @@
 module({
 }, function() {
-    var FakeRandom = IMVU.BaseClass.extend('FakeRandom',{
+    var FakeRandom = BaseClass.extend('FakeRandom',{
         initialize: function() {
             this.__values = [];
             this.__shuffleValues = [];

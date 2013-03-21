@@ -6,7 +6,7 @@ module({
 
     var START_TIME = 1234;
 
-    return IMVU.BaseClass.extend('FakeTimer', {
+    return BaseClass.extend('FakeTimer', {
         initialize: function() {
             this._setTime(START_TIME * 1000);
 
