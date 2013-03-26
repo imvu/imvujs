@@ -34,7 +34,7 @@ function next() {
         ++count;
 
         var nextTest = tests.shift();
-        var url = 'http://127.0.0.1:8001/third-party/imvujs/bin/test-trampoline.html?count=' + count + '#/' + nextTest;
+        var url = 'http://127.0.0.1:8001/bin/test-trampoline.html?count=' + count + '#/' + nextTest;
         leprechaun.log('Running test: ' + url);
         individualStartTime = getTime();
         testframe.contentWindow.location.assign(url);
