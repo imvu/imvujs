@@ -1,0 +1,41 @@
+.testoutput {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 50%;
+    bottom: 0;
+    overflow: scroll;
+    border: thin black solid;
+    background-color: gray;
+    color: white;
+    padding: 0;
+    margin: 0;
+}
+.testoutput .status {
+    background-color: white;
+    font-weight: bold;
+    color: yellow;
+}
+.testoutput.pass {
+    border: thick green solid;
+}
+.testoutput.pass .status {
+    color: green;
+}
+.testoutput.fail {
+    border: thick red solid;
+}
+.testoutput.fail .status {
+    color: red;
+}
+.testoutput li {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.testoutput li.PASS {
+    color: #004000;
+}
+.testoutput li.FAIL {
+    color: #400000;
+}

@@ -3,54 +3,33 @@
 <head>
     <title>Test trampoline</title>
 
+    <script>var window = {};</script>
+    <script src="../out/imvu.js"></script>
     <script>
-var window = {};
+        (function() {
+            var dependenciesURL = '/test-trampoline-dependencies.json',
+                ajaxSettings = {
+                    type: 'GET',
+                    async: false,
+                };
+
+            $.ajax(dependenciesURL, _.extend(ajaxSettings, {dataType: 'json'}))
+            .done(function(dependencies) {
+                _.each(dependencies, function(dependency) {
+                    $.ajax(dependency, _.extend(ajaxSettings, {dataType: 'script'}))
+                        .done(function() {
+                            console.log('Test dependency ' + dependency + ' loaded.');
+                        })
+                        .fail(function() {
+                            throw new Error('Failed to load ' + location.origin + dependency);
+                        });
+                });
+            });
+
+            $.ajax('../src/imvujstest.js', _.extend(ajaxSettings, {dataType: 'script'}));
+        })();
     </script>
-    <script src="/out/imvu.js"></script>
-    <script src="/src/imvujstest.js"></script>
-    <style type="text/css">
-.testoutput {
-    position: fixed;
-    left: 0;
-    right: 0;
-    height: 50%;
-    bottom: 0;
-    overflow: scroll;
-    border: thin black solid;
-    background-color: gray;
-    color: white;
-    padding: 0;
-    margin: 0;
-}
-.testoutput .status {
-    background-color: white;
-    font-weight: bold;
-    color: yellow;
-}
-.testoutput.pass {
-    border: thick green solid;
-}
-.testoutput.pass .status {
-    color: green;
-}
-.testoutput.fail {
-    border: thick red solid;
-}
-.testoutput.fail .status {
-    color: red;
-}
-.testoutput li {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-}
-.testoutput li.PASS {
-    color: #004000;
-}
-.testoutput li.FAIL {
-    color: #400000;
-}
-    </style>
+    <link rel="stylesheet" type="text/css" href="test-trampoline.css">
 </head>
 <body>
     <div class="test-sandbox">
