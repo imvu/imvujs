@@ -22,7 +22,7 @@ function run_jshint() {
     else
         FINDSUBST="+"
     fi
-    
+
     echo "Running jshint..."
     find src fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
 }
@@ -39,7 +39,7 @@ function launch_server() {
     cd "$HERE"/..
     python -m SimpleHTTPServer 8001 >/dev/null 2>&1 &
     echo "Launched server."
-    
+
     SERVER_PID="$!"
     cd - > /dev/null
     while true; do
@@ -64,11 +64,12 @@ function launch_server() {
 function run_browser_tests() {
     local TEST_TYPE=$1
     local TESTS=`find $HERE/.. -type f -iname "*.test.js" -path "*/tests/kraken/*" $TESTMASK`
-    
+
     if [ "${#TESTS}" != 0 ]; then
         printf "\nRunning browser tests...\n\n"
-        
+
         OS=`python -c "import sys; print sys.platform"`
+        TRAMPOLINE="http://127.0.0.1:8001/bin/test-trampoline.html"
         RUNNER="$HERE/../bin/leprechaun-runner.js"
         if [ $OS = 'darwin' ]; then
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/leprechaun.app/Contents/MacOS/leprechaun"
@@ -79,10 +80,10 @@ function run_browser_tests() {
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/windows/leprechaun.exe"
             RUNNER="$HERE\..\bin\leprechaun-runner.js"
         fi
-    
+
         launch_server
-        DISPLAY=:9.0 "$LEPRECHAUN" $RUNNER $TESTS
-        
+        DISPLAY=:9.0 "$LEPRECHAUN" $RUNNER $TRAMPOLINE $TESTS
+
         if [ "$?" != 0 ]; then
             fail
         fi

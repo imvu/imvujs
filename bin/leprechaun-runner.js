@@ -1,6 +1,8 @@
 /*global leprechaun*/
 
-var tests = leprechaun.args.slice(1);
+var tests = leprechaun.args.slice(2);
+var trampoline = leprechaun.args[1];
+
 var count = 0;
 
 var testframe = document.createElement('iframe');
@@ -34,12 +36,8 @@ function next() {
         ++count;
 
         var nextTest = tests.shift();
-        var url;
-        if (leprechaun.args[0] === 's/../third-party/imvujs/bin/leprechaun-runner.js') {
-            var url = 'http://127.0.0.1:8001/third-party/imvujs/bin/test-trampoline.html?count=' + count + '#/' + nextTest;
-        } else {
-            var url = 'http://127.0.0.1:8001/bin/test-trampoline.html?count=' + count + '#/' + nextTest;
-        }
+        var url = trampoline + '?count=' + count + '#/' + nextTest;
+
         leprechaun.log('Running test: ' + url);
         individualStartTime = getTime();
         testframe.contentWindow.location.assign(url);
