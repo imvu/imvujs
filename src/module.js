@@ -177,6 +177,8 @@ var KRAKEN_DEBUG = true;
         /* TODO var progressCallback = onProgress || function() {}; */
         
         var newImports = [];
+        onComplete = _.after(urls.length, onComplete);
+        
         _.each(urls, function(url, key) {
             importJs(url, function(result) {
                 newImports[key] = result;
