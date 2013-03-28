@@ -9,7 +9,7 @@ module({
             this.sysincludeModuleDep = null;
         });
        
-        test("dynamicImport loads another module dynamically", function() {
+        test("dynamicImport loads modules dynamically", function() {
             var imports = [];
             
             module.dynamicImport([
