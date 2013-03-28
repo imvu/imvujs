@@ -151,7 +151,6 @@ var KRAKEN_DEBUG = true;
 
     function importJs(url, onComplete) {
         url = toAbsoluteUrl(url, ourUrl);
-        console.log(url);
 
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
