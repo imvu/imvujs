@@ -217,6 +217,10 @@ module({
             return counter.num;
         };
 
+        FakeXMLHttpRequest.getPending = function() {
+            return _.keys(pending);
+        };
+        
         return FakeXMLHttpRequest;
     }
     return FakeXMLHttpRequestFactory;

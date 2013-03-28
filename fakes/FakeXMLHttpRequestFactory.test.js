@@ -21,7 +21,19 @@ module({
             this.FakeXMLHttpRequest._respond('GET', '/foo/bar/baz');
             assert.deepEqual(['readyState 1', 'readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
         });
-
+        
+        test("getPending returns pending keys", function() {
+            var xhr = new this.FakeXMLHttpRequest();
+            xhr.open('GET', 'http://test_url');
+            xhr.send();
+            
+            xhr = new this.FakeXMLHttpRequest();
+            xhr.open('POST', 'http://another_test');
+            xhr.send();
+            
+            assert.deepEqual(['GET http://test_url', 'POST http://another_test'], this.FakeXMLHttpRequest.getPending());
+        });
+        
         test('expected request', function () {
             var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
