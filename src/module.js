@@ -151,6 +151,7 @@ var KRAKEN_DEBUG = true;
 
     function importJs(url, onComplete) {
         url = toAbsoluteUrl(url, ourUrl);
+        console.log(url);
 
         if (completeJs.hasOwnProperty(url)) {
             completeJs[url].register(onComplete);
@@ -172,7 +173,7 @@ var KRAKEN_DEBUG = true;
     }
     
     function dynamicImport(urls, onComplete) {
-        ourUrl = "//";
+        ourUrl = window.location.pathname;
         onComplete = onComplete || function() {};
         /* TODO var progressCallback = onProgress || function() {}; */
         

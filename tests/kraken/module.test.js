@@ -19,8 +19,8 @@ module({
                 imports = _.union(imports, newlyImported);
             });
             
-            this.xhrFactory._respond('GET', '/another_module.js', 200, [], "module({}, function() {return {}})");
-            this.xhrFactory._respond('GET', '/a_module.js', 200, [], "module({}, function() {return {}})");
+            this.xhrFactory._respond('GET', '/bin/another_module.js', 200, [], "module({}, function() {return {}})");
+            this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], "module({}, function() {return {}})");
             assert.equal(2, imports.length);
         });
     });
