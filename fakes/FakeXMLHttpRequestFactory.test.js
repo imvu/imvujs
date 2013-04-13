@@ -1,7 +1,9 @@
 module({
     FakeXMLHttpRequestFactory: 'FakeXMLHttpRequestFactory.js'
 }, function (imports) {
-    fixture('FakeXMLHttpRequest', function() {
+    var InvalidStateError = imports.FakeXMLHttpRequestFactory.InvalidStateError;
+
+    var BaseFixture = fixture('BaseFixture', function() {
         this.setUp(function () {
             this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory;
         });
@@ -9,7 +11,9 @@ module({
         this.tearDown(function() {
             assert.true_(this.FakeXMLHttpRequest._areAllResolved());
         });
+    });
 
+    BaseFixture.extend('FakeXMLHttpRequest', function() {
         test('unexpected request', function () {
             var calls = [];
             var xhr = new this.FakeXMLHttpRequest;
@@ -254,6 +258,48 @@ module({
             ]);
 
             assert.equal(0, this.xhr.readyState);
+        });
+    });
+
+    BaseFixture.extend("responseType", function() {
+        this.setUp(function() {
+            this.xhr = new this.FakeXMLHttpRequest;
+        });
+
+        test("changing responseType if LOADING throws InvalidStateError", function() {
+            this.xhr.open('GET', 'http://url');
+            this.xhr._headersReceived(200, '', {});
+            this.xhr._dataReceived('foo');
+            assert.throws(InvalidStateError, function() {
+                this.xhr.responseType = 'arraybuffer';
+            }.bind(this));
+        });
+
+        test("changing responseType if DONE throws InvalidStateError", function() {
+            this.xhr.open('GET', 'http://url');
+            this.xhr._headersReceived(200, '', {});
+            this.xhr._dataReceived('foo');
+            this.xhr._done();
+            assert.throws(InvalidStateError, function() {
+                this.xhr.responseType = 'arraybuffer';
+            }.bind(this));
+        });
+
+        test("arraybuffer responseType returns ArrayBuffer as response", function() {
+            this.xhr.responseType = 'arraybuffer';
+            this.xhr.open('GET', 'http://url');
+            this.xhr._headersReceived(200, '', {});
+            this.xhr._dataReceived('foo');
+            this.xhr._done();
+            assert['instanceof'](this.xhr.response, ArrayBuffer);
+            assert.equal(3, this.xhr.response.byteLength);
+            var view = new Uint8Array(this.xhr.response);
+            assert.equal('f'.charCodeAt(0), view[0]);
+            assert.equal('o'.charCodeAt(0), view[1]);
+            assert.equal('o'.charCodeAt(0), view[2]);
+            assert.throws(InvalidStateError, function() {
+                return this.xhr.responseText;
+            }.bind(this));
         });
     });
 });

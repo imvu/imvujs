@@ -5,7 +5,7 @@ module({
     // Implemented per
     // http://www.w3.org/TR/XMLHttpRequest/
 
-    var InvalidStateError = Error; // ???
+    var InvalidStateError = IMVU.extendError(Error, 'InvalidStateError');
 
     var commonProperties = {
         UNSENT: 0,
@@ -24,6 +24,7 @@ module({
         function FakeXMLHttpRequest() {
             this.requestHeaders = {};
             this.readyState = this.UNSENT;
+            this._responseType = '';
             counter.num += 1;
         }
 
@@ -32,6 +33,32 @@ module({
 
         _.extend(FakeXMLHttpRequest, commonProperties);
         _.extend(FakeXMLHttpRequest.prototype, commonProperties);
+
+        Object.defineProperties(FakeXMLHttpRequest.prototype, {
+            'responseType': {
+                get: function() {
+                    return this._responseType;
+                },
+                set: function(v) {
+                    if (this.readyState >= this.LOADING) {
+                        throw new InvalidStateError;
+                    }
+                    this._responseType = v;
+                }
+            },
+            'responseText': {
+                get: function() {
+                    if (this.responseType !== '' && this.responseType !== 'text') {
+                        throw new InvalidStateError;
+                    }
+                    if (this.readyState < this.LOADING) {
+                        return '';
+                    }
+                    // error flag? per 4.7.9, item 3
+                    return this.response;
+                }
+            }
+        });
 
         _.extend(FakeXMLHttpRequest.prototype, {
             _error: false,
@@ -113,7 +140,19 @@ module({
                 if (this.readyState !== this.HEADERS_RECEIVED) {
                     throw new InvalidStateError('_headersReceived must have been called before _dataReceived');
                 }
-                this.responseText = data;
+                if (this.responseType === 'arraybuffer') {
+                    var view = new Uint8Array(data.length);
+                    for (var i = 0; i < data.length; ++i) {
+                        var c = data.charCodeAt(i);
+                        if (c > 255) {
+                            throw new TypeError('non-byte character in ArrayBuffer response');
+                        }
+                        view[i] = c;
+                    }
+                    this.response = view.buffer;
+                } else {
+                    this.response = data;
+                }
                 this.__changeReadyState(this.LOADING);
             },
 
@@ -223,5 +262,6 @@ module({
         
         return FakeXMLHttpRequest;
     }
+    FakeXMLHttpRequestFactory.InvalidStateError = InvalidStateError;
     return FakeXMLHttpRequestFactory;
 });
