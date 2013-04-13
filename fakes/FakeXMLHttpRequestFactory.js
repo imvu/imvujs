@@ -216,6 +216,10 @@ module({
         });
 
         FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, callback) {
+            if (responseBody instanceof Object && !(responseBody instanceof ArrayBuffer)) {
+                throw new TypeError('Invalid type for expectation');
+            }
+
             var normalizedHeaders = {};
 
             Object.keys(responseHeaders).forEach(function (key) {

@@ -22,7 +22,7 @@ module({
                 jquery_ajax_settings = {
                     url: dummyUrl
                 };
-            FakeXMLHttpRequest._expect('PUT', dummyUrl, 200, {}, {});
+            FakeXMLHttpRequest._expect('PUT', dummyUrl, 200, {}, '');
             this.restRequester.put(jquery_ajax_settings);
         });
 
@@ -31,7 +31,7 @@ module({
                 jquery_ajax_settings = {
                     url: dummyUrl
                 };
-            FakeXMLHttpRequest._expect('POST', dummyUrl, 200, {}, {});
+            FakeXMLHttpRequest._expect('POST', dummyUrl, 200, {}, '');
             this.restRequester.post(jquery_ajax_settings);
         });
 
@@ -40,7 +40,7 @@ module({
                 jquery_ajax_settings = {
                     url: dummyUrl
                 };
-            FakeXMLHttpRequest._expect('DELETE', dummyUrl, 200, {}, {});
+            FakeXMLHttpRequest._expect('DELETE', dummyUrl, 200, {}, '');
             this.restRequester.delete_(jquery_ajax_settings);
         });
 
@@ -49,7 +49,7 @@ module({
                 jquery_ajax_settings = {
                     url: dummyUrl
                 };
-            FakeXMLHttpRequest._expect('GET', dummyUrl, 200, {}, {});
+            FakeXMLHttpRequest._expect('GET', dummyUrl, 200, {}, '');
             this.restRequester.get(jquery_ajax_settings);
         });
     });
