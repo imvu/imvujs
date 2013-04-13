@@ -26,7 +26,7 @@ module({
             assert.deepEqual(['readyState 1', 'readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
         });
         
-        test("getPending returns pending keys", function() {
+        test("_getAllPending returns pending keys", function() {
             var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', 'http://test_url');
             xhr.send();
@@ -35,7 +35,9 @@ module({
             xhr.open('POST', 'http://another_test');
             xhr.send();
             
-            assert.deepEqual(['GET http://test_url', 'POST http://another_test'], this.FakeXMLHttpRequest.getPending());
+            assert.deepEqual(
+                ['GET http://test_url', 'POST http://another_test'],
+                this.FakeXMLHttpRequest._getAllPending());
         });
         
         test('expected request', function () {
@@ -128,9 +130,9 @@ module({
         });
 
         test("has count of requests", function () {
-            assert.equal(0, this.FakeXMLHttpRequest.getCount());
+            assert.equal(0, this.FakeXMLHttpRequest._getCount());
             this.xhr = new this.FakeXMLHttpRequest;
-            assert.equal(1, this.FakeXMLHttpRequest.getCount());
+            assert.equal(1, this.FakeXMLHttpRequest._getCount());
             this.xhr.abort();
         });
     });

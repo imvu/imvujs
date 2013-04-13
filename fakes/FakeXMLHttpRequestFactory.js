@@ -171,6 +171,10 @@ module({
                 this.onloadend();
             },
 
+            _getRequestHeaders: function() {
+                return this.requestHeaders;
+            },
+
             _triggerAbortError: function() {
                 if (this.readyState === this.UNSENT || this.readyState === this.DONE) {
                     throw new InvalidStateError('abort errors cannot occur before sent or after done');
@@ -258,11 +262,11 @@ module({
             return Object.keys(expectations).length === 0;
         };
 
-        FakeXMLHttpRequest.getCount = function () {
+        FakeXMLHttpRequest._getCount = function () {
             return counter.num;
         };
 
-        FakeXMLHttpRequest.getPending = function() {
+        FakeXMLHttpRequest._getAllPending = function() {
             return _.keys(pending);
         };
         
