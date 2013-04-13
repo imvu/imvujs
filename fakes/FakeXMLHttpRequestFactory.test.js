@@ -301,5 +301,23 @@ module({
                 return this.xhr.responseText;
             }.bind(this));
         });
+
+        test("arraybuffer responseType handles arraybuffer in _dataReceived", function() {
+            var data = new Uint8Array(3);
+            data[0] = 1;
+            data[1] = 2;
+            data[2] = 3;
+
+            this.xhr.responseType = 'arraybuffer';
+            this.xhr.open('GET', 'http://url');
+            this.xhr._headersReceived(200, '', {});
+            this.xhr._dataReceived(data);
+            this.xhr._done();
+            assert.equal(3, this.xhr.response.byteLength);
+            var view = new Uint8Array(this.xhr.response);
+            assert.equal(1, view[0]);
+            assert.equal(2, view[1]);
+            assert.equal(3, view[2]);
+        });
     });
 });

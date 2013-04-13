@@ -141,15 +141,21 @@ module({
                     throw new InvalidStateError('_headersReceived must have been called before _dataReceived');
                 }
                 if (this.responseType === 'arraybuffer') {
-                    var view = new Uint8Array(data.length);
-                    for (var i = 0; i < data.length; ++i) {
-                        var c = data.charCodeAt(i);
-                        if (c > 255) {
-                            throw new TypeError('non-byte character in ArrayBuffer response');
+                    if (data instanceof Uint8Array) {
+                        this.response = data.buffer;
+                    } else if (data instanceof ArrayBuffer) {
+                        this.response = data;
+                    } else {
+                        var view = new Uint8Array(data.length);
+                        for (var i = 0; i < data.length; ++i) {
+                            var c = data.charCodeAt(i);
+                            if (c > 255) {
+                                throw new TypeError('non-byte character in ArrayBuffer response');
+                            }
+                            view[i] = c;
                         }
-                        view[i] = c;
+                        this.response = view.buffer;
                     }
-                    this.response = view.buffer;
                 } else {
                     this.response = data;
                 }
