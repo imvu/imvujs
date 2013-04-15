@@ -263,6 +263,27 @@ module({
         });
     });
 
+    BaseFixture.extend("_respond", function() {
+        this.setUp(function() {
+            this.xhr = new this.FakeXMLHttpRequest;
+        });
+
+        test("_respond responds", function(method, url, responseCode, responseHeaders, responseBody) {
+            var loaded;
+            this.xhr.open('GET', 'http://url');
+            this.xhr.onload = function() {
+                loaded = true;
+            };
+            this.xhr.send();
+
+            this.FakeXMLHttpRequest._respond('GET', 'http://url', 200, {}, 'body');
+            
+            assert.equal(4, this.xhr.readyState);
+            assert['true'](loaded);
+            assert.equal('body', this.xhr.response);
+        });
+    });
+
     BaseFixture.extend("responseType", function() {
         this.setUp(function() {
             this.xhr = new this.FakeXMLHttpRequest;
