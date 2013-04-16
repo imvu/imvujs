@@ -73,10 +73,17 @@ function runTest(testPath, continuation) {
 
     var testPassed;
 
-    var green = '\x1b[32m',
-        red = '\x1b[31m',
-        yellow = '\x1b[33m',
-        normal = '\x1b[0m';
+    if (process.platform === 'win32') {
+        var green = '',
+            red = '',
+            yellow = '',
+            normal = '';
+    } else {
+        var green = '\x1b[32m',
+            red = '\x1b[31m',
+            yellow = '\x1b[33m',
+            normal = '\x1b[0m';
+    }
 
     // I'd use Object.create here but prototypes don't extend across
     // vm contexts in Node.js.  o_O Known issue with Node.js...
