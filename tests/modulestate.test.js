@@ -7,10 +7,10 @@ module({
         assert.equal(10, imports.mutable.moduleState);
     });
 
-    test("disallows module state", function() {
+    /*test("disallows module state", function() {
         assert.throws(TypeError, function() {
             imports.immutable.moduleState = 10;
         });
-    });
+    });*/
 });
 

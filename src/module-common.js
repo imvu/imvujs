@@ -11,7 +11,7 @@ var IMVU = IMVU || {};
         _loadBody: function(body, importList) {
             var impl = body(importList);
             if (!this.moduleStateAllowed && impl instanceof Object) {
-                Object.freeze(impl);
+               // Object.freeze(impl);
             }
 
             // reset per-module state
