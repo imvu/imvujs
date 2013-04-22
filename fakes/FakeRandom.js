@@ -4,6 +4,8 @@ module({
         initialize: function() {
             this.__values = [];
             this.__shuffleValues = [];
+            this.__choiceIndex = 0;
+            this.__shuffleRotate = 0;
         },
 
         getInteger: function(min, max) {
@@ -48,7 +50,12 @@ module({
         shuffle: function(sequence) {
             var a = this.__shuffleValues.shift();
             if (a === undefined) {
-                throw new Error("FakeRandom shuffle called without any shuffle values.");
+                var len = sequence.length;
+                var i = this.__shuffleRotate % len;
+                sequence = Array.prototype.concat.call(
+                    sequence.slice(i, len), sequence.slice(0, i)
+                );
+                return;
             }
             sequence.splice(sequence.length);
             _.each(a, function(value, i) {
@@ -59,7 +66,11 @@ module({
         shuffled: function(sequence) {
             var seq = _.clone(sequence);
             this.shuffle(seq);
-             return seq;
+            return seq;
+        },
+
+        choice: function (items) { // always picks __choiceIndex
+            return items[this.__choiceIndex % items.length];
         },
 
         sample: function() {
@@ -75,8 +86,16 @@ module({
             }, this);
         },
 
-        _setShuffleValue: function(value) {
+        _setShuffleValues: function(value) {
             this.__shuffleValues.push(value);
+        },
+
+        _setShuffleRotate: function(value) {
+            this.__shuffleRotate = value;
+        },
+
+        _setChoiceIndex: function(index) {
+            this.__choiceIndex = index;
         }
     });
 
