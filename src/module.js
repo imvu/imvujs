@@ -12,10 +12,10 @@ var KRAKEN_DEBUG = true;
     "use strict";
 
     var XHRFactory = XMLHttpRequest;
-    
+
     function setXHRFactory(f) {
         XHRFactory = f;
-    }    
+    }
 
     // https://developer-new.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function/bind
     function bind(fn, oThis) {
@@ -64,7 +64,7 @@ var KRAKEN_DEBUG = true;
         if (version){
             url = url + '?v=' + version;
         }
-        
+
         var xhr = new XHRFactory();
         xhr.open('GET', url);
         if (!window.module.caching) {
@@ -111,7 +111,7 @@ var KRAKEN_DEBUG = true;
     var fetchJs = coallescer(function(url, onComplete) {
         C.warn("fetchJs", url);
         fetch(url, onFetched);
-        
+
         function onFetched(xhr) {
             if (xhr.status !== 200) {
                 console.error("Failed to fetch " + url);
@@ -158,7 +158,7 @@ var KRAKEN_DEBUG = true;
             var f = new Future();
             completeJs[url] = f;
             f.register(onComplete);
-            
+
             /* The completion callback here is left empty because a module() invocation is
              * expected to occur while evaluating the JS.  This module() invocation is expected to
              * complete the relevant completeJs[url] future.
@@ -170,15 +170,15 @@ var KRAKEN_DEBUG = true;
             });
         }
     }
-    
+
     function dynamicImport(urls, onComplete) {
         ourUrl = window.location.pathname;
         onComplete = onComplete || function() {};
         /* TODO var progressCallback = onProgress || function() {}; */
-        
+
         var newImports = [];
         var callback = _.after(_.keys(urls).length, onComplete);
-        
+
         _.each(urls, function(url, key) {
             importJs(url, function(result) {
                 newImports[key] = result;
@@ -228,7 +228,7 @@ var KRAKEN_DEBUG = true;
         relativeTo = splitPath(normalizePath(relativeTo))[0];
 
         if (relativeTo === '') {
-            return url;
+            return '/' + url;
         } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
             url = relativeTo + url;
         } else {
@@ -271,7 +271,7 @@ var KRAKEN_DEBUG = true;
     function require() {
         throw new Error('commonjs require modules are not supported');
     }
-    
+
     function module(dependencies, body) {
         C.log("module", ourUrl, dependencies);
 
