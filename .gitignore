@@ -4,3 +4,5 @@ out
 .project
 .#*
 *.swp
+debug.log
+out.txt
