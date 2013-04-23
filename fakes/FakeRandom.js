@@ -52,9 +52,12 @@ module({
             if (a === undefined) {
                 var len = sequence.length;
                 var i = this.__shuffleRotate % len;
-                sequence = Array.prototype.concat.call(
-                    sequence.slice(i, len), sequence.slice(0, i)
-                );
+                var rotated = sequence.slice(0, i);
+                console.log(rotated);
+                sequence.splice(0,i);
+                console.log(sequence);
+                sequence.splice.apply(sequence, [len-i, 0].concat(rotated));
+                console.log(sequence);
                 return;
             }
             sequence.splice(sequence.length);

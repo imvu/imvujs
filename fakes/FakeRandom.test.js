@@ -69,13 +69,13 @@ module({
     });
 
     base.extend("shuffle", function() {
-       test("shuffle rotates if a value hasn't been stuffed", function() {
-           var a = [1,2,3];
-           var b = _.clone(a);
-           this.random.shuffle(a);
+        test("shuffle rotates if a value hasn't been stuffed", function() {
+            var a = [1,2,3];
+            var b = _.clone(a);
+            this.random.shuffle(a);
 
-           assert.deepEqual(b, a);
-       });
+            assert.deepEqual(b, a);
+        });
 
         test("shuffled rotates if a value hasn't been stuffed", function() {
             var a = [1,2,3];
@@ -127,6 +127,14 @@ module({
         test("choice index wraps rather than throwing", function(){
             this.random._setChoiceIndex(3);
             assert.equal('a', this.random.choice(['a', 'b', 'c']));
+        });
+
+        test("shuffle rotates", function() {
+            var a = [1,2,3];
+            this.random._setShuffleRotate(1);
+            this.random.shuffle(a);
+
+            assert.deepEqual([2,3,1], a);
         });
     });
 });
