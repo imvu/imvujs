@@ -26,7 +26,8 @@ var IMVU = IMVU || {};
             }
 
             relativeTo = this.splitPath(this.normalizePath(relativeTo))[0];
-            if (relativeTo[0] !== '/'){
+            var isRelativeAbsolute = relativeTo[0] === '/' || relativeTo.match(/^(http|https):\/\//) !== null;
+            if (!isRelativeAbsolute){
                 relativeTo = '/' + relativeTo;
             }
 
