@@ -9,7 +9,7 @@ function relpath() {
 }
 
 function normpath() {
-    python "$HERE/bin/normpath.py" "$@"
+    realpath "$@"
 }
 
 if [ "$1" ]; then
