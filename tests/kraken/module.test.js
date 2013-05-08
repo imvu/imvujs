@@ -23,5 +23,25 @@ module({
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], "module({}, function() {return {}})");
             assert.equal(2, imports.length);
         });
+        test("module.Future before resolution", function () {
+            var f = new module.Future();
+            var completed = false;
+            f.register(function () {
+                completed = true;
+            });
+            assert.false(completed);
+            f.complete();
+            assert.true(completed);
+        });
+
+        test("module.Future after resolution", function () {
+            var f = new module.Future();
+            var completed = false;
+            f.complete();
+            f.register(function () {
+                completed = true;
+            });
+            assert.true(completed);
+        });
     });
 });

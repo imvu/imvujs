@@ -288,14 +288,6 @@ var KRAKEN_DEBUG = true;
     window.module = module;
     window.define = define;
 
-    _.extend(module, {
-        importJs: importJs,
-        dynamicImport: dynamicImport,
-        setXHRFactory: setXHRFactory,
-        caching: true,
-        versionedUrls: {}
-    });
-
     function Future(name) {
         this.name = name;
         this.callbacks = [];
@@ -324,5 +316,14 @@ var KRAKEN_DEBUG = true;
         }
         delete this.callbacks;
     };
+
+    _.extend(module, {
+        importJs: importJs,
+        dynamicImport: dynamicImport,
+        setXHRFactory: setXHRFactory,
+        caching: true,
+        versionedUrls: {},
+        Future: Future
+    });
 
 })();
