@@ -20,6 +20,11 @@ var IMVU = IMVU || {};
         'new': function(type/*, ..., options*/) {
             var args = Array.prototype.slice.call(arguments, 1);
             var options = args.pop() || {};
+
+            if (!type || !(type instanceof Function)){
+                throw new ReferenceError('Passed bad class type "' + IMVU.repr(type) + '" to ServiceProvider.new()');
+            }
+
             var dependencies = type.dependencies || type.prototype.dependencies || [];
             if (!(dependencies instanceof Array)) {
                 throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));

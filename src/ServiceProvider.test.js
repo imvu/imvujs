@@ -101,6 +101,20 @@ fixture("ServiceProvider", function() {
         assert.equal(undefined, instance.service);
     });
 
+    test('trying to create a new undefined thing throws a helpful error', function(){
+        var e = assert.throws(ReferenceError, function() {
+            this.sp['new'](undefined);
+        }.bind(this));
+        assert.equal('Passed bad class type "undefined" to ServiceProvider.new()', e.message);
+    });
+
+    test('trying to create a new int throws a helpful error', function(){
+        var e = assert.throws(ReferenceError, function() {
+            this.sp['new'](10);
+        }.bind(this));
+        assert.equal('Passed bad class type "10" to ServiceProvider.new()', e.message);
+    });
+
     test('attempting to get unknown services raises ReferenceError', function() {
         var e = assert.throws(ReferenceError, function() {
             this.sp.get('service');
