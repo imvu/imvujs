@@ -21,7 +21,7 @@ var IMVU = IMVU || {};
             var args = Array.prototype.slice.call(arguments, 1);
             var options = args.pop() || {};
 
-            if (!type || !(type instanceof Function)){
+            if (!(type instanceof Function)){
                 throw new ReferenceError('Passed bad class type "' + IMVU.repr(type) + '" to ServiceProvider.new()');
             }
 
