@@ -20,16 +20,29 @@ module({
             assert.equal(100, this.timer.getTime() - start);
         });
 
-        test('getCurrentDate', function() {
+        test('getDate returns now', function() {
             var now = this.timer.getTime();
-            var currentData = this.timer.getCurrentDate();
+            var currentData = this.timer.getDate();
             assert.equal(now, currentData.getTime());
+        });
+
+        test('getDate can take a date argument', function() {
+            var t = new Date(1234);
+            var currentData = this.timer.getDate(t);
+            assert.notEqual(t, currentData.getTime());
+            assert.equal(t.getTime(), currentData.getTime());
+        });
+
+        test('getDate can take a ms argument', function() {
+            var t = 1234;
+            var currentData = this.timer.getDate(t);
+            assert.equal(t, currentData.getTime());
         });
 
         test('setTime', function () {
             var now = 1234567890 * 1000; // 2009-02-13 23:31:30
             this.timer._setTime(now);
-            var currentDate = this.timer.getCurrentDate();
+            var currentDate = this.timer.getDate();
             assert.equal('2009-02-13T23:31:30.000Z', currentDate.toISOString());
         });
     });

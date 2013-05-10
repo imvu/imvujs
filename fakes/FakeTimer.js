@@ -20,8 +20,11 @@ module({
         },
 
 
-        getCurrentDate: function() {
-            return new Date(this.getTime());
+        getDate: function(t) {
+            if (_.isUndefined(t)){
+                t = this.getTime();
+            }
+            return new Date(t);
         },
 
         getTime: function() {
