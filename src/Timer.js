@@ -5,6 +5,9 @@ var IMVU = IMVU || {};
         getTime: Date.now.bind(Date),
 
         getDate: function(t) {
+            if (_.isUndefined(t)){
+                return new Date();
+            }
             return new Date(t);
         },
 
