@@ -8,11 +8,18 @@
             window.oRequestAnimationFrame      ||
             window.msRequestAnimationFrame     ||
             function( callback, element ) {
-                window.setTimeout( callback, 1000/60 );
+                return window.setTimeout( callback, 1000/60 );
+            };
+
+        var polyfillCancelAnimationFrame =
+            window.cancelAnimationFrame ||
+            function( id ) {
+                window.clearTimeout(id);
             };
 
         if(!window.requestAnimationFrame) {
             window.requestAnimationFrame = polyfillRequestAnimationFrame;
+            window.cancelAnimationFrame = polyfillCancelAnimationFrame;
         }
     }
 })();
