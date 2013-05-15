@@ -9,7 +9,7 @@ def generate(env):
         os.path.abspath(os.path.join(
             os.path.dirname(__file__),
             '..')),
-        env.Dir('.').abspath)
+        env.Dir('#').abspath)
 
     if sys.platform in ('win32', 'cygwin'):
         env['NODEJS'] = os.path.join(relativePathToHere, 'third-party', 'windows', 'nodejs-0.8.6', 'node.exe')
