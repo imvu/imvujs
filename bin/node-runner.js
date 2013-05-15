@@ -46,9 +46,24 @@ global.sysinclude = sysinclude;
 [
   'out/imvu.node.js',
   'src/node-kraken.js',
-  'src/imvujstest.js',
 ].forEach(function(v) {
   sysinclude(__filename, __dirname + '/../' + v);
+});
+
+function runInDirectory(dir, action) {
+    var previousDir = process.cwd();
+    process.chdir(__dirname);
+    action();
+    process.chdir(previousDir);
+}
+
+runInDirectory(__dirname, function () {
+     // node-kraken.js loads js relative to process.cwd(), we can't rely on
+     // this, so we change to __dirname to import relative to *here*
+    global.module({
+        imvujstest: '../src/imvujstest.js'
+    }, function (imvujstest) {
+    });
 });
 
 function usage() {

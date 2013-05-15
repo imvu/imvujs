@@ -3,7 +3,7 @@
 window.module.caching = false;
 
 function dispatch(testUrl) {
-    module({
+    module.dynamicImport({
         test: testUrl,
         superfixtures: '../tests/superfixture.js',
     }, function (imports) {
@@ -39,16 +39,19 @@ function dispatch(testUrl) {
         $('.testoutput .status').text(prettyText);
     });
 }
-dispatch(window.location.hash.substr(1));
-window.addEventListener('hashchange', function () {
+
+module.importJs('../src/imvujstest.js', function (imvujstest) {
     dispatch(window.location.hash.substr(1));
+    window.addEventListener('hashchange', function () {
+        dispatch(window.location.hash.substr(1));
+    });
+
+    window.onerror = function(errorMsg, url, lineNumber){
+        $('.testoutput').addClass('fail');
+        var prettyText = 'Test Failed: Uncaught Exception: ' + errorMsg;
+
+        console.log(prettyText);
+        $('.testoutput .status').text(prettyText);
+        window.postMessage(JSON.stringify({type: 'test-complete', verdict: 'FAIL', stack: prettyText, name: window.location.hash.substr(1)}), '*');
+    };
 });
-
-window.onerror = function(errorMsg, url, lineNumber){
-    $('.testoutput').addClass('fail');
-    var prettyText = 'Test Failed: Uncaught Exception: ' + errorMsg;
-
-    console.log(prettyText);
-    $('.testoutput .status').text(prettyText);
-    window.postMessage(JSON.stringify({type: 'test-complete', verdict: 'FAIL', stack: prettyText, name: window.location.hash.substr(1)}), '*');
-};
