@@ -5,7 +5,7 @@ def exists(env):
     return True
 
 def generate(env):
-    env['UGLIFYJS'] = os.path.relpath(
+    env['UGLIFYJS'] = env.File(
         os.path.join(
             os.path.dirname(__file__),
             '..',
