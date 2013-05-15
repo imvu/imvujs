@@ -40,7 +40,7 @@ function dispatch(testUrl) {
     });
 }
 
-module.importJs('../src/imvujstest.js', function (imvujstest) {
+module.importJs('../src/imvujstest/syncrunner.js', function (syncrunner) {
     dispatch(window.location.hash.substr(1));
     window.addEventListener('hashchange', function () {
         dispatch(window.location.hash.substr(1));

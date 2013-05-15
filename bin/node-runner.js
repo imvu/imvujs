@@ -61,7 +61,7 @@ runInDirectory(__dirname, function () {
      // node-kraken.js loads js relative to process.cwd(), we can't rely on
      // this, so we change to __dirname to import relative to *here*
     global.module({
-        imvujstest: '../src/imvujstest.js'
+        syncrunner: '../src/imvujstest/syncrunner.js'
     }, function (imvujstest) {
     });
 });

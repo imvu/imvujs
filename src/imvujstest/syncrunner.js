@@ -1,7 +1,7 @@
 /*global IMVU:true, TEST_MAX_OUTPUT_SIZE*/
 module({
     AssertionError: 'AssertionError.js',
-    imvujsassert: 'imvujsassert.js'
+    assert: 'assert.js'
 }, function (imports) {
     // { beforeTest: function,
     //   afterTest: function }
@@ -176,7 +176,7 @@ module({
         return new Fixture(undefined, fixtureName, definition, true);
     };
 
-    var assert = imports.imvujsassert;
+    var assert = imports.assert;
 
     var g = 'undefined' === typeof window ? global : window;
 
