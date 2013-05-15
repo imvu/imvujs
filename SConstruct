@@ -36,7 +36,7 @@ NODE_SOURCES = BASE_SOURCES + [
 
 env = Environment(
     ENV=os.environ,
-    toolpath=['tools'],
+    toolpath=['scons-tools'],
     tools=['closure', 'uglify', 'gzip', 'kraken_combine'])
 
 BASE_CLOSURE_FLAGS = [
