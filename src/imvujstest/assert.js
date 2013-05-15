@@ -23,7 +23,7 @@ module({
         }
     }
 
-    return {
+    var assert = {
 
         ////////////////////////////////////////////////////////////////////////////////
         // GENERAL STATUS
@@ -353,4 +353,18 @@ module({
             }
         }
     };
+
+    // synonyms
+    assert.equals = assert.equal;
+    assert.notEquals = assert.notEqual;
+    assert['null'] = assert.equal.bind(null, null);
+    assert.notNull = assert.notEqual.bind(null, null);
+    assert['undefined'] = assert.equal.bind(null, undefined);
+    assert.notUndefined = assert.notEqual.bind(null, undefined);
+
+    // ES3 synonyms
+    assert.false_ = assert['false'];
+    assert.true_ = assert['true'];
+
+    return assert;
 });

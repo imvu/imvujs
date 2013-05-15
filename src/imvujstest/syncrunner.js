@@ -176,21 +176,7 @@ module({
         return new Fixture(undefined, fixtureName, definition, true);
     };
 
-    var assert = imports.assert;
-
     var g = 'undefined' === typeof window ? global : window;
-
-    // synonyms
-    assert.equals = assert.equal;
-    assert.notEquals = assert.notEqual;
-    assert['null'] = assert.equal.bind(null, null);
-    assert.notNull = assert.notEqual.bind(null, null);
-    assert['undefined'] = assert.equal.bind(null, undefined);
-    assert.notUndefined = assert.notEqual.bind(null, undefined);
-
-    // ES3 synonyms
-    assert.false_ = assert['false'];
-    assert.true_ = assert['true'];
 
     g.registerSuperFixture = registerSuperFixture;
     g.test = test;
@@ -198,7 +184,7 @@ module({
     g.fixture = fixture;
     g.repr = IMVU.repr;
     g.AssertionError = imports.AssertionError;
-    g.assert = assert;
+    g.assert = imports.assert;
     g.test = test;
     g.TEST_MAX_OUTPUT_SIZE = 1024;
 
