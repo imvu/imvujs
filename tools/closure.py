@@ -17,9 +17,7 @@ def generate(env):
         'third-party',
         'closure-compiler-2388',
         'compiler.jar')
-    closure = os.path.relpath(
-        os.path.normpath(closure),
-        env.Dir('#').abspath)
+    closure = env.File(closure)
 
     env['JAVA'] = 'java'
     env['CLOSURE_COMPILER'] = closure
