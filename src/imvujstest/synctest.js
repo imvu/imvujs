@@ -8,10 +8,10 @@ module({
     var syncRunner = new imports.SyncRunner();
 
     function fixture(fixtureName, definition) {
-        return new imports.Fixture(undefined, fixtureName, definition, false, syncRunner);
+        return new imports.Fixture(undefined, fixtureName, definition, false, syncRunner.runner);
     }
     fixture.abstract = function(fixtureName, definition) {
-        return new imports.Fixture(undefined, fixtureName, definition, true, syncRunner);
+        return new imports.Fixture(undefined, fixtureName, definition, true, syncRunner.runner);
     };
 
     var g = 'undefined' === typeof window ? global : window;
@@ -26,7 +26,7 @@ module({
     g.TEST_MAX_OUTPUT_SIZE = 1024;
 
     g.setTimeout = function(fn, time) {
-        if (time === 1 || time === 0){
+        if (time === 1 || time === 0) {
             fn();
             return 0;
         }
