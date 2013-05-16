@@ -62,14 +62,22 @@ function launch_server() {
 }
 
 function run_browser_tests() {
-    local TEST_TYPE=$1
     local TESTS=`find $HERE/.. -type f -iname "*.test.js" -path "*/tests/kraken/*" $TESTMASK`
 
+    run_leprechaun "http://127.0.0.1:8001/bin/test-trampoline.html" "$TESTS"
+
+    if [ "$?" != 0 ]; then 
+        fail
+    fi
+}
+
+function run_leprechaun() {
+    local TRAMPOLINE="$1"
+    local TESTS="$2"
     if [ "${#TESTS}" != 0 ]; then
         printf "\nRunning browser tests...\n\n"
 
         OS=`python -c "import sys; print sys.platform"`
-        TRAMPOLINE="http://127.0.0.1:8001/bin/test-trampoline.html"
         RUNNER="$HERE/../bin/leprechaun-runner.js"
         if [ $OS = 'darwin' ]; then
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/leprechaun.app/Contents/MacOS/leprechaun"
@@ -81,12 +89,18 @@ function run_browser_tests() {
             RUNNER="$HERE\..\bin\leprechaun-runner.js"
         fi
 
-        launch_server
         DISPLAY=:9.0 "$LEPRECHAUN" $RUNNER $TRAMPOLINE $TESTS
+        return "$?"
+    fi
+}
 
-        if [ "$?" != 0 ]; then
-            fail
-        fi
+function run_browser_async_tests() {
+    local TESTS=`find $HERE/.. -type f -iname "*.async-test.js" -path "*/tests/kraken/*" $TESTMASK`
+
+    run_leprechaun "http://127.0.0.1:8001/bin/async-test-trampoline.html" "$TESTS"
+
+    if [ "$?" != 0 ]; then
+        fail
     fi
 }
 
@@ -114,7 +128,9 @@ fi
 run_jshint
 "$HERE"/build
 run_node_tests
+launch_server
 run_browser_tests
+run_browser_async_tests
 run_fail_tests
 
 succeed

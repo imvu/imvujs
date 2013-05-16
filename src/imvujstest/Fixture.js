@@ -40,10 +40,8 @@ module({
                 this.runner.activeFixture = undefined;
             }
         },
-        setUp: function defaultSetUp() {
-        },
-        tearDown: function defaultTearDown() {
-        },
+        setUp: null,
+        tearDown: null,
         addAbstractTests: function(concreteFixture) {
             if (this.abstract) {
                 for (var i = 0; i < this.abstractTests.length; ++i) {

@@ -43,8 +43,10 @@ module({
                     return;
                 }
                 runSetUp(fixtureObject.parent);
-                fixtureObject.setUp.call(testScope);
-                afterTests.push(fixtureObject.tearDown.bind(testScope));
+                var setUp = fixtureObject.setUp || function () {};
+                var tearDown = fixtureObject.tearDown || function () {};
+                setUp.call(testScope);
+                afterTests.push(tearDown.bind(testScope));
             };
             runSetUp(test.fixture);
 

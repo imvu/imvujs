@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <title>Test trampoline</title>
+
+    <script>var window = {};</script>
+    <script src="../out/imvu.js"></script>
+    <script>
+        (function() {
+            var dependenciesURL = '/async-test-trampoline-dependencies.json',
+                ajaxSettings = {
+                    type: 'GET',
+                    async: false,
+                };
+
+            $.ajax(dependenciesURL, _.extend(ajaxSettings, {dataType: 'json'}))
+            .done(function(dependencies) {
+                _.each(dependencies, function(dependency) {
+                    $.ajax(dependency, _.extend(ajaxSettings, {dataType: 'script'}))
+                        .done(function() {
+                            console.log('Test dependency ' + dependency + ' loaded.');
+                        })
+                        .fail(function() {
+                            throw new Error('Failed to load ' + location.origin + dependency);
+                        });
+                });
+            });
+        })();
+    </script>
+    <link rel="stylesheet" type="text/css" href="test-trampoline.css">
+</head>
+<body>
+    <div class="test-sandbox">
+    </div>
+
+    <ul class="testoutput">
+        <li class="status">Test Running</li>
+    </ul>
+
+    <script src="async-test-runner.js"></script>
+</body>
+
+</html>
