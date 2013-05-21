@@ -37,7 +37,7 @@ module({
                 superfixtures: superfixtureUrl
             }, function (imports) {
                 function log(msg) {
-                    var entry = $('<li>').text(msg);
+                    var entry = $('<li class="log">').text(msg);
                     console.log(msg);
                     $('.testoutput').append(entry);
                     $('.testoutput')[0].scrollTop = $('.testoutput')[0].scrollHeight;

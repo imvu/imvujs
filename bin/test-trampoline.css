@@ -1,11 +1,26 @@
-.testoutput {
-    position: fixed;
-    left: 0;
+.test-sandbox {
+    position: absolute;
+    top: 0;
     right: 0;
-    height: 50%;
+    bottom: 33%;
+    left: 0;
+    overflow: auto;
+
+    padding: 0;
+    margin: 0;
+}
+
+.testoutput {
+    position: absolute;
+    top: auto;
+    right: 0;
     bottom: 0;
-    overflow: scroll;
-    border: thin black solid;
+    left: 0;
+    height: 33%;
+
+    box-sizing: border-box;
+    overflow: auto;
+    border-top: 2px black inset;
     background-color: gray;
     color: white;
     padding: 0;
@@ -17,25 +32,37 @@
     color: yellow;
 }
 .testoutput.pass {
-    border: thick green solid;
+    border-top-color: green;
 }
 .testoutput.pass .status {
     color: green;
 }
 .testoutput.fail {
-    border: thick red solid;
+    border-top-color: red;
 }
 .testoutput.fail .status {
     color: red;
 }
 .testoutput li {
+    font-family: sans-serif;
     padding: 0;
     margin: 0;
     list-style-type: none;
 }
-.testoutput li.PASS {
-    color: #004000;
+.testoutput li.log:hover {
+    background-color: #909080 !important; /* override .PASS and .FAIL */
 }
-.testoutput li.FAIL {
+.testoutput li.log.PASS:before {
+    content: "\02713  ";
+}
+.testoutput li.log.PASS {
+    color: #004000;
+    background-color: #809080;
+}
+.testoutput li.log.FAIL:before {
+    content: "\02717  ";
+}
+.testoutput li.log.FAIL {
     color: #400000;
+    background-color: #908080;
 }
