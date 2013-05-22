@@ -4,9 +4,7 @@
 
 /*global exports:true*/
 var impls = {}; // path : body
-if (typeof global.implsPending === "undefined") {
-    global.implsPending = {};
-}
+var implsPending = {};
 var currentFilePath = null;
 
 function includeModule(modulePath, sysinclude) {
@@ -29,7 +27,7 @@ function module(dependencies, body, settings) {
     var criticalErrorHandler = settings.criticalErrorHandler || function() { 
         global.syncWrite("Error: circular module dependency detected:\n");
         global.syncWrite("  " + dependencies[k] + " is required in\n");
-        global.syncWrite("  " + cfp + " and " + global.implsPending[vPending] + "\n");
+        global.syncWrite("  " + cfp + " and " + implsPending[vPending] + "\n");
         process.exit(1); 
     };
     var cfp = currentFilePath;
@@ -38,7 +36,7 @@ function module(dependencies, body, settings) {
     for (var k in dependencies) {
         var v = path.join(path.dirname(cfp), dependencies[k]);
 
-        for (var vPending in global.implsPending) {
+        for (var vPending in implsPending) {
             if (vPending === v) {
                 criticalErrorHandler();
                 return;
@@ -46,11 +44,11 @@ function module(dependencies, body, settings) {
         }
 
         if (!(v in impls)) {
-            global.implsPending[v] = cfp;
+            implsPending[v] = cfp;
             includeModule(v, sysinclude);
         }
 
-        delete global.implsPending[v];
+        delete implsPending[v];
         importList[k] = impls[v];
     }
 

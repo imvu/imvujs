@@ -53,8 +53,12 @@ global.sysinclude = sysinclude;
 function runInDirectory(dir, action) {
     var previousDir = process.cwd();
     process.chdir(__dirname);
-    action();
-    process.chdir(previousDir);
+    try {
+        action();
+    }
+    finally {
+        process.chdir(previousDir);
+    }
 }
 
 runInDirectory(__dirname, function () {
