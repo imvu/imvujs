@@ -26,10 +26,6 @@ module({
     g.TEST_MAX_OUTPUT_SIZE = 1024;
 
     g.setTimeout = function(fn, time) {
-        if (time === 1 || time === 0) {
-            fn();
-            return 0;
-        }
         throw new imports.AssertionError("Don't call setTimeout in tests.  Use fakes.");
     };
 
