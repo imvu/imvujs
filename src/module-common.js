@@ -1,21 +1,22 @@
 /*global IMVU:true*/
 var IMVU = IMVU || {};
 (function() {
-    IMVU.moduleCommon = {
-        moduleStateAllowed: false,
+    var aliases = {};
+    var moduleStateAllowed = false;
 
+    IMVU.moduleCommon = {
         allowModuleState: function() {
-            this.moduleStateAllowed = true;
+            moduleStateAllowed = true;
         },
 
         _loadBody: function(body, importList) {
             var impl = body(importList);
-            if (!this.moduleStateAllowed && impl instanceof Object) {
+            if (!moduleStateAllowed && impl instanceof Object) {
                // Object.freeze(impl);
             }
 
             // reset per-module state
-            this.moduleStateAllowed = false;
+            moduleStateAllowed = false;
             return impl;
         },
 
@@ -70,6 +71,22 @@ var IMVU = IMVU || {};
                 }
             }
             return segments.join('/');
+        },
+
+        setAlias: function(name, path) {
+            var resolved = aliases[name];
+            if (undefined !== resolved) {
+                throw new ReferenceError('Cannot redefine alias: ' + name);
+            }
+            aliases[name] = path;
+        },
+
+        alias: function(name) {
+            var resolved = aliases[name];
+            if (undefined === resolved) {
+                throw new ReferenceError('Unknown alias: ' + name);
+            }
+            return resolved;
         }
     };
 })();

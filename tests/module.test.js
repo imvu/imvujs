@@ -50,6 +50,5 @@ module({
             module({depA: "a.js"}, this.fakeModuleBody, this.settings);
             assert.true(this.criticalErrorOccurred);
         });
-
     });
 });
