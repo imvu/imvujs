@@ -1,5 +1,7 @@
 # imvujs Modules
 
+All of these examples have code available in the [module](module/) subdirectory.
+
 ## Browser Module Interface
 
 imvujs modules have a set of named dependencies and a module body.
@@ -66,3 +68,60 @@ module({
 </script>
 ```
 
+Loading the html file in your browser will result in the following output lines:
+
+```
+module.importJs() example:
+Foo.doFoo: Hello there!
+module.dynamicImport() example:
+Foo.doFoo: How are you doing?
+Foo.doFoo: Very well, thanks! <- came from Bar.js
+```
+
+---
+
+## Custom dependencies
+
+Sometimes, you want to have a dependency on an asset (or resource) that is available asynchronously. Some example use cases would be to load an asset via XMLHttpRequest, or set up and initialize a web worker.
+
+If instead of being a string which is the relativ path to javascript, the dependency can be a function that takes two
+parameters:
+
+```js
+/* customDependency.js */
+module({
+    staticFile: function (onComplete, scope) {
+        var url = scope.getAbsoluteURL('static.txt');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                onComplete(xhr.responseText);
+            }
+        };
+        xhr.send();
+    }
+}, function (imports) {
+    return {
+        staticFile: imports.staticFile
+    };
+});
+```
+
+```html
+<!doctype html>
+<title>Custom Dependency Example</title>
+<script src="../../out/imvu.js"></script>
+<script>
+    module.importJs('customDependency.js', function (customDependency) {
+        alert('static.txt: "' + customDependency.staticFile + '"');
+    });
+</script>
+```
+
+And the static dependency, static.txt:
+
+```A static text file!
+```
+
+Opening the html file in your browser will alert the string: `static.txt: "A static text file!\n"`

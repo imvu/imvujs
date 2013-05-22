@@ -1,0 +1,8 @@
+<!doctype html>
+<title>Custom Dependency Example</title>
+<script src="../../out/imvu.js"></script>
+<script>
+    module.importJs('customDependency.js', function (customDependency) {
+        alert('static.txt: "' + customDependency.staticFile + '"');
+    });
+</script>
