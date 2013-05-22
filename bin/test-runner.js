@@ -15,14 +15,14 @@ module({
     return {
         start: function (superfixtureUrl) {
             $('<div class="test-sandbox"></div>').appendTo(document.body);
-            $('<ul class="testoutput"><li class="status">Test Running</li></ul>').appendTo(document.body);
+            $('<div class="test-output"><div class="status">Test Running</div><ul></ul></div>').appendTo(document.body);
 
             window.onerror = function(errorMsg, url, lineNumber){
-                $('.testoutput').addClass('fail');
+                $('.test-output').addClass('fail');
                 var prettyText = 'Test Failed: Uncaught Exception: ' + errorMsg;
 
                 console.log(prettyText);
-                $('.testoutput .status').text(prettyText);
+                $('.test-output .status').text(prettyText);
                 window.postMessage(JSON.stringify({type: 'test-complete', verdict: 'FAIL', stack: prettyText, name: window.location.hash.substr(1)}), '*');
             };
 
@@ -39,8 +39,8 @@ module({
                 function log(msg) {
                     var entry = $('<li class="log">').text(msg);
                     console.log(msg);
-                    $('.testoutput').append(entry);
-                    $('.testoutput')[0].scrollTop = $('.testoutput')[0].scrollHeight;
+                    $('.test-output ul').append(entry);
+                    $('.test-output ul')[0].scrollTop = $('.test-output ul')[0].scrollHeight;
                     return entry;
                 }
                 function reporter(msg) {
@@ -51,21 +51,21 @@ module({
                             entry.append($('<pre>').addClass('stack').text(msg.stack));
                             console.log(msg.stack);
                         }
-                        $('.testoutput').trigger('test-complete', msg);
+                        $('.test-output').trigger('test-complete', msg);
                     }
                     window.postMessage(JSON.stringify(msg), "*");
                 }
 
-                $('.testoutput').removeClass('fail');
-                $('.testoutput').removeClass('pass');
-                $('.testoutput .status').text('Testing ' + testUrl + '...');
+                $('.test-output').removeClass('fail');
+                $('.test-output').removeClass('pass');
+                $('.test-output .status').text('Testing ' + testUrl + '...');
                 log('Testing ' + testUrl + '...');
                 var failed = !run_all(reporter);
 
-                $('.testoutput').addClass(failed ? 'fail' : 'pass');
+                $('.test-output').addClass(failed ? 'fail' : 'pass');
                 var prettyText = failed ? 'Test Failed' : 'Test Passed' ;
                 console.log(prettyText);
-                $('.testoutput .status').text(prettyText);
+                $('.test-output .status').text(prettyText);
             });
         }
     };

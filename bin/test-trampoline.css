@@ -10,7 +10,7 @@
     margin: 0;
 }
 
-.testoutput {
+.test-output {
     position: absolute;
     top: auto;
     right: 0;
@@ -26,43 +26,54 @@
     padding: 0;
     margin: 0;
 }
-.testoutput .status {
+.test-output .status {
     background-color: white;
     font-weight: bold;
     color: yellow;
+    height: 20px;
 }
-.testoutput.pass {
+.test-output.pass {
     border-top-color: green;
 }
-.testoutput.pass .status {
+.test-output.pass .status {
     color: green;
 }
-.testoutput.fail {
+.test-output.fail {
     border-top-color: red;
 }
-.testoutput.fail .status {
+.test-output.fail .status {
     color: red;
 }
-.testoutput li {
+.test-output ul  {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
+    margin: 0;
+    padding: 0;
+}
+.test-output li {
     font-family: sans-serif;
     padding: 0;
     margin: 0;
     list-style-type: none;
 }
-.testoutput li.log:hover {
+.test-output li.log:hover {
     background-color: #909080 !important; /* override .PASS and .FAIL */
 }
-.testoutput li.log.PASS:before {
+.test-output li.log.PASS:before {
     content: "\02713  ";
 }
-.testoutput li.log.PASS {
+.test-output li.log.PASS {
     color: #004000;
     background-color: #809080;
 }
-.testoutput li.log.FAIL:before {
+.test-output li.log.FAIL:before {
     content: "\02717  ";
 }
-.testoutput li.log.FAIL {
+.test-output li.log.FAIL {
     color: #400000;
     background-color: #908080;
 }
