@@ -1,5 +1,5 @@
 /*
- * Node.js implementation of the kraken interface.
+ * Node.js implementation of the module interface.
  */
 
 /*global exports:true*/

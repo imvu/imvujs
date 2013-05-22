@@ -6,7 +6,7 @@
  * I wish I could make this @const too. :(
  * @define {boolean}
  */
-var KRAKEN_DEBUG = true;
+var MODULE_DEBUG = true;
 
 (function() {
     "use strict";
@@ -187,7 +187,7 @@ var KRAKEN_DEBUG = true;
     }
 
     function reportSyntaxError(url, code) {
-        if (KRAKEN_DEBUG) {
+        if (MODULE_DEBUG) {
             try {
                 var result = esprima.parse(code);
                 console.groupCollapsed("This parse should never succeed");

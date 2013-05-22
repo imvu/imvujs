@@ -31,13 +31,13 @@ WEB_SOURCES = [
 ]
 
 NODE_SOURCES = BASE_SOURCES + [
-    'src/node-kraken.js',
+    'src/node-module.js',
 ]
 
 env = Environment(
     ENV=os.environ,
     toolpath=['scons-tools'],
-    tools=['closure', 'uglify', 'gzip', 'kraken_combine'])
+    tools=['closure', 'uglify', 'gzip', 'module_combine'])
 
 BASE_CLOSURE_FLAGS = [
     '--language_in', 'ECMASCRIPT5',
@@ -68,7 +68,7 @@ targets += env.ClosureCompiler(
 targets += env.ClosureCompiler(
     'out/imvu.min.js',
     WEB_SOURCES,
-    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS + ["--define='KRAKEN_DEBUG=false'"])
+    CLOSURE_FLAGS=BASE_CLOSURE_FLAGS + ["--define='MODULE_DEBUG=false'"])
 
 targets += env.ClosureCompiler(
     'out/imvu.node.js',
