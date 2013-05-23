@@ -8,7 +8,7 @@ var util = require('util');
 
 var fix_output = require('../src/fix_output.js');
 fix_output.fixConsole(console);
-global.syncWrite = fix_output.syncWriteStdout;
+var syncWrite = fix_output.syncWriteStdout;
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
