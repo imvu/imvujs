@@ -45,7 +45,6 @@ global.sysinclude = sysinclude;
 
 [
   'out/imvu.node.js',
-  'src/node-module.js',
 ].forEach(function(v) {
   sysinclude(__filename, __dirname + '/../' + v);
 });
