@@ -5,39 +5,33 @@ import subprocess
 
 def generate(env):
     def depend_on_combiner(target, source, env):
-        env.Depends(target, env['KRAKEN_COMBINE'])
-        env.Depends(target, env['KRAKEN_COMBINE'] + '.js')
-        env.Depends(target, env['KRAKEN_SCAN'])
-        env.Depends(target, env['KRAKEN_SCAN'] + '.js')
+        env.Depends(target, env['MODULE_COMBINE'])
+        env.Depends(target, env.File(str(env['MODULE_COMBINE']) + '.js'))
+        env.Depends(target, env['MODULE_SCAN'])
+        env.Depends(target, env.File(str(env['MODULE_SCAN']) + '.js'))
 
         return target, source
 
     def combine(target, source, env, for_signature):
-        return 'bash $KRAKEN_COMBINE $SOURCE > $TARGET'
+        return 'bash $MODULE_COMBINE $SOURCE > $TARGET'
     
-    path = os.path.join(
+    path = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
         '..',
         'bin',
-        'combine')
-    path = os.path.relpath(
-        os.path.normpath(path),
-        env.Dir('#').abspath)
-    env['KRAKEN_COMBINE'] = path
+        'combine'))
+    env['MODULE_COMBINE'] = env.File(path)
 
-    path = os.path.join(
+    path = os.path.abspath(os.path.join(
         os.path.dirname(__file__),
         '..',
         'bin',
-        'scan-dependencies')
-    path = os.path.relpath(
-        os.path.normpath(path),
-        env.Dir('#').abspath)
-    env['KRAKEN_SCAN'] = path
+        'scan-dependencies'))
+    env['MODULE_SCAN'] = env.File(path)
 
     def scan_module_dependencies(node, env, path):
         popen = subprocess.Popen(
-            ['bash', env.subst('$KRAKEN_SCAN'), str(node)],
+            ['bash', env.subst('$MODULE_SCAN'), str(node)],
             stdout=subprocess.PIPE)
         stdout, _ = popen.communicate()
         if popen.returncode:
