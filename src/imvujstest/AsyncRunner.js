@@ -2,7 +2,7 @@ module({
     Runner: 'Runner.js',
     cps: '../cps.js'
 }, function (imports) {
-    return BaseClass.extend('SyncRunner', {
+    return IMVU.BaseClass.extend('AsyncRunner', {
         initialize: function () {
             this.runner = new imports.Runner(runTest);
         },

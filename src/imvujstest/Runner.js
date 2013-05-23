@@ -1,7 +1,7 @@
 module({
     cps: '../cps.js'
 }, function (imports) {
-    return BaseClass.extend('Runner', {
+    return IMVU.BaseClass.extend('Runner', {
         initialize: function (runTest) {
             // { fixture: Fixture instance,
             //   name: string,

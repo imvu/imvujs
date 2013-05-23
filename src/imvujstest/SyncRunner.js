@@ -2,7 +2,7 @@ module({
     Runner: 'Runner.js',
     assert: 'assert.js'
 }, function (imports) {
-    return BaseClass.extend('SyncRunner', {
+    return IMVU.BaseClass.extend('SyncRunner', {
         initialize: function () {
             this.runner = new imports.Runner(runTest);
         },

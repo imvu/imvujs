@@ -1,7 +1,7 @@
 /*global IMVU:true*/
 var IMVU = IMVU || {};
 (function() {
-    IMVU.ServiceProvider = BaseClass.extend('ServiceProvider', {
+    IMVU.ServiceProvider = IMVU.BaseClass.extend('ServiceProvider', {
         initialize: function() {
             this.services = {};
         },

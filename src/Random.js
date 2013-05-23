@@ -2,7 +2,7 @@
 var IMVU = IMVU || {};
 
 (function() {
-    IMVU.Random = BaseClass.extend('Random', {
+    IMVU.Random = IMVU.BaseClass.extend('Random', {
         getInteger: function(min, max) {
             if (arguments.length < 2)
                 throw new Error("getInteger expected (min, max)");

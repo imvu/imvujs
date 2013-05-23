@@ -1,7 +1,8 @@
 /*global IMVU:true*/
 var IMVU = IMVU || {};
 (function() {
-    var BaseClass = function () {};
+    function BaseClass() {
+    }
 
     BaseClass.extend = function (name, def, classDef) {
         if (typeof name !== "string" || null === name.match(/[a-z_][0-9a-z_]*/i)) {
@@ -27,20 +28,5 @@ var IMVU = IMVU || {};
 
     BaseClass.prototype.initialize = function () {};
 
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            /*jshint -W020*/
-            exports = module.exports = BaseClass;
-        }
-        exports.BaseClass = BaseClass;
-
-    } else {
-        var g = 'undefined' !== typeof window ? window : global;
-
-        g.BaseClass = BaseClass;
-
-        g.IMVU = g.IMVU || {};
-        g.IMVU.BaseClass = BaseClass;
-    }
-
+    IMVU.BaseClass = BaseClass;
 })();
