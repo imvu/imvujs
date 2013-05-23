@@ -43,11 +43,7 @@ function sysinclude(currentPath, includePath, settings) {
 global.require = require;
 global.sysinclude = sysinclude;
 
-[
-  'out/imvu.node.js',
-].forEach(function(v) {
-  sysinclude(__filename, __dirname + '/../' + v);
-});
+sysinclude(__filename, __dirname + '/../out/imvu.node.js');
 
 function runInDirectory(dir, action) {
     var previousDir = process.cwd();

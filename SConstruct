@@ -4,8 +4,11 @@ import multiprocessing
 SetOption('num_jobs', multiprocessing.cpu_count())
 print "running with -j", GetOption('num_jobs')
 
-BASE_SOURCES = [
+FIRST_SOURCES = [
     'ext/underscore-1.4.2.js',
+]
+
+BASE_SOURCES = [
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
@@ -21,7 +24,7 @@ BASE_SOURCES = [
     'src/rest.js',
 ]
 
-WEB_SOURCES = [
+WEB_SOURCES = FIRST_SOURCES + [
     'ext/jquery-1.8.2.js',
     'ext/easyXDM-2.4.15.118.js',
 ] + BASE_SOURCES + [
@@ -30,7 +33,7 @@ WEB_SOURCES = [
     'src/Timer.js',
 ]
 
-NODE_SOURCES = BASE_SOURCES + [
+NODE_SOURCES = FIRST_SOURCES + BASE_SOURCES + [
     'src/node-module.js',
 ]
 
