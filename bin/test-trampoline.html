@@ -2,7 +2,7 @@
 <title>IMVUJS Test Runner</title>
 <script src="../out/imvu.js"></script>
 <script>
-    module.importJs('test-runner.js', function (testRunner) {
-        testRunner.start('../tests/superfixture.js');
+    module.importJs('../out/imvutest.js', function (imvutest) {
+        imvutest.start('../tests/superfixture.js');
     });
 </script>

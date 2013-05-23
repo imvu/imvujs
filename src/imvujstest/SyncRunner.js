@@ -2,26 +2,6 @@ module({
     Runner: 'Runner.js',
     assert: 'assert.js'
 }, function (imports) {
-    return IMVU.BaseClass.extend('SyncRunner', {
-        initialize: function () {
-            this.runner = new imports.Runner(runTest);
-        },
-        registerSuperFixture: function (superFixture) {
-            this.runner.registerSuperFixture(superFixture);
-        },
-        test: function (name, body) {
-            this.runner.test(name, body);
-        },
-        run_all: function (reporter) {
-            var passed;
-            this.runner.run_all(reporter, function onComplete(pass) {
-                passed = pass;
-            });
-            assert.notUndefined(passed); // test runner must complete synchronously
-            return passed;
-        }
-    });
-
     function runTest(superFixtures, test, continuation) {
         try {
             var afterTests = [];
@@ -60,4 +40,24 @@ module({
             continuation({stack: e.stack, e: e});
         }
     }
+
+    return IMVU.BaseClass.extend('SyncRunner', {
+        initialize: function () {
+            this.runner = new imports.Runner(runTest);
+        },
+        registerSuperFixture: function (superFixture) {
+            this.runner.registerSuperFixture(superFixture);
+        },
+        test: function (name, body) {
+            this.runner.test(name, body);
+        },
+        run_all: function (reporter) {
+            var passed;
+            this.runner.run_all(reporter, function onComplete(pass) {
+                passed = pass;
+            });
+            assert.notUndefined(passed); // test runner must complete synchronously
+            return passed;
+        }
+    });
 });
