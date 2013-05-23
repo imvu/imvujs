@@ -5,7 +5,7 @@ var IMVU = IMVU || {};
     var moduleStateAllowed = false;
 
     function normalizePath(path) {
-// NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
+        // NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
         var segments = path.split(/\//g);
         var i = 0;
         while (i < segments.length) {
@@ -25,6 +25,15 @@ var IMVU = IMVU || {};
             }
         }
         return segments.join('/');
+    }
+
+    function splitPath(path) {
+        var i = path.lastIndexOf('/');
+        if (i !== -1) {
+            return [path.substring(0, i), path.substring(i + 1)];
+        } else {
+            return ['', path];
+        }
     }
 
     IMVU.moduleCommon = {
@@ -49,7 +58,7 @@ var IMVU = IMVU || {};
                 return url;
             }
 
-            relativeTo = this.splitPath(normalizePath(relativeTo))[0];
+            relativeTo = splitPath(normalizePath(relativeTo))[0];
             var isRelativeAbsolute = relativeTo[0] === '/' || relativeTo.match(/^(http|https):\/\//) !== null;
             if (!isRelativeAbsolute){
                 relativeTo = '/' + relativeTo;
@@ -63,15 +72,6 @@ var IMVU = IMVU || {};
                 url = relativeTo + '/' + url;
             }
             return normalizePath(url);
-        },
-
-        splitPath: function(path) {
-            var i = path.lastIndexOf('/');
-            if (i !== -1) {
-                return [path.substring(0, i), path.substring(i + 1)];
-            } else {
-                return ['', path];
-            }
         },
 
         setAlias: function(name, path) {
