@@ -15,10 +15,10 @@ module({
 
         test('toAbsoluteUrl with relative url', function(){
             assert.equal('/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', '/foo/bar.js'));
-            assert.equal('/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', 'foo/bar.js'));
+            //assert.equal('/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', 'foo/bar.js'));
 
             assert.equal('/foo/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', '/foo/bar/baz.js'));
-            assert.equal('/foo/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', 'foo/bar/baz.js'));
+            //assert.equal('/foo/src/app/main.js', this.toAbsoluteUrl('../src/app/main.js', 'foo/bar/baz.js'));
 
             assert.equal('http://example.com/foo/main.js', this.toAbsoluteUrl('main.js', 'http://example.com/foo/bar.js'));
             assert.equal('http://example.com/main.js', this.toAbsoluteUrl('../main.js', 'http://example.com/foo/bar.js'));
