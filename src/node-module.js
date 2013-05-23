@@ -20,16 +20,23 @@ function includeModule(modulePath, sysinclude) {
     }
 }
 
-function module(dependencies, body, settings) {
-    settings = settings || {};
-    var path = settings.path || require('path');
-    var sysinclude = settings.sysinclude || global.sysinclude;
-    var criticalErrorHandler = settings.criticalErrorHandler || function() { 
+var defaultModuleSettings = {
+    path: require('path'),
+    sysinclude: global.sysinclude,
+    criticalErrorHandler: function(required, cfp, by) {
         global.syncWrite("Error: circular module dependency detected:\n");
-        global.syncWrite("  " + dependencies[k] + " is required in\n");
-        global.syncWrite("  " + cfp + " and " + implsPending[vPending] + "\n");
+        global.syncWrite("  " + required + " is required in\n");
+        global.syncWrite("  " + cfp + " and " + by + "\n");
         process.exit(1); 
-    };
+    }
+};
+
+function module(dependencies, body, settings) {
+    settings = settings || defaultModuleSettings;
+    var path = settings.path;
+    var criticalErrorHandler = settings.criticalErrorHandler;
+    var sysinclude = settings.sysinclude;
+
     var cfp = currentFilePath;
     var importList = {};
 
@@ -38,7 +45,7 @@ function module(dependencies, body, settings) {
 
         for (var vPending in implsPending) {
             if (vPending === v) {
-                criticalErrorHandler();
+                criticalErrorHandler(dependencies[k], cfp, implsPending[vPending]);
                 return;
             }
         }

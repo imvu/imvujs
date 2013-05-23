@@ -4,6 +4,29 @@ var IMVU = IMVU || {};
     var aliases = {};
     var moduleStateAllowed = false;
 
+    function normalizePath(path) {
+// NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
+        var segments = path.split(/\//g);
+        var i = 0;
+        while (i < segments.length) {
+            var s = segments[i];
+            if (s === '.') {
+                segments.splice(i, 1);
+                continue;
+            } else if (s === '..' && i === 0 && segments.length > 2) {
+                segments.splice(i, 2);
+                continue;
+            } else if (s === '..' && i > 0) {
+                segments.splice(i - 1, 2);
+                i -= 1;
+                continue;
+            } else {
+                i += 1;
+            }
+        }
+        return segments.join('/');
+    }
+
     IMVU.moduleCommon = {
         allowModuleState: function() {
             moduleStateAllowed = true;
@@ -26,7 +49,7 @@ var IMVU = IMVU || {};
                 return url;
             }
 
-            relativeTo = this.splitPath(this.normalizePath(relativeTo))[0];
+            relativeTo = this.splitPath(normalizePath(relativeTo))[0];
             var isRelativeAbsolute = relativeTo[0] === '/' || relativeTo.match(/^(http|https):\/\//) !== null;
             if (!isRelativeAbsolute){
                 relativeTo = '/' + relativeTo;
@@ -39,7 +62,7 @@ var IMVU = IMVU || {};
             } else {
                 url = relativeTo + '/' + url;
             }
-            return this.normalizePath(url);
+            return normalizePath(url);
         },
 
         splitPath: function(path) {
@@ -49,28 +72,6 @@ var IMVU = IMVU || {};
             } else {
                 return ['', path];
             }
-        },
-
-        normalizePath: function(path) {
-            var segments = path.split(/\//g); // NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
-            var i = 0;
-            while (i < segments.length) {
-                var s = segments[i];
-                if (s === '.') {
-                    segments.splice(i, 1);
-                    continue;
-                } else if (s === '..' && i === 0 && segments.length > 2) {
-                    segments.splice(i, 2);
-                    continue;
-                } else if (s === '..' && i > 0) {
-                    segments.splice(i - 1, 2);
-                    i -= 1;
-                    continue;
-                } else {
-                    i += 1;
-                }
-            }
-            return segments.join('/');
         },
 
         setAlias: function(name, path) {
