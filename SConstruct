@@ -7,7 +7,6 @@ print "running with -j", GetOption('num_jobs')
 BASE_SOURCES = [
     'ext/underscore-1.4.2.js',
     'ext/backbone-0.9.10.js',
-    'ext/easyXDM-2.4.15.118.js',
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
@@ -24,7 +23,8 @@ BASE_SOURCES = [
 ]
 
 WEB_SOURCES = [
-    'ext/jquery-1.8.2.js'
+    'ext/jquery-1.8.2.js',
+    'ext/easyXDM-2.4.15.118.js',
 ] + BASE_SOURCES + [
     'src/web-module.js',
     'src/Timer.js',
