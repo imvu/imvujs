@@ -18,9 +18,12 @@ module({
 
     g.registerSuperFixture = asyncRunner.registerSuperFixture.bind(asyncRunner);
     g.test = asyncRunner.test.bind(asyncRunner);
-    g.run_all = asyncRunner.run_all.bind(asyncRunner);
     g.fixture = fixture;
     g.repr = IMVU.repr;
     g.AssertionError = imports.AssertionError;
     g.assert = imports.assert;
+
+    return {
+        run_all: asyncRunner.run_all.bind(asyncRunner)
+    };
 });

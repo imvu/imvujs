@@ -18,10 +18,11 @@ module({
 
     g.registerSuperFixture = syncRunner.registerSuperFixture.bind(syncRunner);
     g.test = syncRunner.test.bind(syncRunner);
-    g.run_all = syncRunner.run_all.bind(syncRunner);
     g.fixture = fixture;
     g.AssertionError = imports.AssertionError;
     g.assert = imports.assert;
+
+    // TODO: move these into another file?  ProactiveIntermittencePrevention.js? :)
 
     g.setTimeout = function(fn, time) {
         throw new imports.AssertionError("Don't call setTimeout in tests.  Use fakes.");
@@ -43,5 +44,9 @@ module({
 
     g.requestAnimationFrame = function() {
         throw new imports.AssertionError("Don't call requestAnimationFrame in tests.  Use fakes.");
+    };
+
+    return {
+        run_all: syncRunner.run_all.bind(syncRunner)
     };
 });

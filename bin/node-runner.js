@@ -60,12 +60,15 @@ function runInDirectory(dir, action) {
     }
 }
 
+var run_all;
+
 runInDirectory(__dirname, function () {
      // node-module.js loads js relative to process.cwd(), we can't rely on
      // this, so we change to __dirname to import relative to *here*
     global.module({
         synctest: '../src/imvujstest/synctest.js'
-    }, function (synctest) {
+    }, function(imports) {
+        run_all = imports.synctest.run_all;
     });
 });
 

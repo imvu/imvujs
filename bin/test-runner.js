@@ -1,4 +1,3 @@
-/*global run_all*/
 window.module.caching = false;
 module({
     css: function (onComplete, scope) {
@@ -12,6 +11,7 @@ module({
     },
     synctest: '../src/imvujstest/synctest.js'
 }, function (imports) {
+    var run_all = imports.synctest.run_all;
     return {
         start: function (superfixtureUrl) {
             $('<div class="test-sandbox"></div>').appendTo(document.body);

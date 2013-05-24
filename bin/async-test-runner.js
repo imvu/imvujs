@@ -1,6 +1,7 @@
 /*global run_all*/
 
 window.module.caching = false;
+var run_all;
 
 function dispatch(testUrl) {
     module.dynamicImport({
@@ -42,6 +43,8 @@ function dispatch(testUrl) {
 }
 
 module.importJs('../src/imvujstest/asynctest.js', function (asynctest) {
+    run_all = asynctest.run_all;
+
     dispatch(window.location.hash.substr(1));
     window.addEventListener('hashchange', function () {
         dispatch(window.location.hash.substr(1));
