@@ -1,5 +1,3 @@
-/*global run_all*/
-
 window.module.caching = false;
 var run_all;
 

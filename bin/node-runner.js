@@ -1,9 +1,10 @@
+/*jslint node:true*/
+/*global _:false*/
 "use strict";
 
 var fs = require('fs');
 var vm = require('vm');
 var path = require('path');
-var _ = require('../ext/underscore-1.4.2.js');
 var util = require('util');
 
 var fix_output = require('../src/fix_output.js');
@@ -44,10 +45,10 @@ global.require = require;
 global.sysinclude = sysinclude;
 
 var imvu_node = require('../out/imvu.node.js');
-var module = global.module = imvu_node.module;
+global.module = imvu_node.module;
 global.IMVU = imvu_node.IMVU;
 global.Backbone = imvu_node.Backbone;
-global._ = _;
+global._ = imvu_node._;
 
 function runInDirectory(dir, action) {
     var previousDir = process.cwd();
@@ -82,7 +83,7 @@ function loadSuperFixture(superfixture) {
     var testContents = loadScript(abspath);
 
     global.testPath = abspath;
-    module.currentFilePath = abspath;
+    global.module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 }
 
@@ -93,16 +94,17 @@ function runTest(testPath, continuation) {
 
     var testPassed;
 
+    var green, red, yellow, normal;
     if (process.platform === 'win32') {
-        var green = '',
-            red = '',
-            yellow = '',
-            normal = '';
+        green = '';
+        red = '';
+        yellow = '';
+        normal = '';
     } else {
-        var green = '\x1b[32m',
-            red = '\x1b[31m',
-            yellow = '\x1b[33m',
-            normal = '\x1b[0m';
+        green = '\x1b[32m';
+        red = '\x1b[31m';
+        yellow = '\x1b[33m';
+        normal = '\x1b[0m';
     }
 
     // I'd use Object.create here but prototypes don't extend across
@@ -120,7 +122,7 @@ function runTest(testPath, continuation) {
 
     syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
     global.testPath = abspath;
-    module.currentFilePath = abspath;
+    global.module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
     return run_all(function (report) {
