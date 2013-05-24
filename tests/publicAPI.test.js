@@ -32,7 +32,7 @@ var NODE_SYMBOLS = [
 test("Public API is limited to the following symbols", function() {
     var actual_symbols = Object.keys(global);
 
-    var IMVUJS_SYMBOLS = ['module', 'IMVU'];
+    var IMVUJS_SYMBOLS = ['module', 'IMVU', 'Backbone', '_'];
     var IMVUJSTEST_SYMBOLS = ['test', 'fixture', 'assert'];
 
     assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));

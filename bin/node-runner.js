@@ -46,6 +46,8 @@ global.sysinclude = sysinclude;
 var imvu_node = require('../out/imvu.node.js');
 var module = global.module = imvu_node.module;
 global.IMVU = imvu_node.IMVU;
+global.Backbone = imvu_node.Backbone;
+global._ = _;
 
 function runInDirectory(dir, action) {
     var previousDir = process.cwd();
@@ -76,7 +78,6 @@ function loadSuperFixture(superfixture) {
     var abspath = path.resolve(superfixture);
     var testContents = loadScript(abspath);
 
-    global._ = _;
     global.testPath = abspath;
     module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
@@ -107,7 +108,6 @@ function runTest(testPath, continuation) {
     //
     // Nested confusion:
     //     vm.runInNewContext has issues because runInThisContext always runs in the root 
-    global._ = _;
     //var sandbox = _.extend({}, imvujstest);
     //sandbox.console = console;
     //sandbox.require = require;
