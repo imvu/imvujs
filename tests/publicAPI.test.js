@@ -1,4 +1,4 @@
-(function(){
+(function(root_this){
     var NODE_SYMBOLS = [
         'ArrayBuffer',
         'Int8Array',
@@ -35,13 +35,31 @@
         'IMVU',
         'Backbone',
         '_',
+
+        // polyfill
+        'Set',
+
+        // AMD compatibility
+        'define',
     ];
 
     var IMVUJSTEST_SYMBOLS = [
         'test',
         'fixture',
         'assert',
+        'AssertionError',
+        'registerSuperFixture',
     ];
+
+    test("this is limited to the following symbols", function() {
+        var actual_symbols = Object.keys(root_this);
+
+        assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));
+        assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
+    
+        var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
+        //assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
+    });
 
     test("Public API is limited to the following symbols", function() {
         var actual_symbols = Object.keys(global);
@@ -65,4 +83,4 @@
             ['Backbone', 'IMVU', /*ES6 polyfill*/'Set', '_', 'module'],
             sorted(Object.keys(loaded)));
     });
-})();
+})(this);
