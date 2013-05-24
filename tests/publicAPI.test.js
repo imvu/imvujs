@@ -42,8 +42,15 @@ test("Public API is limited to the following symbols", function() {
     //assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
 });
 
+function sorted(ls) {
+    ls = ls.slice(0);
+    ls.sort();
+    return ls;
+}
 
 test("Can import with NodeJS's require", function() {
     var loaded = require('../out/imvu.node.js');
-    assert.deepEqual(['_', /*ES6 polyfill*/'Set', 'IMVU', 'module'], Object.keys(loaded));
+    assert.deepEqual(
+        ['Backbone', 'IMVU', /*ES6 polyfill*/'Set', '_', 'module'],
+        sorted(Object.keys(loaded)));
 });

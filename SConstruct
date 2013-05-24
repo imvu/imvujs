@@ -9,6 +9,7 @@ FIRST_SOURCES = [
 ]
 
 BASE_SOURCES = [
+    'ext/backbone-0.9.10.js',
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
@@ -28,7 +29,6 @@ WEB_SOURCES = FIRST_SOURCES + [
     'ext/jquery-1.8.2.js',
     'ext/easyXDM-2.4.15.118.js',
 ] + BASE_SOURCES + [
-    'ext/backbone-0.9.10.js',
     'src/web-module.js',
     'src/Timer.js',
 ]
