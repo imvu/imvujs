@@ -82,7 +82,7 @@ function loadSuperFixture(superfixture) {
     var abspath = path.resolve(superfixture);
     var testContents = loadScript(abspath);
 
-    global.testPath = abspath;
+    global.__filename = abspath; // kill when we load modules with vm.runInContext
     global.module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 }
@@ -121,7 +121,7 @@ function runTest(testPath, continuation) {
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
     syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
-    global.testPath = abspath;
+    global.__filename = abspath;
     global.module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 

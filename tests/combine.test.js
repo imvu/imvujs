@@ -54,7 +54,7 @@ module({}, function(imports) {
     fixture('functional', function() {
         this.setUp(function() {
             this.cwd = process.cwd();
-            process.chdir(path.dirname(testPath));
+            process.chdir(path.dirname(__filename));
         });
 
         this.tearDown(function() {

@@ -23,8 +23,10 @@
         'console',
         'module',
         'require',
-        
+
         'exports',
+        '__filename',
+        '__dirname',
 
         // browser-ish symbols prevented in tests
         'requestAnimationFrame',
