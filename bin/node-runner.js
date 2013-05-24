@@ -31,18 +31,8 @@ function joinPath(a, b) {
     }
 }
 
-function sysinclude(currentPath, includePath, settings) {
-    var abspath = path.resolve(includePath);
-    if (!fs.existsSync(abspath)) {
-        console.log("File " + includePath + " included by " + currentPath + " does not exist");
-        process.exit(1);
-    }
-    var script = loadScript(abspath, settings);
-    vm.runInThisContext(script, includePath);
-}
-
+global.loadScript = loadScript;
 global.require = require;
-global.sysinclude = sysinclude;
 
 var imvu_node = require('../out/imvu.node.js');
 global.module = imvu_node.module;

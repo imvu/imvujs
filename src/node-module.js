@@ -2,9 +2,23 @@
  * Node.js implementation of the module interface.
  */
 
-/*global exports:true*/
+/*global exports:true, loadScript*/
 var impls = {}; // path : body
 var implsPending = {};
+
+var path = require('path');
+var vm = require('vm');
+var fs = require('fs');
+
+function sysinclude(currentPath, includePath, settings) {
+    var abspath = path.resolve(includePath);
+    if (!fs.existsSync(abspath)) {
+        console.log("File " + includePath + " included by " + currentPath + " does not exist");
+        process.exit(1);
+    }
+    var script = loadScript(abspath, settings);
+    vm.runInThisContext(script, includePath);
+}
 
 function includeModule(modulePath, sysinclude) {
     var cfp = module.currentFilePath;
@@ -25,7 +39,7 @@ function includeModule(modulePath, sysinclude) {
 
 var defaultModuleSettings = {
     path: require('path'),
-    sysinclude: global.sysinclude,
+    sysinclude: sysinclude,
     criticalErrorHandler: function(required, cfp, by) {
         global.syncWrite("Error: circular module dependency detected:\n");
         global.syncWrite("  " + required + " is required in\n");
