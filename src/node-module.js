@@ -84,3 +84,4 @@ var define = function(dependencies, body) {
     });
 };
 define.amd = true;
+global.define = define;
