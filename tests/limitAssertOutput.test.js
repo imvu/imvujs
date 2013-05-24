@@ -1,6 +1,6 @@
 test("asserts limit length of values in error", function() {
-    var savedOutputSize = TEST_MAX_OUTPUT_SIZE;
-    TEST_MAX_OUTPUT_SIZE = 8;
+    var savedOutputSize = assert.MAX_OUTPUT_SIZE;
+    assert.MAX_OUTPUT_SIZE = 8;
 
     var message = null;
     try {
@@ -10,6 +10,6 @@ test("asserts limit length of values in error", function() {
     }
     assert.equal("expected falsy, actual [1, 2, 3...", message);
 
-    TEST_MAX_OUTPUT_SIZE = savedOutputSize;
+    assert.MAX_OUTPUT_SIZE = savedOutputSize;
 });
 

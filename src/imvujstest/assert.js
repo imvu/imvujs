@@ -8,11 +8,11 @@ module({
     }
 
     function formatTestValue(v) {
-        var s = IMVU.repr(v, TEST_MAX_OUTPUT_SIZE + 1);
-        if (s.length <= TEST_MAX_OUTPUT_SIZE) {
+        var s = IMVU.repr(v, assert.MAX_OUTPUT_SIZE + 1);
+        if (s.length <= assert.MAX_OUTPUT_SIZE) {
             return s;
         }
-        return s.substring(0, TEST_MAX_OUTPUT_SIZE) + '...';
+        return s.substring(0, assert.MAX_OUTPUT_SIZE) + '...';
     }
 
     function decipherDomElement(selectorOrJQueryObject) {
@@ -24,6 +24,7 @@ module({
     }
 
     var assert = {
+        MAX_OUTPUT_SIZE: 1024,
 
         ////////////////////////////////////////////////////////////////////////////////
         // GENERAL STATUS

@@ -22,7 +22,6 @@ module({
     g.fixture = fixture;
     g.AssertionError = imports.AssertionError;
     g.assert = imports.assert;
-    g.TEST_MAX_OUTPUT_SIZE = 1024;
 
     g.setTimeout = function(fn, time) {
         throw new imports.AssertionError("Don't call setTimeout in tests.  Use fakes.");
