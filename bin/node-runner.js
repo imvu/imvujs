@@ -43,7 +43,9 @@ function sysinclude(currentPath, includePath, settings) {
 global.require = require;
 global.sysinclude = sysinclude;
 
-sysinclude(__filename, __dirname + '/../out/imvu.node.js');
+var imvu_node = require('../out/imvu.node.js');
+var module = global.module = imvu_node.module;
+global.IMVU = imvu_node.IMVU;
 
 function runInDirectory(dir, action) {
     var previousDir = process.cwd();
@@ -76,7 +78,7 @@ function loadSuperFixture(superfixture) {
 
     global._ = _;
     global.testPath = abspath;
-    currentFilePath = abspath;
+    module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 }
 
@@ -115,7 +117,7 @@ function runTest(testPath, continuation) {
 
     syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
     global.testPath = abspath;
-    currentFilePath = abspath;
+    module.currentFilePath = abspath;
     vm.runInThisContext(testContents, abspath);
 
     return run_all(function (report) {

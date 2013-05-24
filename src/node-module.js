@@ -5,18 +5,21 @@
 /*global exports:true*/
 var impls = {}; // path : body
 var implsPending = {};
-var currentFilePath = null;
 
 function includeModule(modulePath, sysinclude) {
-    var cfp = currentFilePath;
+    var cfp = module.currentFilePath;
 
     try {
-        currentFilePath = modulePath;
+        module.currentFilePath = modulePath;
+        var oldExports = exports;
         exports = undefined; // Prevents some modules from figuring out that we're really on NodeJS.
-
-        sysinclude(cfp, modulePath, {strictMode: true});
+        try {
+            sysinclude(cfp, modulePath, {strictMode: true});
+        } finally {
+            exports = oldExports;
+        }
     } finally {
-        currentFilePath = cfp;
+        module.currentFilePath = cfp;
     }
 }
 
@@ -37,7 +40,7 @@ function module(dependencies, body, settings) {
     var criticalErrorHandler = settings.criticalErrorHandler;
     var sysinclude = settings.sysinclude;
 
-    var cfp = currentFilePath;
+    var cfp = module.currentFilePath;
     var importList = {};
 
     for (var k in dependencies) {
@@ -62,6 +65,7 @@ function module(dependencies, body, settings) {
     impls[cfp] = module._loadBody(body, importList);
 }
 _.extend(module, IMVU.moduleCommon);
+module.currentFilePath = undefined;
 
 // AMD compatibility
 var define = function(dependencies, body) {

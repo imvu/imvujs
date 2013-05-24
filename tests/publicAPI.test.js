@@ -41,3 +41,9 @@ test("Public API is limited to the following symbols", function() {
     var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
     //assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
 });
+
+
+test("Can import with NodeJS's require", function() {
+    var loaded = require('../out/imvu.node.js');
+    assert.deepEqual(['_', /*ES6 polyfill*/'Set', 'IMVU', 'module'], Object.keys(loaded));
+});

@@ -33,8 +33,11 @@ WEB_SOURCES = FIRST_SOURCES + [
     'src/Timer.js',
 ]
 
-NODE_SOURCES = FIRST_SOURCES + BASE_SOURCES + [
+NODE_SOURCES = FIRST_SOURCES + [
+    'src/node-pre.js',
+] + BASE_SOURCES + [
     'src/node-module.js',
+    'src/node-export.js',
 ]
 
 env = Environment(
