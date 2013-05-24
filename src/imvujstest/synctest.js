@@ -20,7 +20,6 @@ module({
     g.test = syncRunner.test.bind(syncRunner);
     g.run_all = syncRunner.run_all.bind(syncRunner);
     g.fixture = fixture;
-    g.repr = IMVU.repr;
     g.AssertionError = imports.AssertionError;
     g.assert = imports.assert;
     g.TEST_MAX_OUTPUT_SIZE = 1024;
