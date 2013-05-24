@@ -24,7 +24,7 @@ function run_jshint() {
     fi
 
     echo "Running jshint..."
-    find $HERE/../src $HERE/../fakes -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
+    find "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
 }
 
 function run_node_tests() {

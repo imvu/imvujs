@@ -15,7 +15,7 @@ function toAbsoluteUrl(url, relativeTo) {
     url = url.replace(/\\/g, '/');
     relativeTo = relativeTo.replace(/\\/g, '/');
 
-    if (url[0] == '/' || typeof relativeTo !== 'string') {
+    if (url[0] === '/' || typeof relativeTo !== 'string') {
         return url;
     }
 
@@ -131,18 +131,18 @@ function readModule(path, ast) {
                 definitions: [
                     new uglify.AST_VarDef({
                         name: new uglify.AST_SymbolVar({
-                            name: '$module$exports',
+                            name: '$module$exports'
                         })
                     })
                 ]
             }),
             new uglify.AST_Defun({
                 name: new uglify.AST_SymbolDeclaration({
-                    name: 'define',
+                    name: 'define'
                 }),
                 argnames: [
                     new uglify.AST_SymbolFunarg({ name: 'a' }),
-                    new uglify.AST_SymbolFunarg({ name: 'b' }),
+                    new uglify.AST_SymbolFunarg({ name: 'b' })
                 ],
                 body: [
                     new uglify.AST_SimpleStatement({
@@ -151,27 +151,27 @@ function readModule(path, ast) {
                             operator: '=',
                             right: new uglify.AST_Call({
                                 expression: new uglify.AST_SymbolRef({ name: 'b' }),
-                                args: [],
-                            }),
-                        }),
-                    }),
-                ],
+                                args: []
+                            })
+                        })
+                    })
+                ]
             }),
             new uglify.AST_SimpleStatement({
                 body: new uglify.AST_Assign({
                     left: new uglify.AST_Dot({
                         expression: new uglify.AST_SymbolRef({ name: 'define' }),
-                        property: 'amd',
+                        property: 'amd'
                     }),
                     operator: '=',
-                    right: new uglify.AST_True(),
-                }),
-            }),
+                    right: new uglify.AST_True()
+                })
+            })
         ].concat(ast.body).concat([
             new uglify.AST_Return({
                 value: new uglify.AST_SymbolVar({
-                    name: '$module$exports',
-                }),
+                    name: '$module$exports'
+                })
             })
         ]);
 
@@ -179,10 +179,10 @@ function readModule(path, ast) {
             deps: {},
             body: new uglify.AST_Function({
                 argnames: [
-                    new uglify.AST_SymbolFunarg({ name: "imports" }),
+                    new uglify.AST_SymbolFunarg({ name: "imports" })
                 ],
-                body: body,
-            }),
+                body: body
+            })
         };
     }
 
@@ -190,7 +190,7 @@ function readModule(path, ast) {
 }
 
 function objectValues(o) {
-    r = [];
+    var r = [];
     for (var k in o) {
         if (!o.hasOwnProperty(k)) {
             continue;
@@ -219,18 +219,19 @@ function readModules(root) {
         next = next[1];
 
         if (!resolved.hasOwnProperty(next)) {
+            var module;
             if (fs.existsSync(next)) {
                 var code = fs.readFileSync(next, 'utf8');
                 var ast;
                 try {
                     ast = uglify.parse(code, {
-                        filename: next,
+                        filename: next
                     });
                 } catch (e) {
                     errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
                 }
 
-                var module = readModule(next, ast);
+                module = readModule(next, ast);
                 if (module === null) {
                     throw "Invalid module " + next;
                 }
@@ -240,7 +241,7 @@ function readModules(root) {
                 }
                 missing[next][referrer] = true;
 
-                var module = {deps:[]};
+                module = {deps:[]};
             }
 
             resolved[next] = module;
@@ -295,7 +296,7 @@ function emitModules(rootPath, modules) {
                 key: depAlias,
                 value: new uglify.AST_Symbol({
                     name: aliases[depPath]
-                }),
+                })
             }));
         }
 
@@ -309,10 +310,10 @@ function emitModules(rootPath, modules) {
                     value: new uglify.AST_Call({
                         expression: module.body,
                         args: [new uglify.AST_Object({
-                            properties: args,
+                            properties: args
                         })]
-                    }),
-                }),
+                    })
+                })
             ]
         }));
         emitted.push(module);
@@ -330,7 +331,7 @@ function emitModules(rootPath, modules) {
             key: depAlias,
             value: new uglify.AST_Symbol({
                 name: aliases[depPath]
-            }),
+            })
         }));
     }
 
@@ -340,27 +341,27 @@ function emitModules(rootPath, modules) {
         definitions: [
             new uglify.AST_VarDef({
                 name: new uglify.AST_Symbol({
-                    name: 'imports',
+                    name: 'imports'
                 }),
                 value: new uglify.AST_Object({
-                    properties: args,
-                }),
-            }),
-        ],
+                    properties: args
+                })
+            })
+        ]
     }));
     rootModule.body.argnames = [];
     body.push(new uglify.AST_SimpleStatement({
         body: new uglify.AST_Call({
             expression: new uglify.AST_Symbol({
-                name: 'module',
+                name: 'module'
             }),
             args: [
                 new uglify.AST_Object({
-                    properties: [],
+                    properties: []
                 }),
-                rootModule.body,
-            ],
-        }),
+                rootModule.body
+            ]
+        })
     }));
     return body;
 }
@@ -392,11 +393,11 @@ function combine(m, rootPath) {
                     expression: new uglify.AST_Function({
                         name: null,
                         argnames: [],
-                        body: emitModules(rootPath, modules),
+                        body: emitModules(rootPath, modules)
                     }),
-                    args: [],
-                }),
-            }),
+                    args: []
+                })
+            })
         ]
     });
 /*

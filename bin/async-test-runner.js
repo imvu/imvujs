@@ -4,7 +4,7 @@ var run_all;
 function dispatch(testUrl) {
     module.dynamicImport({
         test: testUrl,
-        superfixtures: '../tests/asyncsuperfixture.js',
+        superfixtures: '../tests/asyncsuperfixture.js'
     }, function (imports) {
         function log(msg) {
             var entry = $('<li>').text(msg);
