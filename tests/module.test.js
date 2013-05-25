@@ -10,7 +10,7 @@ module({
                     dirname: function(f) {
                         return "fake_dir";
                     },
-                    join: function(a,b) {
+                    resolve: function(a,b) {
                         return a + "/" + b;
                     }
                 },

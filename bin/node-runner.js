@@ -15,23 +15,6 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-function loadScript(path, settings) {
-    var testContents = fs.readFileSync(path, 'utf-8');
-    if (settings !== undefined && settings.strictMode) {
-        testContents = '"use strict";' + testContents; // so line numbers match up
-    }
-    return testContents;
-}
-
-function joinPath(a, b) {
-    if (a.length > 0) {
-        return a + '/' + b;
-    } else {
-        return b;
-    }
-}
-
-global.loadScript = loadScript;
 global.require = require;
 
 var imvu_node = require('../out/imvu.node.js');
@@ -70,17 +53,14 @@ function usage() {
 
 function loadSuperFixture(superfixture) {
     var abspath = path.resolve(superfixture);
-    var testContents = loadScript(abspath);
 
     global.__filename = abspath; // kill when we load modules with vm.runInContext
     global.module.currentFilePath = abspath;
-    vm.runInThisContext(testContents, abspath);
+    global.module({superfixture: abspath}, function(){});
 }
 
 function runTest(testPath, continuation) {
     var abspath = path.resolve(testPath);
-
-    var testContents = loadScript(abspath, {strictMode: true});
 
     var testPassed;
 
@@ -113,7 +93,7 @@ function runTest(testPath, continuation) {
     syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
     global.__filename = abspath;
     global.module.currentFilePath = abspath;
-    vm.runInThisContext(testContents, abspath);
+    global.module({test:abspath}, function() {});
 
     return run_all(function (report) {
         if (report.type === 'test-start') {

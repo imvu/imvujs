@@ -10,6 +10,14 @@ var path = require('path');
 var vm = require('vm');
 var fs = require('fs');
 
+function loadScript(path, settings) {
+    var testContents = fs.readFileSync(path, 'utf-8');
+    if (settings !== undefined && settings.strictMode) {
+        testContents = '"use strict";' + testContents; // so line numbers match up
+    }
+    return testContents;
+}
+
 function sysinclude(currentPath, includePath, settings) {
     var abspath = path.resolve(includePath);
     if (!fs.existsSync(abspath)) {
@@ -58,7 +66,7 @@ function module(dependencies, body, settings) {
     var importList = {};
 
     for (var k in dependencies) {
-        var v = path.join(path.dirname(cfp), dependencies[k]);
+        var v = path.resolve(path.dirname(cfp), dependencies[k]);
 
         for (var vPending in implsPending) {
             if (vPending === v) {
