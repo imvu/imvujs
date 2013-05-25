@@ -60,7 +60,7 @@
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
     
         var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
-        //assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
+        assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
     });
 
     test("Public API is limited to the following symbols", function() {
@@ -70,7 +70,7 @@
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
     
         var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
-        //assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
+        assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
     });
 
     function sorted(ls) {
