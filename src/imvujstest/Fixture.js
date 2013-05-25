@@ -2,7 +2,7 @@ module({
 }, function (imports) {
     var Fixture = IMVU.BaseClass.extend('Fixture', {
         initialize: function (parent, name, definition, abstract_, runner) {
-            if (!(definition instanceof Function)) {
+            if (typeof definition !== "function") {
                 throw new TypeError("fixture's 2nd argument must be a function");
             }
 
