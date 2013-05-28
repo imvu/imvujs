@@ -252,19 +252,5 @@ var IMVU = IMVU || {};
         }
     };
 
-
-    IMVU.Rest.AjaxError = function (message) {
-        this.name = "AjaxError";
-        this.message = message || "Ajax Error";
-    };
-    if (typeof Error !== 'undefined') {
-        IMVU.Rest.AjaxError.prototype = new Error();
-        IMVU.Rest.AjaxError.constructor = IMVU.Rest.AjaxError;
-    } else {
-        IMVU.Rest.AjaxError.prototpe = {
-            toString: function () {
-                return this.name + ": " + this.message;
-            }
-        };
-    }
+    IMVU.Rest.AjaxError = IMVU.extendError(Error, 'AjaxError');
 }());

@@ -95,4 +95,19 @@
             ['Backbone', 'IMVU', /*ES6 polyfill*/'Set', '_', 'module'],
             sorted(Object.keys(loaded)));
     });
+
+    test("IMVU export list", function() {
+        assert.deepEqual(
+            [ 'repr',
+              'new',
+              'extendError',
+              'isSubClass',
+              'createNamedFunction',
+              'BaseClass',
+              'ServiceProvider',
+              'Random',
+              'moduleCommon',
+              'Rest' ],
+            Object.keys(IMVU));
+    });
 })(this);

@@ -2,6 +2,12 @@
 var IMVU = IMVU || {};
 
 (function() {
+    function swap(sequence, a, b) {
+        var t = sequence[a];
+        sequence[a] = sequence[b];
+        sequence[b] = t;
+    }
+
     IMVU.Random = IMVU.BaseClass.extend('Random', {
         getInteger: function(min, max) {
             if (arguments.length < 2)
@@ -18,12 +24,6 @@ var IMVU = IMVU || {};
             return a;
         },
 
-        __swap: function(sequence, a, b) {
-            var t = sequence[a];
-            sequence[a] = sequence[b];
-            sequence[b] = t;
-        },
-
         sample: function(sequence, numElements) {
             var ret = [];
             var toUndo = [];
@@ -31,13 +31,13 @@ var IMVU = IMVU || {};
             for (i = 0; i < numElements; i++) {
                 selection = this.getInteger(0, sequence.length - i);
                 ret.push(sequence[selection]);
-                this.__swap(sequence, selection, sequence.length - i - 1);
+                swap(sequence, selection, sequence.length - i - 1);
                 toUndo.push(selection);
             }
 
             for (i = numElements; i > 0; i--) {
                 selection = toUndo.pop();
-                this.__swap(sequence, selection, sequence.length - i);
+                swap(sequence, selection, sequence.length - i);
             }
 
             return ret;
@@ -46,14 +46,14 @@ var IMVU = IMVU || {};
         choice: function(sequence, excludedElement) {
             var selectionMax = sequence.length;
             if (typeof excludedElement !== 'undefined') {
-                this.__swap(sequence, excludedElement, sequence.length - 1);
+                swap(sequence, excludedElement, sequence.length - 1);
                 selectionMax--;
             }
 
             var ret = sequence[this.getInteger(0, selectionMax)];
 
             if (typeof excludedElement !== 'undefined') {
-                this.__swap(sequence, excludedElement, sequence.length - 1);
+                swap(sequence, excludedElement, sequence.length - 1);
             }
 
             return ret;
@@ -61,7 +61,7 @@ var IMVU = IMVU || {};
 
         shuffle: function(sequence) {
             for (var i = 0; i < sequence.length; i++) {
-                this.__swap(sequence, i, this.getInteger(i, sequence.length));
+                swap(sequence, i, this.getInteger(i, sequence.length));
             }
         },
 
