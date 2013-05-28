@@ -30,6 +30,16 @@
 
         // browser-ish symbols prevented in tests
         'requestAnimationFrame',
+
+        // only on windows?
+        'DTRACE_NET_SERVER_CONNECTION',
+        'DTRACE_NET_STREAM_END',
+        'DTRACE_NET_SOCKET_READ',
+        'DTRACE_NET_SOCKET_WRITE',
+        'DTRACE_HTTP_SERVER_REQUEST',
+        'DTRACE_HTTP_SERVER_RESPONSE',
+        'DTRACE_HTTP_CLIENT_REQUEST',
+        'DTRACE_HTTP_CLIENT_RESPONSE'
     ];
 
     var IMVUJS_SYMBOLS = [
