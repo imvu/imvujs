@@ -5,7 +5,6 @@ HERE=`dirname "$0"`
 NODEJS="$HERE/node"
 JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
 
-
 function fail() {
     printf "\nFailed\n"
     exit 1
@@ -17,14 +16,9 @@ function succeed() {
 }
 
 function run_jshint() {
-    if [ .$MSYSTEM = .MINGW32 ]; then
-        FINDSUBST="\;"
-    else
-        FINDSUBST="+"
-    fi
-
     echo "Running jshint..."
-    find "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" -iname '*.js' -exec $NODEJS $JSHINT {} $FINDSUBST || fail
+    
+    "$JSHINT" "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" || fail
 }
 
 function run_node_tests() {
