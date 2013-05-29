@@ -25,7 +25,22 @@ function sysinclude(currentPath, includePath, settings) {
         process.exit(1);
     }
     var script = loadScript(abspath, settings);
-    vm.runInThisContext(script, includePath);
+    var newGlobal = Object.create(global);
+    var context = vm.createContext({
+        module: module,
+        IMVU: IMVU,
+        global: newGlobal,
+        console: console,
+        _: _,
+
+        // test stuff... hrm
+        registerSuperFixture: global.registerSuperFixture,
+        assert: global.assert,
+        fixture: global.fixture,
+        test: global.test
+    });
+    vm.runInContext(script, context, includePath);
+    _.extend(global, newGlobal);
 }
 
 function includeModule(modulePath, sysinclude) {

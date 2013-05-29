@@ -17,7 +17,7 @@ module({
             this.runner.run_all(reporter, function onComplete(pass) {
                 passed = pass;
             });
-            assert.notUndefined(passed); // test runner must complete synchronously
+            imports.assert.notUndefined(passed); // test runner must complete synchronously
             return passed;
         }
     });
