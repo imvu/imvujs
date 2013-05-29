@@ -28,11 +28,13 @@ function sysinclude(currentPath, includePath, settings) {
     vm.runInThisContext(script, includePath);
 }
 
+var currentFilePath;
+
 function includeModule(modulePath, sysinclude) {
-    var cfp = module.currentFilePath;
+    var cfp = currentFilePath;
 
     try {
-        module.currentFilePath = modulePath;
+        currentFilePath = modulePath;
         var oldExports = exports;
         exports = undefined; // Prevents some modules from figuring out that we're really on NodeJS.
         try {
@@ -41,7 +43,7 @@ function includeModule(modulePath, sysinclude) {
             exports = oldExports;
         }
     } finally {
-        module.currentFilePath = cfp;
+        currentFilePath = cfp;
     }
 }
 
@@ -62,7 +64,7 @@ function module(dependencies, body, settings) {
     var criticalErrorHandler = settings.criticalErrorHandler;
     var sysinclude = settings.sysinclude;
 
-    var cfp = module.currentFilePath;
+    var cfp = currentFilePath;
     var importList = {};
 
     for (var k in dependencies) {
@@ -87,7 +89,6 @@ function module(dependencies, body, settings) {
     impls[cfp] = module._loadBody(body, importList);
 }
 _.extend(module, IMVU.moduleCommon);
-module.currentFilePath = undefined;
 
 // AMD compatibility
 var define = function(dependencies, body) {
