@@ -32,9 +32,9 @@ var currentFilePath;
 
 function includeModule(modulePath, sysinclude) {
     var cfp = currentFilePath;
+    currentFilePath = modulePath;
 
     try {
-        currentFilePath = modulePath;
         var oldExports = exports;
         exports = undefined; // Prevents some modules from figuring out that we're really on NodeJS.
         try {
@@ -91,7 +91,7 @@ function module(dependencies, body, settings) {
 _.extend(module, IMVU.moduleCommon);
 
 // AMD compatibility
-var define = function(dependencies, body) {
+var define = function define(dependencies, body) {
     var deps = {};
     for (var i = 0; i < dependencies.length; ++i) {
         var name = dependencies[i];
@@ -108,3 +108,8 @@ var define = function(dependencies, body) {
 };
 define.amd = true;
 global.define = define;
+
+module.canonicalize = function(fp) {
+    console.log('canonicalize', currentFilePath, fp);
+    return path.resolve(path.dirname(currentFilePath), fp);
+};

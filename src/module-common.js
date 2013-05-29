@@ -79,7 +79,7 @@ var IMVU = IMVU || {};
             if (undefined !== resolved) {
                 throw new ReferenceError('Cannot redefine alias: ' + name);
             }
-            aliases[name] = path;
+            aliases[name] = module.canonicalize(path);
         },
 
         alias: function(name) {
