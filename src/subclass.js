@@ -2,7 +2,7 @@
 var IMVU = IMVU || {};
 (function() {
     IMVU.isSubClass = function isSubClass(cls, parent) {
-        if (!(cls instanceof Function)) {
+        if (typeof cls !== "function") {
             throw new TypeError('class must be a constructor');
         }
         if (cls === parent) {

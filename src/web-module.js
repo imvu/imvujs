@@ -205,10 +205,10 @@ var MODULE_DEBUG = true;
 
         moduleWasCalled = true;
 
-        if (!(dependencies instanceof Object)) {
+        if ("object" !== typeof dependencies) {
             throw new Error("Dependencies must be object");
         }
-        if (!(body instanceof Function)) {
+        if ("function" !== typeof body) {
             throw new Error("Body must be a function");
         }
 
@@ -235,7 +235,7 @@ var MODULE_DEBUG = true;
             }
 
             var d = dependencies[key];
-            if (d instanceof Function) {
+            if (typeof d === "function") {
                 // Nothing.  d is a function of (url, onComplete)
             } else if (d.constructor === String) {
                 d = importJs.bind(undefined, d);

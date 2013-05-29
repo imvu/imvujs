@@ -44,7 +44,7 @@ var IMVU = IMVU || {};
 
             _seen.add(v);
             try {
-                if (v instanceof Array) {
+                if (Array.isArray(v)) {
                     var rv = "[";
                     var len = v.length;
                     for (var i = 0; i < len && (limit === undefined || rv.length < limit); ++i) {

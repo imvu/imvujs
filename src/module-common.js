@@ -43,7 +43,7 @@ var IMVU = IMVU || {};
 
         _loadBody: function(body, importList) {
             var impl = body(importList);
-            if (!moduleStateAllowed && impl instanceof Object) {
+            if (!moduleStateAllowed && typeof(impl) === "object") {
                // Object.freeze(impl);
             }
 

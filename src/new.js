@@ -9,7 +9,7 @@ var IMVU = IMVU || {};
 
     // ES3
     IMVU['new'] = function new_(constructor) {
-        if (!(constructor instanceof Function)) {
+        if (typeof constructor !== "function") {
             throw new TypeError('IMVU.new called with constructor type ' + typeof(constructor) + " which is not a function");
         }
 
@@ -28,6 +28,6 @@ var IMVU = IMVU || {};
         var obj = new dummy;
 
         var r = constructor.apply(obj, slice.call(arguments, 1));
-        return (r instanceof Object) ? r : obj;
+        return ("object" === typeof r) ? r : obj;
     };
 })();
