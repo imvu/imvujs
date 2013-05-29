@@ -109,7 +109,6 @@ var define = function define(dependencies, body) {
 define.amd = true;
 global.define = define;
 
-module.canonicalize = function(fp) {
-    console.log('canonicalize', currentFilePath, fp);
+module.canonicalize = function canonicalize(fp) {
     return path.resolve(path.dirname(currentFilePath), fp);
 };

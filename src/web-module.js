@@ -265,6 +265,10 @@ var MODULE_DEBUG = true;
     }
     _.extend(module, IMVU.moduleCommon);
 
+    module.canonicalize = function canonicalize(fp) {
+        return fp;
+    };
+
     window.module = module;
     window.define = define;
 

@@ -1,6 +1,13 @@
+module.setAlias('short', '../includes/include.js');
+
 module({
-    'FakeXHRFactory': '../../fakes/FakeXMLHttpRequestFactory.js'
-}, function(imports) {        
+    include: module.alias('short'),
+    FakeXHRFactory: '../../fakes/FakeXMLHttpRequestFactory.js'
+}, function(imports) {
+    test('can import modules by alias', function() {
+        assert.equal(10, imports.include.ReturnsTen());
+    });
+
     fixture("Fixture", function() {
         this.setUp(function() {
             this.xhrFactory = new imports.FakeXHRFactory();
