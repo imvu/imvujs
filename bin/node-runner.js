@@ -118,6 +118,7 @@ function main() {
     }
 
     var tests = [];
+    var aliases = [];
     var superfixtures = [];
 
     var argv = process.argv;
@@ -125,10 +126,18 @@ function main() {
         if (argv[i] === '--superfixture' && (i + 1) < argv.length) {
             superfixtures.push(argv[i + 1]);
             ++i;
+        } else if (argv[i] === '--alias' && (i + 1) < argv.length) {
+            aliases.push(argv[i + 1]);
+            ++i;
         } else {
             tests.push(argv[i]);
         }
     }
+
+    aliases.forEach(function(alias) {
+        var eq = alias.split('=', 2);
+        global.module.setAlias(eq[0], eq[1]);
+    });
 
     for (var i = 0; i < superfixtures.length; ++i) {
         loadSuperFixture(superfixtures[i]);
