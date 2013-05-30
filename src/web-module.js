@@ -58,7 +58,7 @@ var MODULE_DEBUG = true;
         xhr.send();
     }
 
-    var ourUrl = window.location.pathname;
+    var ourUrl = window.location.pathname; // todo: should be href (support cross-domain references)
 
     var completeJs = {}; // url : Future<exportTable>
 
@@ -151,7 +151,7 @@ var MODULE_DEBUG = true;
     }
 
     function dynamicImport(urls, onComplete) {
-        ourUrl = window.location.pathname;
+        ourUrl = window.location.pathname; // todo: use href, support cross-domain references
         onComplete = onComplete || function() {};
         /* TODO var progressCallback = onProgress || function() {}; */
 
@@ -266,7 +266,7 @@ var MODULE_DEBUG = true;
     _.extend(module, IMVU.moduleCommon);
 
     module.canonicalize = function canonicalize(fp) {
-        return fp;
+        return module.toAbsoluteUrl(fp, ourUrl);
     };
 
     window.module = module;
