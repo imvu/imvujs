@@ -49,7 +49,7 @@ def generate(env):
                 try:
                     return env['MODULE_ALIASES'][a]
                 except KeyError:
-                    raise ValueError('Alias "%s" not set in MODULE_ALIASES')
+                    raise ValueError('Alias "%s" not set in MODULE_ALIASES' % (a,))
             else:
                 return path
 
