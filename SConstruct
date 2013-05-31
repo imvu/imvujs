@@ -74,17 +74,17 @@ targets += env.ClosureCompiler(
     'out/imvu.min.js',
     WEB_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS + ["--define='MODULE_DEBUG=false'"])
+env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
 
 targets += env.ClosureCompiler(
     'out/imvu.node.js',
     NODE_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
 
-#targets += env.UglifyMinify(
-#    'out/imvu.min2.js',
-#    WEB_SOURCES)
-
-env.Gzip('out/imvu.min.js.gz', 'out/imvu.min.js')
+targets += env.UglifyJS(
+    'out/imvu.uglify.js',
+    WEB_SOURCES)
+env.Gzip('out/imvu.uglify.js.gz', 'out/imvu.uglify.js')
 
 targets += env.CombinedModule('out/imvu.fakes.js', 'fakes/Package.js')
 
@@ -93,3 +93,11 @@ if 'target' in ARGUMENTS:
     env.Alias('install', ARGUMENTS['target'])
 
 env.Default('out')
+
+# automated tests for the scons dependency scanner and combiner tool
+#@apply
+def scons_tool_tests(env=env):
+    env = env.Clone()
+    env.Append(MODULE_ALIASES={
+        'SHORT': 'tests/includes/include.js'})
+    env.CombinedModule('out/tests/uses_alias.js', 'tests/includes/alias.js')
