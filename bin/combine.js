@@ -2,6 +2,8 @@ var fs     = require('fs');
 var uglify = require('uglify-js');
 var path   = require('path');
 
+var aliases = {};
+
 function splitPath(p) {
     var i = p.lastIndexOf('/');
     if (i !== -1) {
@@ -246,12 +248,21 @@ function readModules(root) {
 
             resolved[next] = module;
 
-            for (var k in module.deps) {
-                module.deps[k] = path.normalize(toAbsoluteUrl(module.deps[k], next));
+            var deps = module.deps;
+            for (var k in deps) {
+                var dep = deps[k];
+                // TODO: put this in some common part of the code?
+                // There may be duplication between this code, the node.js module loader, and the web module loader.
+                if (dep[0] === '@') {
+                    dep = aliases[dep.substr(1)] || dep;
+                } else {
+                    dep = toAbsoluteUrl(dep, next);
+                }
+                deps[k] = path.normalize(dep);
             }
 
             unresolved = unresolved.concat(
-                objectValues(module.deps).map(function(dep) {
+                objectValues(deps).map(function(dep) {
                     return [next, dep];
                 })
             );
@@ -400,27 +411,6 @@ function combine(m, rootPath) {
             })
         ]
     });
-/*
-                    args: [
-                        new uglify.AST_Object({
-                            properties: [],
-                        }),
-                        new uglify.AST_Function({
-                            argnames: [],
-                            body: emitModules(rootPath, modules),
-                        }),
-                    ]
-                })
-            }),
-        ],
-    });
-*/
-/*
-            new uglify.AST_SimpleStatement({
-            })
-        ]
-    });
-*/
 }
 
 function usage() {
@@ -431,12 +421,25 @@ function main(argv) {
     var fix_output = require('../src/fix_output.js');
     fix_output.fixConsole(console);
 
-    if (3 !== argv.length) {
+    var fileName;
+
+    for (var i = 2; i < argv.length; ++i) {
+        if (argv[i] === '--alias' && (i + 1) < argv.length) {
+            var eq = argv[i + 1].split('=', 2);
+            aliases[eq[0]] = eq[1];
+            ++i;
+        } else {
+            if (fileName) {
+                throw new Error('Only one input file can be given');
+            }
+            fileName = argv[i];
+        }
+    }
+
+    if (!fileName) {
         usage();
         return 1;
     }
-
-    var fileName = argv[2];
 
     try {
         var m = readModules(fileName);
@@ -471,7 +474,7 @@ function gen_code(ast, options) {
 }
 
 if (null === module.parent) {
-    main(process.argv);
+    process.exit(main(process.argv));
 } else {
     exports.readModule  = readModule;
     exports.readModules = readModules;

@@ -95,9 +95,9 @@ if 'target' in ARGUMENTS:
 env.Default('out')
 
 # automated tests for the scons dependency scanner and combiner tool
-#@apply
+@apply
 def scons_tool_tests(env=env):
     env = env.Clone()
     env.Append(MODULE_ALIASES={
-        'SHORT': 'tests/includes/include.js'})
+        'short': 'tests/includes/include.js'})
     env.CombinedModule('out/tests/uses_alias.js', 'tests/includes/alias.js')
