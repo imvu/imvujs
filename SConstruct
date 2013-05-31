@@ -5,14 +5,14 @@ SetOption('num_jobs', multiprocessing.cpu_count())
 print "running with -j", GetOption('num_jobs')
 
 FIRST_SOURCES = [
+    'src/polyfill.js',
+    'third-party/es5-shim/es5-shim.js',
+    'src/es6-collections.js',
     'ext/underscore-1.4.2.js',
 ]
 
 BASE_SOURCES = [
     'ext/backbone-0.9.10.js',
-    'src/polyfill.js',
-    'third-party/es5-shim/es5-shim.js',
-    'src/es6-collections.js',
     'src/repr.js',
     'src/new.js',
     'src/error.js',
