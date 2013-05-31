@@ -81,10 +81,10 @@ targets += env.ClosureCompiler(
     NODE_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
 
-targets += env.UglifyJS(
-    'out/imvu.uglify.js',
-    WEB_SOURCES)
-env.Gzip('out/imvu.uglify.js.gz', 'out/imvu.uglify.js')
+#targets += env.UglifyJS(
+#    'out/imvu.uglify.js',
+#    WEB_SOURCES)
+#env.Gzip('out/imvu.uglify.js.gz', 'out/imvu.uglify.js')
 
 targets += env.CombinedModule('out/imvu.fakes.js', 'fakes/Package.js')
 
