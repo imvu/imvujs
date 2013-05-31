@@ -1,7 +1,7 @@
 module.setAlias('short', 'includes/include.js');
 
 module({
-    'include': module.alias('short'),
+    'include': '@short',
     'includesAlias': 'includes/alias.js',
 }, function(imports) {
     test('can import modules by alias', function() {

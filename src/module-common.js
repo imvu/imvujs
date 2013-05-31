@@ -4,6 +4,14 @@ var IMVU = IMVU || {};
     var aliases = {};
     var moduleStateAllowed = false;
 
+    function alias(name) {
+        var resolved = aliases[name];
+        if (undefined === resolved) {
+            throw new ReferenceError('Unknown alias: ' + name);
+        }
+        return resolved;
+    }
+
     function normalizePath(path) {
         // NOTE: This isn't quite perfect because it doesn't correctly handle backslashes. -- andy 20 Aug 2012
         var segments = path.split(/\//g);
@@ -82,12 +90,13 @@ var IMVU = IMVU || {};
             aliases[name] = module.canonicalize(path);
         },
 
-        alias: function(name) {
-            var resolved = aliases[name];
-            if (undefined === resolved) {
-                throw new ReferenceError('Unknown alias: ' + name);
+        _resolveDependencies: function(dependencies) {
+            for (var key in dependencies) {
+                var value = dependencies[key];
+                if ('string' === typeof value && '@' === value.substr(0, 1)) {
+                    dependencies[key] = alias(value.substr(1));
+                }
             }
-            return resolved;
         }
     };
 })();

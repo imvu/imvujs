@@ -212,6 +212,8 @@ var MODULE_DEBUG = true;
             throw new Error("Body must be a function");
         }
 
+        module._resolveDependencies(dependencies);
+
         var url = ourUrl;
         var future;
         if (completeJs.hasOwnProperty(url)) {

@@ -1,5 +1,5 @@
 module({
-    include: module.alias('short'),
+    include: '@short',
 }, function(imports) {
     return imports.include;
 });

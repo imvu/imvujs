@@ -59,6 +59,8 @@ var defaultModuleSettings = {
 };
 
 function module(dependencies, body, settings) {
+    module._resolveDependencies(dependencies);
+
     settings = settings || defaultModuleSettings;
     var path = settings.path;
     var criticalErrorHandler = settings.criticalErrorHandler;

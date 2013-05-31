@@ -1,7 +1,7 @@
 module.setAlias('short', '../includes/include.js');
 
 module({
-    include: module.alias('short'),
+    include: '@short',
     include2: 'relativePaths/through_alias.js',
     FakeXHRFactory: '../../fakes/FakeXMLHttpRequestFactory.js'
 }, function(imports) {
