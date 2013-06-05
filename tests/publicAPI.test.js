@@ -106,7 +106,8 @@
               'BaseClass',
               'ServiceProvider',
               'Random',
-              'moduleCommon' ],
+              'moduleCommon',
+              'EventLoop' ],
             Object.keys(IMVU));
     });
 })(this);
