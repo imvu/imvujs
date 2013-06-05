@@ -3,76 +3,61 @@ var IMVU = IMVU || {};
 (function() {
     // Implementation of http://dom.spec.whatwg.org/#dom-future as of
     // 2013-06-04, minus the synchronous flag.  It's unclear whether
-    // that will survive the ES6 standardization process.
+    // synchronicity will survive the ES6 standardization process.
 
     var FutureError = IMVU.FutureError = IMVU.extendError(Error, "FutureError");
 
-    IMVU.FutureFactory = function(eventLoop) {
-        function FutureResolver(future) {
-            this.future = future;
+    function FutureResolver(future) {
+        this.future = future;
+    }
+
+    FutureResolver.prototype.accept = function(value) {
+        var future = this.future;
+        if (future.state !== 'pending') {
+            throw new FutureError("accept failed: future is already " + future.state);
         }
+        future.state = 'accepted';
+        future.result = value;
+        future.rejectCallbacks.length = 0;
+        future._scheduleCallbacks();
+    };
 
-        FutureResolver.prototype.accept = function(value) {
-            var future = this.future;
-            if (future.state !== 'pending') {
-                throw new FutureError("accept failed: future is already " + future.state);
-            }
-            future.state = 'accepted';
-            future.result = value;
-            future.rejectCallbacks.length = 0;
-            future._scheduleCallbacks();
-        };
-
-        FutureResolver.prototype.resolve = function(value) {
-            var then = null;
-            var future = this.future;
-            if (typeof value === "object") {
-                try {
-                    then = value.then;
-                } catch (e) {
-                    this.reject(e);
-                    return;
-                }
-            }
-            if (typeof then === "function") {
-                var accept = this.resolve.bind(this);
-                var reject = this.reject.bind(this);
-                try {
-                    then.call(value, accept, reject);
-                } catch (e) {
-                    this.reject(e);
-                }
+    FutureResolver.prototype.resolve = function(value) {
+        var then = null;
+        var future = this.future;
+        if (typeof value === "object") {
+            try {
+                then = value.then;
+            } catch (e) {
+                this.reject(e);
                 return;
             }
-            this.accept(value);
-        };
-
-        FutureResolver.prototype.reject = function(value) {
-            var future = this.future;
-            if (future.state !== 'pending') {
-                throw new FutureError("reject failed: future is already " + future.state);
+        }
+        if (typeof then === "function") {
+            var accept = this.resolve.bind(this);
+            var reject = this.reject.bind(this);
+            try {
+                then.call(value, accept, reject);
+            } catch (e) {
+                this.reject(e);
             }
-            future.state = 'rejected';
-            future.result = value;
-            future.acceptCallbacks.length = 0;
-            future._scheduleCallbacks();
-        };
+            return;
+        }
+        this.accept(value);
+    };
+    
+    FutureResolver.prototype.reject = function(value) {
+        var future = this.future;
+        if (future.state !== 'pending') {
+            throw new FutureError("reject failed: future is already " + future.state);
+        }
+        future.state = 'rejected';
+        future.result = value;
+        future.acceptCallbacks.length = 0;
+        future._scheduleCallbacks();
+    };
 
-/*
-        FutureResolver.prototype.resolve = function(value) {
-            if (this.state !== 'pending') {
-                return;
-            }
-            
-            
-        };
-*/
-
-/*
-        FutureResolver.prototype.reject = function(value) {
-        };
-*/
-
+    IMVU.FutureFactory = function(eventLoop) {
         function Future(init) {
             this.acceptCallbacks = [];
             this.rejectCallbacks = [];
