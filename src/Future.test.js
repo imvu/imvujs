@@ -61,5 +61,38 @@ module({
                 r.accept("two");
             });
         });
+
+        test("resolve", function() {
+            var r;
+            new this.Future(function(resolver) {
+                r = resolver;
+            }).then(this.acceptCallback);
+            r.resolve("hello");
+            this.eventLoop._flushTasks();
+            assert.deepEqual(['hello'], this.accepts);
+        });
+
+        test("resolve given a future", function() {
+            var r1;
+            var f1 = new this.Future(function(resolver) {
+                r1 = resolver;
+            });
+
+            var r2;
+            var f2 = new this.Future(function(resolver) {
+                r2 = resolver;
+            });
+
+            f1.then(this.acceptCallback);
+            r1.resolve(f2);
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([], this.accepts);
+
+            r2.resolve('hello');
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual(['hello'], this.accepts);
+        });
     });
 });

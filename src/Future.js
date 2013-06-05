@@ -23,6 +23,30 @@ var IMVU = IMVU || {};
             future._scheduleCallbacks();
         };
 
+        FutureResolver.prototype.resolve = function(value) {
+            var then = null;
+            var future = this.future;
+            if (typeof value === "object") {
+                try {
+                    then = value.then;
+                } catch (e) {
+                    this.reject(e);
+                    return;
+                }
+            }
+            if (typeof then === "function") {
+                var accept = this.resolve.bind(this);
+                var reject = this.reject.bind(this);
+                try {
+                    then.call(value, accept, reject);
+                } catch (e) {
+                    this.reject(e);
+                }
+                return;
+            }
+            this.accept(value);
+        };
+
         FutureResolver.prototype.reject = function(value) {
             var future = this.future;
             if (future.state !== 'pending') {
