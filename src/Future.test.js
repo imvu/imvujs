@@ -94,5 +94,19 @@ module({
             this.eventLoop._flushTasks();
             assert.deepEqual(['hello'], this.accepts);
         });
+
+        test("chaining then", function() {
+            var r;
+            var f = new this.Future(function(resolver) {
+                r = resolver;
+            });
+
+            f.then().then(this.acceptCallback, this.rejectCallback);
+            r.accept('hey');
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([], this.rejects);
+            assert.deepEqual(['hey'], this.accepts);
+        });
     });
 });

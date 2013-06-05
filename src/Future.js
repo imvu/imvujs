@@ -100,16 +100,38 @@ var IMVU = IMVU || {};
         };
 
         Future.prototype.then = function(acceptCallback, rejectCallback) {
-            if (acceptCallback) {
-                this.acceptCallbacks.push(acceptCallback);
+            var resolver;
+            var future = new Future(function(r) {
+                resolver = r;
+            });
+
+            function futureWrapperCallback(callback) {
+                return function(argument) {
+                    var value;
+                    try {
+                        value = callback.call(future, argument);
+                    } catch (e) {
+                        resolver.reject(e); // per spec: synchronous=true
+                        return;
+                    }
+                    resolver.resolve(value); // per spec: synchronous=true
+                };
             }
-            if (rejectCallback) {
-                this.rejectCallbacks.push(rejectCallback);
-            }
+            
+            this.acceptCallbacks.push(
+                acceptCallback ?
+                    futureWrapperCallback(acceptCallback) :
+                    resolver.accept.bind(resolver));
+            this.rejectCallbacks.push(
+                rejectCallback ?
+                    futureWrapperCallback(rejectCallback) :
+                    resolver.reject.bind(resolver));
 
             if (this.state !== 'pending') {
                 this._scheduleCallbacks();
             }
+
+            return future;
         };
 
         return Future;
