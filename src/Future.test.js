@@ -31,6 +31,7 @@ module({
                 r = resolver;
             });
             r.accept("hello");
+            this.eventLoop._flushTasks();
             future.then(this.acceptCallback);
             assert.deepEqual([], this.accepts);
 

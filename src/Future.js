@@ -19,6 +19,7 @@ var IMVU = IMVU || {};
             }
             future.state = 'accepted';
             future.result = value;
+            future.rejectCallbacks.length = 0;
             future._scheduleCallbacks();
         };
 
@@ -29,6 +30,7 @@ var IMVU = IMVU || {};
             }
             future.state = 'rejected';
             future.result = value;
+            future.acceptCallbacks.length = 0;
             future._scheduleCallbacks();
         };
 
@@ -80,13 +82,10 @@ var IMVU = IMVU || {};
             if (rejectCallback) {
                 this.rejectCallbacks.push(rejectCallback);
             }
-/*
-            if (this.state === 'accepted') {
-                eventLoop.queueTask(this._runAcceptCallbacks.bind(this));
-            } else if (this.state === 'rejected') {
-                eventLoop.queueTask(this._runRejectCallbacks.bind(this));
+
+            if (this.state !== 'pending') {
+                this._scheduleCallbacks();
             }
-*/
         };
 
         return Future;
