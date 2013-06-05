@@ -5,6 +5,9 @@ var IMVU = IMVU || {};
     // 2013-06-04, minus the synchronous flag.  It's unclear whether
     // synchronicity will survive the ES6 standardization process.
 
+    // I have not implemented Future.any, Future.every, and
+    // Future.some.  Let's wait and see if they're truly standardized.
+
     var FutureError = IMVU.FutureError = IMVU.extendError(Error, "FutureError");
 
     function FutureResolver(future) {
@@ -135,6 +138,10 @@ var IMVU = IMVU || {};
             }
 
             return future;
+        };
+
+        Future.prototype['catch'] = function(rejectCallback) {
+            return this.then(undefined, rejectCallback);
         };
 
         return Future;

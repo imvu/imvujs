@@ -115,5 +115,20 @@ module({
             this.eventLoop._flushTasks();
             assert.deepEqual(['hello'], this.accepts);
         });
+
+        test("then.catch", function() {
+            var e = "value";
+            var caught;
+            this.Future.accept(e).
+                then(function(value) {
+                    throw value;
+                })
+                ['catch'](function(error) {
+                    caught = error;
+                });
+            assert.equal(undefined, caught);
+            this.eventLoop._flushTasks();
+            assert.equal(e, caught);
+        });
     });
 });
