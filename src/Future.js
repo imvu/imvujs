@@ -66,6 +66,24 @@ var IMVU = IMVU || {};
             init(new FutureResolver(this));
         }
 
+        Future.accept = function(value) {
+            return new Future(function(resolver) {
+                resolver.accept(value);
+            });
+        };
+
+        Future.resolve = function(value) {
+            return new Future(function(resolver) {
+                resolver.resolve(value);
+            });
+        };
+
+        Future.reject = function(value) {
+            return new Future(function(resolver) {
+                resolver.reject(value);
+            });
+        };
+
         function processCallbacks(callbacks, result) {
             eventLoop.queueTask(function() {
                 // todo: try {

@@ -108,5 +108,12 @@ module({
             assert.deepEqual([], this.rejects);
             assert.deepEqual(['hey'], this.accepts);
         });
+
+        test("static accept returns accepted Future", function() {
+            var f = this.Future.accept("hello");
+            f.then(this.acceptCallback);
+            this.eventLoop._flushTasks();
+            assert.deepEqual(['hello'], this.accepts);
+        });
     });
 });
