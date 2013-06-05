@@ -5,21 +5,31 @@ var IMVU = IMVU || {};
     // 2013-06-04, minus the synchronous flag.  It's unclear whether
     // that will survive the ES6 standardization process.
 
+    var FutureError = IMVU.FutureError = IMVU.extendError(Error, "FutureError");
+
     IMVU.FutureFactory = function(eventLoop) {
         function FutureResolver(future) {
-            this.resolved = false;
             this.future = future;
         }
 
         FutureResolver.prototype.accept = function(value) {
-            if (this.resolved) {
-                return;
-            }
-
             var future = this.future;
+            if (future.state !== 'pending') {
+                throw new FutureError("accept failed: future is already " + future.state);
+            }
             future.state = 'accepted';
             future.result = value;
-            future._scheduleAcceptCallbacks();
+            future._scheduleCallbacks();
+        };
+
+        FutureResolver.prototype.reject = function(value) {
+            var future = this.future;
+            if (future.state !== 'pending') {
+                throw new FutureError("reject failed: future is already " + future.state);
+            }
+            future.state = 'rejected';
+            future.result = value;
+            future._scheduleCallbacks();
         };
 
 /*
@@ -45,24 +55,32 @@ var IMVU = IMVU || {};
             init(new FutureResolver(this));
         }
 
-        Future.prototype._scheduleAcceptCallbacks = function() {
+        function processCallbacks(callbacks, result) {
             eventLoop.queueTask(function() {
                 // todo: try {
-                while (this.acceptCallbacks.length) {
-                    this.acceptCallbacks.shift()(this.result);
+                while (callbacks.length) {
+                    callbacks.shift()(result);
                 }
                 // } catch (e) schedule another task
-            }.bind(this));
+            });
+        }
+
+        Future.prototype._scheduleCallbacks = function() {
+            processCallbacks(
+                this.state === 'accepted' ?
+                    this.acceptCallbacks :
+                    this.rejectCallbacks,
+                this.result);
         };
 
         Future.prototype.then = function(acceptCallback, rejectCallback) {
             if (acceptCallback) {
                 this.acceptCallbacks.push(acceptCallback);
             }
-/*
             if (rejectCallback) {
                 this.rejectCallbacks.push(rejectCallback);
             }
+/*
             if (this.state === 'accepted') {
                 eventLoop.queueTask(this._runAcceptCallbacks.bind(this));
             } else if (this.state === 'rejected') {

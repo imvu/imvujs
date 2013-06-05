@@ -37,5 +37,28 @@ module({
             this.eventLoop._flushTasks();
             assert.deepEqual(["hello"], this.accepts);
         });
+
+        test("reject after then", function() {
+            var r;
+            (new this.Future(function(resolver) {
+                r = resolver;
+            })).then(undefined, this.rejectCallback);
+
+            r.reject("bye");
+            assert.deepEqual([], this.rejects);
+            this.eventLoop._flushTasks();
+            assert.deepEqual(["bye"], this.rejects);
+        });
+
+        test("second accept throws", function() {
+            var r;
+            new this.Future(function(resolver) {
+                r = resolver;
+            });
+            r.accept("hello");
+            assert.throws(IMVU.FutureError, function() {
+                r.accept("two");
+            });
+        });
     });
 });
