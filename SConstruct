@@ -23,6 +23,7 @@ BASE_SOURCES = [
     'src/Random.js',
     'src/module-common.js',
     'src/EventLoop.js',
+    'src/Future.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [

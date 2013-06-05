@@ -1,11 +1,11 @@
-/*global IMVU:true*/
+/*global IMVU:true, setImmediate*/
 var IMVU = IMVU || {};
 (function() {
     var impl =
-        // node
-        (typeof process !== 'undefined' && process.nextTick) ||
         // IE10+
-        (typeof window !== 'undefined' && window.setImmediate) ||
+        (typeof setImmediate === 'function' && setImmediate) ||
+        // node
+        (typeof process === 'object' && process.nextTick) ||
         // everyone else. we would probably benefit from specialize polyfills for Chrome and Firefox
         // use postMessage?
         function(fn) {

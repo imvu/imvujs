@@ -107,7 +107,8 @@
               'ServiceProvider',
               'Random',
               'moduleCommon',
-              'EventLoop' ],
+              'EventLoop',
+              'FutureFactory' ],
             Object.keys(IMVU));
     });
 })(this);
