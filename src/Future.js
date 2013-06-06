@@ -124,24 +124,31 @@ var IMVU = IMVU || {};
                 };
             }
             
-            this.acceptCallbacks.push(
+            this.done(
                 acceptCallback ?
                     futureWrapperCallback(acceptCallback) :
-                    resolver.accept.bind(resolver));
-            this.rejectCallbacks.push(
+                    resolver.accept.bind(resolver),
                 rejectCallback ?
                     futureWrapperCallback(rejectCallback) :
                     resolver.reject.bind(resolver));
-
-            if (this.state !== 'pending') {
-                this._scheduleCallbacks();
-            }
 
             return future;
         };
 
         Future.prototype['catch'] = function(rejectCallback) {
             return this.then(undefined, rejectCallback);
+        };
+
+        Future.prototype.done = function(acceptCallback, rejectCallback) {
+            if (acceptCallback) {
+                this.acceptCallbacks.push(acceptCallback);
+            }
+            if (rejectCallback) {
+                this.rejectCallbacks.push(rejectCallback);
+            }
+            if (this.state !== 'pending') {
+                this._scheduleCallbacks();
+            }
         };
 
         return Future;

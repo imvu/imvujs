@@ -130,5 +130,33 @@ module({
             this.eventLoop._flushTasks();
             assert.equal(e, caught);
         });
+
+        test("done", function() {
+            var e = "value";
+            var f = new ReferenceError();
+            var value;
+            this.Future.accept(e).done(function(v) {
+                value = v;
+                throw f;
+            });
+
+            var error = assert.throws(ReferenceError, this.eventLoop._flushTasks.bind(this.eventLoop));
+            assert.equal(value, e);
+            assert.equal(error, f);
+        });
+
+        test("done with error", function() {
+            var e = "value";
+            var f = new ReferenceError();
+            var value;
+            this.Future.reject(e).done(undefined, function(v) {
+                value = v;
+                throw f;
+            });
+
+            var error = assert.throws(ReferenceError, this.eventLoop._flushTasks.bind(this.eventLoop));
+            assert.equal(value, e);
+            assert.equal(error, f);
+        });
     });
 });
