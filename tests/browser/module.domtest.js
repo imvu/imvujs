@@ -3,7 +3,8 @@ module.setAlias('short', '../includes/include.js');
 module({
     include: '@short',
     include2: 'relativePaths/through_alias.js',
-    FakeXHRFactory: '../../fakes/FakeXMLHttpRequestFactory.js'
+    FakeXHRFactory: '../../fakes/FakeXMLHttpRequestFactory.js',
+    FakeEventLoop: '../../fakes/FakeEventLoop.js'
 }, function(imports) {
     test('can import modules by alias', function() {
         assert.equal(10, imports.include.ReturnsTen());
@@ -17,13 +18,13 @@ module({
         this.setUp(function() {
             this.xhrFactory = new imports.FakeXHRFactory();
             module.setXHRFactory(this.xhrFactory);
-            this.sysincludeCalls = [];
-            this.sysincludeModuleDep = null;
+            this.eventLoop = new imports.FakeEventLoop;
+            module.setPromiseFactory(new IMVU.PromiseFactory(this.eventLoop));
         });
        
         test("dynamicImport loads modules dynamically", function() {
             var imports = [];
-            
+
             module.dynamicImport([
                 "a_module.js",
                 "another_module.js"
@@ -33,27 +34,9 @@ module({
             
             this.xhrFactory._respond('GET', '/bin/another_module.js', 200, [], "module({}, function() {return {}})");
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], "module({}, function() {return {}})");
+            assert.equal(0, imports.length);
+            this.eventLoop._flushTasks();
             assert.equal(2, imports.length);
-        });
-        test("module.Future before resolution", function () {
-            var f = new module.Future();
-            var completed = false;
-            f.register(function () {
-                completed = true;
-            });
-            assert.false(completed);
-            f.complete();
-            assert.true(completed);
-        });
-
-        test("module.Future after resolution", function () {
-            var f = new module.Future();
-            var completed = false;
-            f.complete();
-            f.register(function () {
-                completed = true;
-            });
-            assert.true(completed);
         });
     });
 });

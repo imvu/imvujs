@@ -1,15 +1,18 @@
-/*global IMVU:true, setImmediate*/
+/*global IMVU:true, setImmediate, MutationObserver*/
 var IMVU = IMVU || {};
 (function() {
+    var mySetTimeout = setTimeout;
+
     var impl =
         // IE10+
         (typeof setImmediate === 'function' && setImmediate) ||
         // node
         (typeof process === 'object' && process.nextTick) ||
-        // everyone else. we would probably benefit from specialize polyfills for Chrome and Firefox
-        // use postMessage?
+        // Fall back on setTimeout.  We would likely benefit from specialized
+        // polyfills for Chrome and Firefox.  Use postMessage?  Supposedly
+        // DOM mutation events occur in the same turn of the event loop.
         function(fn) {
-            setTimeout(fn, 0);
+            mySetTimeout(fn, 0);
         };
 
     var queue = [];

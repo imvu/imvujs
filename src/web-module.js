@@ -12,9 +12,14 @@ var MODULE_DEBUG = true;
     "use strict";
 
     var XHRFactory = XMLHttpRequest;
+    var Promise = new IMVU.PromiseFactory(IMVU.EventLoop);
 
     function setXHRFactory(f) {
         XHRFactory = f;
+    }
+
+    function setPromiseFactory(f) {
+        Promise = f;
     }
 
     var C = {
@@ -60,7 +65,7 @@ var MODULE_DEBUG = true;
 
     var ourUrl = window.location.pathname; // todo: should be href (support cross-domain references)
 
-    var completeJs = {}; // url : Future<exportTable>
+    var completeJs = {}; // url : {promise: Promise<exportTable>, resolver: PromiseResolver}
 
     /* Returns a function which implements memoization and request coallescing
      * for the function 'fn'
@@ -69,17 +74,17 @@ var MODULE_DEBUG = true;
      * where onComplete is itself a function that takes the result as its sole parameter.
      */
     function coallescer(fn) {
-        var futures = {}; // arg : Future
+        var promises = {}; // arg : Promise
 
         function coalescedWrapper(arg, onComplete) {
-            if (futures.hasOwnProperty(arg)) {
-                futures[arg].register(onComplete);
+            if (promises.hasOwnProperty(arg)) {
+                promises[arg].then(onComplete);
             } else {
-                var future = new Future();
-                futures[arg] = future;
-                futures[arg].register(onComplete);
-
-                fn(arg, future.complete.bind(future));
+                var promise = new Promise(function(resolver) {
+                    fn(arg, resolver.resolve.bind(resolver));
+                });
+                promise.then(onComplete);
+                promises[arg] = promise;
             }
         }
 
@@ -132,21 +137,20 @@ var MODULE_DEBUG = true;
         url = IMVU.moduleCommon.toAbsoluteUrl(url, ourUrl);
 
         if (completeJs.hasOwnProperty(url)) {
-            completeJs[url].register(onComplete);
+            completeJs[url].promise.then(onComplete);
         } else {
-            var f = new Future();
-            completeJs[url] = f;
-            f.register(onComplete);
+            var thing = {};
+            thing.promise = new Promise(function(resolver) {
+                thing.resolver = resolver;
+            });
+            completeJs[url] = thing;
 
-            /* The completion callback here is left empty because a module() invocation is
-             * expected to occur while evaluating the JS.  This module() invocation is expected to
-             * complete the relevant completeJs[url] future.
-             */
             fetchJs(url, function(result) {
                 if (!moduleWasCalled) {
-                    f.complete(result);
+                    thing.resolver.resolve(result);
                 }
             });
+            thing.promise.then(onComplete);
         }
     }
 
@@ -215,12 +219,15 @@ var MODULE_DEBUG = true;
         module._resolveDependencies(dependencies);
 
         var url = ourUrl;
-        var future;
+        var futureAndResolver;
         if (completeJs.hasOwnProperty(url)) {
-            future = completeJs[url];
+            futureAndResolver = completeJs[url];
         } else {
-            future = new Future("module " + url);
-            completeJs[url] = future;
+            futureAndResolver = {};
+            futureAndResolver.promise = new Promise(function(resolver) {
+                futureAndResolver.resolver = resolver;
+            });
+            completeJs[url] = futureAndResolver;
         }
 
         var result = {};
@@ -262,7 +269,7 @@ var MODULE_DEBUG = true;
         function complete() {
             C.log('evaluating module', url);
             var exportTable = body.call(null, result);
-            future.complete(exportTable);
+            futureAndResolver.resolver.resolve(exportTable);
         }
     }
     _.extend(module, IMVU.moduleCommon);
@@ -274,42 +281,13 @@ var MODULE_DEBUG = true;
     window.module = module;
     window.define = define;
 
-    function Future(name) {
-        this.name = name;
-        this.callbacks = [];
-        this.isComplete = false;
-        this.value = null;
-    }
-
-    Future.prototype.register = function(f) {
-        if (this.isComplete) {
-            f(this.value);
-        } else {
-            this.callbacks.push(f);
-        }
-    };
-
-    Future.prototype.complete = function(v) {
-        if (this.isComplete) {
-            throw new Error("Cannot complete a future twice " + JSON.stringify(this.name ? this.name : ""));
-        }
-
-        this.isComplete = true;
-        this.value = v;
-
-        for (var index = 0; index < this.callbacks.length; ++index) {
-            this.callbacks[index](v);
-        }
-        delete this.callbacks;
-    };
-
     _.extend(module, {
         importJs: importJs,
         dynamicImport: dynamicImport,
         setXHRFactory: setXHRFactory,
+        setPromiseFactory: setPromiseFactory,
         caching: true,
-        versionedUrls: {},
-        Future: Future
+        versionedUrls: {}
     });
 
 })();
