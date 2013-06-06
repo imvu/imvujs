@@ -108,8 +108,8 @@
               'Random',
               'moduleCommon',
               'EventLoop',
-              'FutureError',
-              'FutureFactory' ],
+              'AlreadyResolved',
+              'PromiseFactory' ],
             Object.keys(IMVU));
     });
 })(this);

@@ -1,10 +1,10 @@
 module({
     FakeEventLoop: '../fakes/FakeEventLoop.js'
 }, function(imports) {
-    fixture("Future tests", function() {
+    fixture("Promise tests", function() {
         this.setUp(function() {
             this.eventLoop = new imports.FakeEventLoop();
-            this.Future = new IMVU.FutureFactory(this.eventLoop);
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop);
 
             this.accepts = [];
             this.rejects = [];
@@ -15,7 +15,7 @@ module({
 
         test("accept after then", function() {
             var r;
-            (new this.Future(function(resolver) {
+            (new this.Promise(function(resolver) {
                 r = resolver;
             })).then(this.acceptCallback);
 
@@ -27,7 +27,7 @@ module({
 
         test("then after accept", function() {
             var r;
-            var future = new this.Future(function(resolver) {
+            var future = new this.Promise(function(resolver) {
                 r = resolver;
             });
             r.accept("hello");
@@ -41,7 +41,7 @@ module({
 
         test("reject after then", function() {
             var r;
-            (new this.Future(function(resolver) {
+            (new this.Promise(function(resolver) {
                 r = resolver;
             })).then(undefined, this.rejectCallback);
 
@@ -53,18 +53,18 @@ module({
 
         test("second accept throws", function() {
             var r;
-            new this.Future(function(resolver) {
+            new this.Promise(function(resolver) {
                 r = resolver;
             });
             r.accept("hello");
-            assert.throws(IMVU.FutureError, function() {
+            assert.throws(IMVU.AlreadyResolved, function() {
                 r.accept("two");
             });
         });
 
         test("resolve", function() {
             var r;
-            new this.Future(function(resolver) {
+            new this.Promise(function(resolver) {
                 r = resolver;
             }).then(this.acceptCallback);
             r.resolve("hello");
@@ -74,12 +74,12 @@ module({
 
         test("resolve given a future", function() {
             var r1;
-            var f1 = new this.Future(function(resolver) {
+            var f1 = new this.Promise(function(resolver) {
                 r1 = resolver;
             });
 
             var r2;
-            var f2 = new this.Future(function(resolver) {
+            var f2 = new this.Promise(function(resolver) {
                 r2 = resolver;
             });
 
@@ -97,7 +97,7 @@ module({
 
         test("chaining then", function() {
             var r;
-            var f = new this.Future(function(resolver) {
+            var f = new this.Promise(function(resolver) {
                 r = resolver;
             });
 
@@ -109,8 +109,8 @@ module({
             assert.deepEqual(['hey'], this.accepts);
         });
 
-        test("static accept returns accepted Future", function() {
-            var f = this.Future.accept("hello");
+        test("static accept returns accepted Promise", function() {
+            var f = this.Promise.accept("hello");
             f.then(this.acceptCallback);
             this.eventLoop._flushTasks();
             assert.deepEqual(['hello'], this.accepts);
@@ -119,7 +119,7 @@ module({
         test("then.catch", function() {
             var e = "value";
             var caught;
-            this.Future.accept(e).
+            this.Promise.accept(e).
                 then(function(value) {
                     throw value;
                 })

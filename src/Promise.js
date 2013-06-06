@@ -5,29 +5,30 @@ var IMVU = IMVU || {};
     // 2013-06-04, minus the synchronous flag.  It's unclear whether
     // synchronicity will survive the ES6 standardization process.
 
-    // I have not implemented Future.any, Future.every, and
-    // Future.some.  Let's wait and see if they're truly standardized.
+    // I have not implemented Promise.any, Promise.every, and
+    // Promise.some.  Let's wait and see if they survive
+    // standardization.
 
-    var FutureError = IMVU.FutureError = IMVU.extendError(Error, "FutureError");
+    var AlreadyResolved = IMVU.AlreadyResolved = IMVU.extendError(Error, "AlreadyResolved");
 
-    function FutureResolver(future) {
-        this.future = future;
+    function PromiseResolver(promise) {
+        this.promise = promise;
     }
 
-    FutureResolver.prototype.accept = function(value) {
-        var future = this.future;
-        if (future.state !== 'pending') {
-            throw new FutureError("accept failed: future is already " + future.state);
+    PromiseResolver.prototype.accept = function(value) {
+        var promise = this.promise;
+        if (promise.state !== 'pending') {
+            throw new AlreadyResolved("accept failed: promise is already " + promise.state);
         }
-        future.state = 'accepted';
-        future.result = value;
-        future.rejectCallbacks.length = 0;
-        future._scheduleCallbacks();
+        promise.state = 'accepted';
+        promise.result = value;
+        promise.rejectCallbacks.length = 0;
+        promise._scheduleCallbacks();
     };
 
-    FutureResolver.prototype.resolve = function(value) {
+    PromiseResolver.prototype.resolve = function(value) {
         var then = null;
-        var future = this.future;
+        var promise = this.promise;
         if (typeof value === "object") {
             try {
                 then = value.then;
@@ -49,40 +50,40 @@ var IMVU = IMVU || {};
         this.accept(value);
     };
     
-    FutureResolver.prototype.reject = function(value) {
-        var future = this.future;
-        if (future.state !== 'pending') {
-            throw new FutureError("reject failed: future is already " + future.state);
+    PromiseResolver.prototype.reject = function(value) {
+        var promise = this.promise;
+        if (promise.state !== 'pending') {
+            throw new AlreadyResolved("reject failed: promise is already " + promise.state);
         }
-        future.state = 'rejected';
-        future.result = value;
-        future.acceptCallbacks.length = 0;
-        future._scheduleCallbacks();
+        promise.state = 'rejected';
+        promise.result = value;
+        promise.acceptCallbacks.length = 0;
+        promise._scheduleCallbacks();
     };
 
-    IMVU.FutureFactory = function(eventLoop) {
-        function Future(init) {
+    IMVU.PromiseFactory = function(eventLoop) {
+        function Promise(init) {
             this.acceptCallbacks = [];
             this.rejectCallbacks = [];
             this.state = 'pending';
             this.result = undefined;
-            init(new FutureResolver(this));
+            init(new PromiseResolver(this));
         }
 
-        Future.accept = function(value) {
-            return new Future(function(resolver) {
+        Promise.accept = function(value) {
+            return new Promise(function(resolver) {
                 resolver.accept(value);
             });
         };
 
-        Future.resolve = function(value) {
-            return new Future(function(resolver) {
+        Promise.resolve = function(value) {
+            return new Promise(function(resolver) {
                 resolver.resolve(value);
             });
         };
 
-        Future.reject = function(value) {
-            return new Future(function(resolver) {
+        Promise.reject = function(value) {
+            return new Promise(function(resolver) {
                 resolver.reject(value);
             });
         };
@@ -97,7 +98,7 @@ var IMVU = IMVU || {};
             });
         }
 
-        Future.prototype._scheduleCallbacks = function() {
+        Promise.prototype._scheduleCallbacks = function() {
             processCallbacks(
                 this.state === 'accepted' ?
                     this.acceptCallbacks :
@@ -105,17 +106,17 @@ var IMVU = IMVU || {};
                 this.result);
         };
 
-        Future.prototype.then = function(acceptCallback, rejectCallback) {
+        Promise.prototype.then = function(acceptCallback, rejectCallback) {
             var resolver;
-            var future = new Future(function(r) {
+            var promise = new Promise(function(r) {
                 resolver = r;
             });
 
-            function futureWrapperCallback(callback) {
+            function promiseWrapperCallback(callback) {
                 return function(argument) {
                     var value;
                     try {
-                        value = callback.call(future, argument);
+                        value = callback.call(promise, argument);
                     } catch (e) {
                         resolver.reject(e); // per spec: synchronous=true
                         return;
@@ -126,24 +127,24 @@ var IMVU = IMVU || {};
             
             this.acceptCallbacks.push(
                 acceptCallback ?
-                    futureWrapperCallback(acceptCallback) :
+                    promiseWrapperCallback(acceptCallback) :
                     resolver.accept.bind(resolver));
             this.rejectCallbacks.push(
                 rejectCallback ?
-                    futureWrapperCallback(rejectCallback) :
+                    promiseWrapperCallback(rejectCallback) :
                     resolver.reject.bind(resolver));
 
             if (this.state !== 'pending') {
                 this._scheduleCallbacks();
             }
 
-            return future;
+            return promise;
         };
 
-        Future.prototype['catch'] = function(rejectCallback) {
+        Promise.prototype['catch'] = function(rejectCallback) {
             return this.then(undefined, rejectCallback);
         };
 
-        return Future;
+        return Promise;
     };
 })();
