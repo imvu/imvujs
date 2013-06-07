@@ -2,7 +2,7 @@
  * Node.js implementation of the module interface.
  */
 
-/*global exports:true, loadScript*/
+/*global exports:true, console*/
 var impls = {}; // path : body
 var implsPending = {};
 

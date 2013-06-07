@@ -2,7 +2,6 @@
 {
     "predef" : [
         // browser environment
-        "console",
         "global",
         "alert",
 

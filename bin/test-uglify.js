@@ -1,3 +1,4 @@
+/*global console*/
 
 var fs = require('fs');
 var uglify = require('uglify-js');

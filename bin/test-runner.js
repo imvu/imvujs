@@ -1,3 +1,5 @@
+/*global console*/
+
 module({
     synctest: '../src/imvujstest/synctest.js'
 }, function (imports) {

@@ -1,3 +1,4 @@
+/*global console*/
 window.module.caching = false;
 var run_all;
 

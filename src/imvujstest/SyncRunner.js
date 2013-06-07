@@ -1,3 +1,4 @@
+/*global console*/
 module({
     Runner: 'Runner.js',
     assert: 'assert.js'
