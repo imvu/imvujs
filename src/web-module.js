@@ -12,14 +12,17 @@ var MODULE_DEBUG = true;
     "use strict";
 
     var XHRFactory = XMLHttpRequest;
-    var Promise = new IMVU.PromiseFactory(IMVU.EventLoop);
-
     function setXHRFactory(f) {
+        var old = XHRFactory;
         XHRFactory = f;
+        return old;
     }
 
+    var Promise = new IMVU.PromiseFactory(IMVU.EventLoop);
     function setPromiseFactory(f) {
+        var old = Promise;
         Promise = f;
+        return old;
     }
 
     var C = {
@@ -29,8 +32,12 @@ var MODULE_DEBUG = true;
         groupCollapsed: function() { },
         groupEnd: function() { }
     };
-
     //C = console;
+    function setLogger(logger) {
+        var old = C;
+        C = logger;
+        return old;
+    }
 
     function hasProperties(o) {
         for (var k in o) {
@@ -65,7 +72,15 @@ var MODULE_DEBUG = true;
 
     var ourUrl = window.location.pathname; // todo: should be href (support cross-domain references)
 
-    var completeJs = {}; // url : {promise: Promise<exportTable>, resolver: PromiseResolver}
+    function _reset() {
+        completeJs = {};
+        moduleWasCalled = false;
+        fetchJs = coallescer(actualFetchJs);
+    }
+    var completeJs; // url : {promise: Promise<exportTable>, resolver: PromiseResolver}
+    var moduleWasCalled;
+    var fetchJs;
+    _reset();
 
     /* Returns a function which implements memoization and request coallescing
      * for the function 'fn'
@@ -91,26 +106,26 @@ var MODULE_DEBUG = true;
         return coalescedWrapper;
     }
 
-    var moduleWasCalled = false;
+    var ModuleError = module.ModuleError = IMVU.extendError(Error, 'ModuleError');
 
-    var fetchJs = coallescer(function(url, onComplete) {
-        C.warn("fetchJs", url);
+    function actualFetchJs(url, onComplete) {
+        C.log("fetch", url);
         fetch(url, onFetched);
 
         function onFetched(xhr) {
             if (xhr.status !== 200) {
-                console.error("Failed to fetch " + url);
-                throw new Error("Failed to fetch " + url + ".  Status code " + xhr.status);
+                C.error("Failed to fetch " + url);
+                throw new ModuleError("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
 
             var evaluated;
             try {
                 evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//@ sourceURL=" + url);
             } catch (e) {
-                console.error("Failed to parse", url);
-                console.groupCollapsed('Source');
-                console.log(xhr.responseText);
-                console.groupEnd();
+                C.error("Failed to parse", url);
+                C.groupCollapsed('Source');
+                C.log(xhr.responseText);
+                C.groupEnd();
 
                 reportSyntaxError(url, xhr.responseText);
 
@@ -131,7 +146,7 @@ var MODULE_DEBUG = true;
 
             onComplete(result);
         }
-    });
+    }
 
     function importJs(url, onComplete) {
         url = IMVU.moduleCommon.toAbsoluteUrl(url, ourUrl);
@@ -174,11 +189,11 @@ var MODULE_DEBUG = true;
         if (MODULE_DEBUG) {
             try {
                 var result = esprima.parse(code);
-                console.groupCollapsed("This parse should never succeed");
-                console.log(result);
-                console.groupEnd();
+                C.groupCollapsed("This parse should never succeed");
+                C.log(result);
+                C.groupEnd();
             } catch (e) {
-                console.error("Parse error in", url + ':', e.message);
+                C.error("Parse error in", url + ':', e.message);
             }
         }
     }
@@ -201,19 +216,17 @@ var MODULE_DEBUG = true;
     define.amd = true;
 
     function require() {
-        throw new Error('commonjs require modules are not supported');
+        throw new SyntaxError('commonjs require modules are not supported');
     }
 
     function module(dependencies, body) {
-        C.log("module", ourUrl, dependencies);
-
         moduleWasCalled = true;
 
         if ("object" !== typeof dependencies) {
-            throw new Error("Dependencies must be object");
+            throw new TypeError("Dependencies must be object");
         }
         if ("function" !== typeof body) {
-            throw new Error("Body must be a function");
+            throw new TypeError("Body must be a function");
         }
 
         module._resolveDependencies(dependencies);
@@ -286,6 +299,8 @@ var MODULE_DEBUG = true;
         dynamicImport: dynamicImport,
         setXHRFactory: setXHRFactory,
         setPromiseFactory: setPromiseFactory,
+        setLogger: setLogger,
+        _reset: _reset,
         caching: true,
         versionedUrls: {}
     });
