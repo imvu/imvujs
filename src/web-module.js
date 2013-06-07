@@ -25,12 +25,12 @@ var MODULE_DEBUG = true;
         return old;
     }
 
+    function nop() {}
     var C = {
-        log: function(){ },
-        error: function() { },
-        warn: function() { },
-        groupCollapsed: function() { },
-        groupEnd: function() { }
+        log: nop,
+        error: nop,
+        warn: nop,
+        info: nop
     };
     //C = console;
     function setLogger(logger) {
@@ -121,9 +121,7 @@ var MODULE_DEBUG = true;
                 evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//@ sourceURL=" + url);
             } catch (e) {
                 C.error("Failed to parse", url);
-                C.groupCollapsed('Source');
                 C.log(xhr.responseText);
-                C.groupEnd();
 
                 reportSyntaxError(url, xhr.responseText);
 
@@ -137,7 +135,12 @@ var MODULE_DEBUG = true;
 
             var result;
             try {
-                result = evaluated.call(window);
+                try {
+                    result = evaluated.call(window);
+                } catch (e) {
+                    C.error('failed to evaluate script:', e);
+                    throw e;
+                }
             } finally {
                 ourUrl = saveUrl;
             }
@@ -187,9 +190,7 @@ var MODULE_DEBUG = true;
         if (MODULE_DEBUG) {
             try {
                 var result = esprima.parse(code);
-                C.groupCollapsed("This parse should never succeed");
                 C.log(result);
-                C.groupEnd();
             } catch (e) {
                 C.error("Parse error in", url + ':', e.message);
             }
@@ -278,8 +279,14 @@ var MODULE_DEBUG = true;
         }
 
         function complete() {
-            C.log('evaluating module', url);
-            var exportTable = body.call(null, result);
+            var exportTable;
+            try {
+                exportTable = body.call(undefined, result);
+            }
+            catch (e) {
+                C.error('failed to evaluate module:', e);
+                throw e;
+            }
             futureAndResolver.resolver.resolve(exportTable);
         }
     }

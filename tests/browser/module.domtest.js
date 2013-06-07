@@ -80,8 +80,7 @@ module({
             assert.deepEqual(
                 [ 'log: fetch /bin/a_module.js',
                   'log: fetch /bin/another_module.js',
-                  'error: Failed to fetch /bin/another_module.js',
-                  'log: evaluating module /bin/a_module.js' ],
+                  'error: Failed to fetch /bin/another_module.js' ],
                 this.logs);
         });
 
@@ -96,12 +95,35 @@ module({
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
             assert.throws(TypeError, function() {
-                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
-            });
+                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], '(null.x);');
+            }.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(
-                [ 'log: fetch /bin/broken.js' ],
+                [ 'log: fetch /bin/broken.js',
+                  "error: failed to evaluate script: TypeError: Cannot read property 'x' of null"],
+                this.logs);
+        });
+
+        test("if evaluating module raises error then dynamicImport logs", function() {
+            var called = 0;
+            module.dynamicImport([
+                'broken.js',
+            ], function(imports) {
+                called += 1;
+            });
+
+            // Should we really bubble the evaluation error out? It
+            // does imply the error would show in the log...
+            assert.throws(TypeError, function() {
+                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
+            }.bind(this));
+            this.eventLoop._flushTasks();
+
+            assert.deepEqual(
+                [ 'log: fetch /bin/broken.js',
+                  "error: failed to evaluate module: TypeError: Cannot read property 'x' of null",
+                  "error: failed to evaluate script: TypeError: Cannot read property 'x' of null" ],
                 this.logs);
         });
     });
