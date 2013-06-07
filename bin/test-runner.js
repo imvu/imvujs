@@ -28,7 +28,7 @@ module({
             this._dispatch(window.location.hash.substr(1), superfixtureUrl);
             window.addEventListener('hashchange', function () {
                 this._dispatch(window.location.hash.substr(1), superfixtureUrl);
-            });
+            }.bind(this));
         },
         _dispatch: function (testUrl, superfixtureUrl) {
             module.dynamicImport({
