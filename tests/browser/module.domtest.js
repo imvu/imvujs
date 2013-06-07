@@ -16,12 +16,12 @@ module({
 
     fixture("Fixture", function() {
         this.setUp(function() {
+            module._reset();
+
             this.xhrFactory = new imports.FakeXHRFactory();
             module.setXHRFactory(this.xhrFactory);
             this.eventLoop = new imports.FakeEventLoop;
             module.setPromiseFactory(new IMVU.PromiseFactory(this.eventLoop));
-
-            module._reset();
 
             var logs = this.logs = [];
             function appendLog(type, args) {
@@ -59,7 +59,7 @@ module({
             assert.equal(2, imports.length);
         });
 
-        test("if error then dynamicImport logs", function() {
+        test("if error loading script then dynamicImport logs", function() {
             var called = 0;
 
             module.dynamicImport([
@@ -68,6 +68,8 @@ module({
             ], function(newlyImported) {
                 called += 1;
             });
+            // Should we really bubble the load error? It does imply
+            // the error shows in the log...
             assert.throws(module.ModuleError, function() {
                 this.xhrFactory._respond('GET', '/bin/another_module.js', 500, [], emptyModule);
             }.bind(this));
@@ -80,6 +82,26 @@ module({
                   'log: fetch /bin/another_module.js',
                   'error: Failed to fetch /bin/another_module.js',
                   'log: evaluating module /bin/a_module.js' ],
+                this.logs);
+        });
+
+        test("if evaluating script raises error then dynamicImport logs", function() {
+            var called = 0;
+            module.dynamicImport([
+                'broken.js',
+            ], function(imports) {
+                called += 1;
+            });
+
+            // Should we really bubble the evaluation error out? It
+            // does imply the error would show in the log...
+            assert.throws(TypeError, function() {
+                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
+            });
+            this.eventLoop._flushTasks();
+
+            assert.deepEqual(
+                [ 'log: fetch /bin/broken.js' ],
                 this.logs);
         });
     });
