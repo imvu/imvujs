@@ -75,5 +75,18 @@ module({}, function() {
             var o = newf(F);
             assert.equal(rv, o);
         });
+
+        test("can new arrays", function() {
+            var a = newf(Array, 1);
+            assert.equal(1, a.length);
+            assert['instanceof'](a, Array);
+            a[1] = 2;
+            assert.equal(2, a.length);
+        });
+
+        test("can new TypedArrayViews", function() {
+            var a = newf(Uint8Array, 2);
+            assert.equal(2, a.length);
+        });
     });
 });
