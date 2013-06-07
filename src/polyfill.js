@@ -1,6 +1,25 @@
 (function() {
     'use strict';
 
+    function setConstant(o, k, v) {
+        if (!o.hasOwnProperty(k)) {
+            o[k] = v;
+        }
+    }
+
+    function setXHRConstants(o) {
+        setConstant(o, 'UNSENT', 0);
+        setConstant(o, 'OPENED', 1);
+        setConstant(o, 'HEADERS_RECEIVED', 2);
+        setConstant(o, 'LOADING', 3);
+        setConstant(o, 'DONE', 4);
+    }
+
+    if ('undefined' !== typeof XMLHttpRequest) {
+        setXHRConstants(XMLHttpRequest);
+        setXHRConstants(XMLHttpRequest.prototype);
+    }
+
     if ('undefined' !== typeof window) {
         var polyfillRequestAnimationFrame =
             window.webkitRequestAnimationFrame ||
