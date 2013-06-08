@@ -1,7 +1,7 @@
 /*global console*/
 
 module({
-    synctest: '../src/imvujstest/synctest.js'
+    synctest: 'synctest.js'
 }, function (imports) {
     var run_all = imports.synctest.run_all;
     return {

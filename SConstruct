@@ -89,7 +89,7 @@ targets += env.ClosureCompiler(
 #env.Gzip('out/imvu.uglify.js.gz', 'out/imvu.uglify.js')
 
 targets += env.CombinedModule('out/imvu.fakes.js', 'fakes/Package.js')
-targets += env.CombinedModule('out/imvutest.js', 'bin/test-runner.js')
+targets += env.CombinedModule('out/imvutest.js', 'src/imvujstest/imvutest.js')
 
 if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)
