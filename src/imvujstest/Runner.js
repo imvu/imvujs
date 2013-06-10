@@ -44,14 +44,16 @@ module({
             }
         },
 
-        run_all: function run_all(reporter, onComplete) {
+        run_all: function run_all(testUrl, reporter, onComplete) {
             var self = this;
+            reporter.startSuite(testUrl);
             var steps = _(this.allTests).map(function (test) {
                 return function (nextTest) {
                     reporter.startTest(test.name);
                     self.runTest(self.superFixtures, test, function (failed) {
                         if (failed) {
                             reporter.endTest(test.name, false, failed.stack, failed.e);
+                            reporter.endSuite(false);
                             onComplete(false);
                         } else {
                             reporter.endTest(test.name, true, undefined, undefined);
@@ -62,6 +64,7 @@ module({
             });
             imports.cps.sequence_(steps, function (results) {
                 self.allTests = [];
+                reporter.endSuite(true);
                 onComplete(true);
             });
         }

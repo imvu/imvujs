@@ -52,9 +52,9 @@ module({
         test: function (name, body) {
             this.runner.test(name, body);
         },
-        run_all: function (reporter) {
+        run_all: function (testUrl, reporter) {
             var passed;
-            this.runner.run_all(reporter, function onComplete(pass) {
+            this.runner.run_all(testUrl, reporter, function onComplete(pass) {
                 passed = pass;
             });
             assert.notUndefined(passed); // test runner must complete synchronously

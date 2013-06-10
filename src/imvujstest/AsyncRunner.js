@@ -58,8 +58,8 @@ module({
         test: function (name, body) {
             this.runner.test(name, body);
         },
-        run_all: function (reporter, onComplete) {
-            this.runner.run_all(reporter, onComplete);
+        run_all: function (testUrl, reporter, onComplete) {
+            this.runner.run_all(testUrl, reporter, onComplete);
         }
     });
 });

@@ -25,9 +25,7 @@ module({
                     test: testUrl,
                     superfixtures: superfixtureUrl
                 }, function (imports) {
-                    reporter.startSuite(testUrl);
-                    var passed = run_all(reporter);
-                    reporter.endSuite(passed);
+                    run_all(testUrl, reporter);
                 });
             };
 

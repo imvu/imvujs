@@ -82,7 +82,7 @@ function runTest(testPath, continuation) {
     // http://nodejs.org/api/vm.html#vm_sandboxes
     //
     // Nested confusion:
-    //     vm.runInNewContext has issues because runInThisContext always runs in the root 
+    //     vm.runInNewContext has issues because runInThisContext always runs in the root
     //var sandbox = _.extend({}, imvujstest);
     //sandbox.console = console;
     //sandbox.require = require;
@@ -120,10 +120,7 @@ function runTest(testPath, continuation) {
     });
     var reporter = new ConsoleReporter();
 
-    reporter.startSuite(testPath);
-    var success = run_all(reporter); 
-    reporter.endSuite(success);
-    return success;
+    return run_all(testPath, reporter);
 }
 
 function main() {
