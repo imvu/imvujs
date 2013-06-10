@@ -42,9 +42,6 @@ module({}, function (imports) {
             if (stack) {
                 $logItem.append($('<pre>').addClass('stack').text(stack));
             }
-            if (exception) {
-                $logItem.append($('<pre>').addClass('exception').text(exception));
-            }
         }
     });
 });
