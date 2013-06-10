@@ -2,65 +2,48 @@
 
 module({
     synctest: 'synctest.js',
-    css: 'css.js'
+    css: 'css.js',
+    DomReporter: 'DomReporter.js',
+    LeprechaunReporter: 'LeprechaunReporter.js'
 }, function (imports) {
     var run_all = imports.synctest.run_all;
     return {
         start: function (superfixtureUrl) {
             imports.css.install();
             $('<div class="test-sandbox"></div>').appendTo(document.body);
-            $('<div class="test-output"><div class="status">Test Running</div><ul></ul></div>').appendTo(document.body);
+            var output = $('<div class="test-output"></div>').appendTo(document.body);
+            var domReporter = new imports.DomReporter({
+                el: output
+            });
+            var leprechaunReporter = new imports.LeprechaunReporter();
 
-            window.onerror = function(errorMsg, url, lineNumber){
-                $('.test-output').addClass('fail');
-                var prettyText = 'Test Failed: Uncaught Exception: ' + errorMsg;
-
-                console.log(prettyText);
-                $('.test-output .status').text(prettyText);
-                window.postMessage(JSON.stringify({type: 'test-complete', verdict: 'FAIL', stack: prettyText, name: window.location.hash.substr(1)}), '*');
+            window.onerror = function (errorMsg, url, lineNumber) {
+                domReporter.error(errorMsg, url, lineNumber);
+                leprechaunReporter.error(errorMsg, url, lineNumber);
             };
 
-            this._dispatch(window.location.hash.substr(1), superfixtureUrl);
-            window.addEventListener('hashchange', function () {
-                this._dispatch(window.location.hash.substr(1), superfixtureUrl);
-            }.bind(this));
-        },
-        _dispatch: function (testUrl, superfixtureUrl) {
-            module.dynamicImport({
-                test: testUrl,
-                superfixtures: superfixtureUrl
-            }, function (imports) {
-                function log(msg) {
-                    var entry = $('<li class="log">').text(msg);
-                    console.log(msg);
-                    $('.test-output ul').append(entry);
-                    $('.test-output ul')[0].scrollTop = $('.test-output ul')[0].scrollHeight;
-                    return entry;
-                }
-                function reporter(msg) {
-                    var entry;
-                    if (msg.type === 'test-complete') {
-                        entry = log(msg.verdict + ': ' + msg.name).addClass(msg.verdict);
-                        if (msg.stack) {
-                            entry.append($('<pre>').addClass('stack').text(msg.stack));
-                            console.log(msg.stack);
-                        }
-                        $('.test-output').trigger('test-complete', msg);
-                    }
-                    window.postMessage(JSON.stringify(msg), "*");
-                }
+            var runTest = function () {
+                var testUrl = window.location.hash.substr(1);
+                module.dynamicImport({
+                    test: testUrl,
+                    superfixtures: superfixtureUrl
+                }, function (imports) {
+                    domReporter.startTest(testUrl);
+                    leprechaunReporter.startTest(testUrl);
+                    var failed = !run_all(
+                        domReporter.getReporter(
+                            leprechaunReporter.getReporter(
+                                function () {}
+                            )
+                        )
+                    );
+                    domReporter.endTest(failed);
+                    leprechaunReporter.endTest(failed);
+                });
+            };
 
-                $('.test-output').removeClass('fail');
-                $('.test-output').removeClass('pass');
-                $('.test-output .status').text('Testing ' + testUrl + '...');
-                log('Testing ' + testUrl + '...');
-                var failed = !run_all(reporter);
-
-                $('.test-output').addClass(failed ? 'fail' : 'pass');
-                var prettyText = failed ? 'Test Failed' : 'Test Passed' ;
-                console.log(prettyText);
-                $('.test-output .status').text(prettyText);
-            });
+            runTest();
+            window.addEventListener('hashchange', runTest);
         }
     };
 });
