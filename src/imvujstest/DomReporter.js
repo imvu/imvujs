@@ -20,9 +20,9 @@ module({}, function (imports) {
             this._log('Testing ' + url + '...');
         },
 
-        endSuite: function (failed) {
-            this.$el.addClass(failed ? 'fail' : 'pass');
-            var prettyText = failed ? 'Test Failed' : 'Test Passed' ;
+        endSuite: function (passed) {
+            this.$el.addClass(passed ? 'pass' : 'fail');
+            var prettyText = passed ? 'Test Passed' : 'Test Failed' ;
             this.$('.status').text(prettyText);
         },
 

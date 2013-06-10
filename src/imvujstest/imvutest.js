@@ -27,7 +27,7 @@ module({
                 }, function (imports) {
                     reporter.startSuite(testUrl);
                     var passed = run_all(reporter);
-                    reporter.endSuite(!passed);
+                    reporter.endSuite(passed);
                 });
             };
 

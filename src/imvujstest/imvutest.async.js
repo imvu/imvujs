@@ -27,7 +27,7 @@ module({
                 }, function (imports) {
                     reporter.startSuite(testUrl);
                     run_all(reporter, function (passed) {
-                        reporter.endSuite(!passed);
+                        reporter.endSuite(passed);
                     });
                 });
             };

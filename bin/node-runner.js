@@ -98,7 +98,7 @@ function runTest(testPath, continuation) {
         startSuite: function (testPath) {
             syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
         },
-        endSuite: function (failed) {},
+        endSuite: function (passed) {},
         error: function (errorMsg, url, lineNumber) {},
         startTest: function (name) {
             syncWrite('* ' + name + '... ');
@@ -122,7 +122,7 @@ function runTest(testPath, continuation) {
 
     reporter.startSuite(testPath);
     var success = run_all(reporter); 
-    reporter.endSuite(!success);
+    reporter.endSuite(success);
     return success;
 }
 

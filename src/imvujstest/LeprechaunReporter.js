@@ -3,7 +3,7 @@ module({
     return IMVU.BaseClass.extend('LeprechaunReporter', {
         startSuite: function (url) {},
 
-        endSuite: function (failed) {
+        endSuite: function (passed) {
             this._report({
                 type: 'all-tests-complete'
             });
