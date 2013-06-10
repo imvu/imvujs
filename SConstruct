@@ -90,6 +90,7 @@ targets += env.ClosureCompiler(
 
 targets += env.CombinedModule('out/imvu.fakes.js', 'fakes/Package.js')
 targets += env.CombinedModule('out/imvutest.js', 'src/imvujstest/imvutest.js')
+targets += env.CombinedModule('out/imvutest.async.js', 'src/imvujstest/imvutest.async.js')
 
 if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)

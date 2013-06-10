@@ -1,11 +1,11 @@
 module({
-    synctest: 'synctest.js',
+    asynctest: 'asynctest.js',
     css: 'css.js',
     DomReporter: 'DomReporter.js',
     LeprechaunReporter: 'LeprechaunReporter.js',
     CompositeReporter: 'CompositeReporter.js'
 }, function (imports) {
-    var run_all = imports.synctest.run_all;
+    var run_all = imports.asynctest.run_all;
     return {
         start: function (superfixtureUrl) {
             imports.css.install();
@@ -26,8 +26,9 @@ module({
                     superfixtures: superfixtureUrl
                 }, function (imports) {
                     reporter.startSuite(testUrl);
-                    var passed = run_all(reporter);
-                    reporter.endSuite(!passed);
+                    run_all(reporter, function (passed) {
+                        reporter.endSuite(!passed);
+                    });
                 });
             };
 

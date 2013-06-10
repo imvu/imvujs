@@ -90,26 +90,40 @@ function runTest(testPath, continuation) {
     //sandbox.__dirname = path.dirname(abspath);
     //_.bindAll(sandbox); // so imvujstest functions can access __filename and __dirname
 
-    syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
     global.__filename = abspath;
     global.module.currentFilePath = abspath;
     global.module({test:abspath}, function() {});
 
-    return run_all(function (report) {
-        if (report.type === 'test-start') {
-            syncWrite('* ' + report.name + '... ');
-        }
-        if (report.type === 'test-complete') {
-            if (report.verdict === 'PASS') {
-                syncWrite(green + report.verdict + normal + '\n');
+    var ConsoleReporter = IMVU.BaseClass.extend('ConsoleReporter', {
+        startSuite: function (testPath) {
+            syncWrite(yellow + path.normalize(testPath) + normal + '\n----\n');
+        },
+        endSuite: function (failed) {},
+        error: function (errorMsg, url, lineNumber) {},
+        startTest: function (name) {
+            syncWrite('* ' + name + '... ');
+        },
+        endTest: function (name, passed, stack, exception) {
+            var verdict = passed ? 'PASS' : 'FAIL';
+            if (passed) {
+                syncWrite(green + verdict + normal + '\n');
             } else {
-                syncWrite(red + report.verdict + normal + '\n');
+                syncWrite(red + verdict + normal + '\n');
             }
-            if (report.stack) {
-                syncWrite(report.stack);
+            if (stack) {
+                syncWrite(stack);
+            }
+            if (exception) {
+                syncWrite(exception);
             }
         }
     });
+    var reporter = new ConsoleReporter();
+
+    reporter.startSuite(testPath);
+    var success = run_all(reporter); 
+    reporter.endSuite(!success);
+    return success;
 }
 
 function main() {

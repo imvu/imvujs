@@ -2,21 +2,6 @@ module({
     Runner: 'Runner.js',
     cps: '../cps.js'
 }, function (imports) {
-    return IMVU.BaseClass.extend('AsyncRunner', {
-        initialize: function () {
-            this.runner = new imports.Runner(runTest);
-        },
-        registerSuperFixture: function (superFixture) {
-            this.runner.registerSuperFixture(superFixture);
-        },
-        test: function (name, body) {
-            this.runner.test(name, body);
-        },
-        run_all: function (reporter, onComplete) {
-            this.runner.run_all(reporter, onComplete);
-        }
-    });
-
     function runTest(superFixtures, test, continuation) {
         var beforeTests = []; // in-order list of superfixture.afterTest
         var afterTests = []; // reverse-order list of superfixture.afterTest
@@ -62,4 +47,19 @@ module({
             };
         }
     }
+
+    return IMVU.BaseClass.extend('AsyncRunner', {
+        initialize: function () {
+            this.runner = new imports.Runner(runTest);
+        },
+        registerSuperFixture: function (superFixture) {
+            this.runner.registerSuperFixture(superFixture);
+        },
+        test: function (name, body) {
+            this.runner.test(name, body);
+        },
+        run_all: function (reporter, onComplete) {
+            this.runner.run_all(reporter, onComplete);
+        }
+    });
 });

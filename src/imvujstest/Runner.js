@@ -48,35 +48,19 @@ module({
             var self = this;
             var steps = _(this.allTests).map(function (test) {
                 return function (nextTest) {
-                    reporter({
-                        type: 'test-start',
-                        name: test.name
-                    });
+                    reporter.startTest(test.name);
                     self.runTest(self.superFixtures, test, function (failed) {
                         if (failed) {
-                            reporter({
-                                type: 'test-complete',
-                                name: test.name,
-                                verdict: 'FAIL',
-                                stack: failed.stack,
-                                e: failed.e
-                            });
+                            reporter.endTest(test.name, false, failed.stack, failed.e);
                             onComplete(false);
                         } else {
-                            reporter({
-                                type: 'test-complete',
-                                name: test.name,
-                                verdict: 'PASS'
-                            });
+                            reporter.endTest(test.name, true, undefined, undefined);
                             nextTest();
                         }
                     });
                 };
             });
             imports.cps.sequence_(steps, function (results) {
-                reporter({
-                    type: 'all-tests-complete'
-                });
                 self.allTests = [];
                 onComplete(true);
             });
