@@ -1,28 +1,14 @@
-/*global IMVU:true, TEST_MAX_OUTPUT_SIZE*/
 module({
     AssertionError: 'AssertionError.js',
     SyncRunner: 'SyncRunner.js',
     Fixture: 'Fixture.js',
-    assert: 'assert.js'
+    testglobals: 'testglobals.js'
 }, function (imports) {
     var syncRunner = new imports.SyncRunner();
-
-    function fixture(fixtureName, definition) {
-        return new imports.Fixture(undefined, fixtureName, definition, false, syncRunner.runner);
-    }
-    fixture.abstract = function(fixtureName, definition) {
-        return new imports.Fixture(undefined, fixtureName, definition, true, syncRunner.runner);
-    };
-
-    var g = 'undefined' === typeof window ? global : window;
-
-    g.registerSuperFixture = syncRunner.registerSuperFixture.bind(syncRunner);
-    g.test = syncRunner.test.bind(syncRunner);
-    g.fixture = fixture;
-    g.AssertionError = imports.AssertionError;
-    g.assert = imports.assert;
+    imports.testglobals.injectGlobals(syncRunner);
 
     // TODO: move these into another file?  ProactiveIntermittencePrevention.js? :)
+    var g = 'undefined' === typeof window ? global : window;
 
     var originals = {};
     g.test.originals = originals;
