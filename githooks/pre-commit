@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-cd $GIT_DIR/..
+if [ "" != "$GIT_DIR" ]; then
+    cd $GIT_DIR/..
+else
+    cd "`dirname \"$0\"`"/..
+fi
 
 if
     git diff --cached | egrep '^\+.*	'>/dev/null
