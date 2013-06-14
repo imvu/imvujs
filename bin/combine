@@ -1,8 +1,12 @@
 #!/bin/bash
-if [ .$MSYSTEM = .MINGW32 ]; then
-    MYDIR="$0"/../..
+MYDIR=`dirname "$0"`/..
+
+OS=`python -c "import sys; print sys.platform"`
+if [ $OS != 'darwin' -a $OS != 'linux2' ]; then
+    COMBINE="`cygpath -w \"$MYDIR/bin/combine.js\"`"
 else
-    MYDIR=`dirname "$0"`/..
+    COMBINE="$MYDIR/bin/combine.js"
 fi
 
-"$MYDIR/s/node" "$MYDIR/bin/combine.js" "$@"
+echo 1>&2 "$MYDIR/s/node" "$COMBINE" "$@"
+"$MYDIR/s/node" "$COMBINE" "$@"
