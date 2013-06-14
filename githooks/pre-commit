@@ -2,7 +2,7 @@
 set -e
 
 if [ "" != "$GIT_DIR" ]; then
-    cd $GIT_DIR/..
+    cd "$GIT_DIR"/..
 else
     cd "`dirname \"$0\"`"/..
 fi
