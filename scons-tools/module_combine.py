@@ -6,39 +6,32 @@ import subprocess
 def generate(env):
     def depend_on_combiner(target, source, env):
         env.Depends(target, env['MODULE_COMBINE'])
-        env.Depends(target, env.File(str(env['MODULE_COMBINE']) + '.js'))
         env.Depends(target, env['MODULE_SCAN'])
-        env.Depends(target, env.File(str(env['MODULE_SCAN']) + '.js'))
-
         return target, source
 
     def combine(target, source, env, for_signature):
-        # TODO: could replace bash invocation with direct node module-combine.js call
         aliases = ["--alias %s=%s" % (key, value) for key, value in env['MODULE_ALIASES'].items()]
-        return 'bash $MODULE_COMBINE ' + ' '.join(aliases) + ' $SOURCE > $TARGET'
+        cmd = '$NODEJS $MODULE_COMBINE ' + ' '.join(aliases) + ' $SOURCE > $TARGET'
+        return cmd
     
-    path = os.path.abspath(os.path.join(
+    env['MODULE_COMBINE'] = env.File(os.path.abspath(os.path.join(
         os.path.dirname(__file__),
         '..',
         'bin',
-        'combine'))
-    env['MODULE_COMBINE'] = env.File(path)
+        'combine.js')))
 
-    path = os.path.abspath(os.path.join(
+    env['MODULE_SCAN'] = env.File(os.path.abspath(os.path.join(
         os.path.dirname(__file__),
         '..',
         'bin',
-        'scan-dependencies'))
-    env['MODULE_SCAN'] = env.File(path)
+        'scan-dependencies.js')))
 
     env['MODULE_ALIASES'] = {}
 
     def scan_module_dependencies(node, env, path):
-        # could replace shell script with node scan-dependencies.js
         # TODO: maybe we should pass the list of aliases and loaders to the tool rather than parsing the @ here
-        print env.subst('$MODULE_SCAN')
         popen = subprocess.Popen(
-            ['bash', env.subst('$MODULE_SCAN'), str(node)],
+            [env.subst('$NODEJS'), env.subst('$MODULE_SCAN'), str(node)],
             stdout=subprocess.PIPE)
         stdout, _ = popen.communicate()
         if popen.returncode:
