@@ -1,0 +1,12 @@
+#!/bin/bash
+MYDIR=`dirname "$0"`/..
+
+OS=`python -c "import sys; print sys.platform"`
+if [ $OS != 'darwin' -a $OS != 'linux2' ]; then
+    COMBINE="`cygpath -w \"$MYDIR/bin/combine.js\"`"
+else
+    COMBINE="$MYDIR/bin/combine.js"
+fi
+
+echo 1>&2 "$MYDIR/s/node" "$COMBINE" "$@"
+"$MYDIR/s/node" "$COMBINE" "$@"
