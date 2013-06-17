@@ -18,7 +18,7 @@ function succeed() {
 function run_jshint() {
     echo "Running jshint..."
     
-    "$NODEJS" "$JSHINT" "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" || fail
+    "$JSHINT" "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" || fail
 }
 
 function run_node_tests() {

@@ -10,5 +10,4 @@ else
     NODEJS="$HERE/../third-party/windows/nodejs-0.8.6/node"
 fi
 
-echo 1>&2 $NODEJS "$@"
 exec $NODEJS "$@"

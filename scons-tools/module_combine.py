@@ -36,7 +36,6 @@ def generate(env):
     def scan_module_dependencies(node, env, path):
         # could replace shell script with node scan-dependencies.js
         # TODO: maybe we should pass the list of aliases and loaders to the tool rather than parsing the @ here
-        print env.subst('$MODULE_SCAN')
         popen = subprocess.Popen(
             ['bash', env.subst('$MODULE_SCAN'), str(node)],
             stdout=subprocess.PIPE)
