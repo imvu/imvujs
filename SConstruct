@@ -44,7 +44,7 @@ NODE_SOURCES = FIRST_SOURCES + [
 env = Environment(
     ENV=os.environ,
     toolpath=['scons-tools'],
-    tools=['node', 'closure', 'uglify', 'gzip', 'module_combine'])
+    tools=['closure', 'uglify', 'gzip', 'module_combine'])
 
 BASE_CLOSURE_FLAGS = [
     '--language_in', 'ECMASCRIPT5',

@@ -1,0 +1,12 @@
+#!/bin/bash
+MYDIR=`dirname "$0"`/..
+
+OS=`python -c "import sys; print sys.platform"`
+if [ $OS != 'darwin' -a $OS != 'linux2' ]; then
+    SCAN_DEPS="`cygpath -w \"$MYDIR/bin/scan-dependencies.js\"`"
+else
+    SCAN_DEPS="$MYDIR/bin/scan-dependencies.js"
+fi
+
+echo 1>&2 "$MYDIR/s/node" "$SCAN_DEPS" "$@"
+"$MYDIR/s/node" "$SCAN_DEPS" "$@"
