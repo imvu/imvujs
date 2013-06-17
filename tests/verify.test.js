@@ -1,4 +1,4 @@
-(function() {
+(function () {
     var accept, parse, reject, uglify, verify;
 
     verify = require('../bin/verify.js');
