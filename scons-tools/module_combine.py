@@ -14,8 +14,18 @@ def generate(env):
         cmd = '$NODEJS $MODULE_COMBINE ' + ' '.join(aliases) + ' $SOURCE > $TARGET'
         return cmd
     
-    env['MODULE_COMBINE'] = env.File(os.path.join('#', 'bin', 'combine.js'))
-    env['MODULE_SCAN'] = env.File(os.path.join('#', 'bin', 'scan-dependencies.js'))
+    env['MODULE_COMBINE'] = env.File(os.path.abspath(os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        'bin',
+        'combine.js')))
+
+    env['MODULE_SCAN'] = env.File(os.path.abspath(os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        'bin',
+        'scan-dependencies.js')))
+
     env['MODULE_ALIASES'] = {}
 
     def scan_module_dependencies(node, env, path):
