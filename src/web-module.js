@@ -89,19 +89,17 @@ var MODULE_DEBUG = true;
     function coallescer(fn) {
         var promises = {}; // arg : Promise
 
-        function coalescedWrapper(arg, onComplete) {
+        return function coalescedWrapper(arg) {
             if (promises.hasOwnProperty(arg)) {
-                promises[arg].then(onComplete);
+                return promises[arg];
             } else {
                 var promise = new Promise(function(resolver) {
                     fn(arg, resolver.resolve.bind(resolver));
                 });
-                promise.then(onComplete);
                 promises[arg] = promise;
+                return promise;
             }
-        }
-
-        return coalescedWrapper;
+        };
     }
 
     var ModuleError = module.ModuleError = IMVU.extendError(Error, 'ModuleError');
@@ -161,7 +159,7 @@ var MODULE_DEBUG = true;
             });
             completeJs[url] = thing;
 
-            fetchJs(url, function(result) {
+            fetchJs(url).then(function(result) {
                 if (!moduleWasCalled) {
                     thing.resolver.resolve(result);
                 }
@@ -215,12 +213,10 @@ var MODULE_DEBUG = true;
     define.amd = true;
 
     function require() {
-        throw new SyntaxError('commonjs require modules are not supported');
+        throw new SyntaxError('CommonJS require modules are not supported');
     }
 
     function module(dependencies, body) {
-        moduleWasCalled = true;
-
         if ("object" !== typeof dependencies) {
             throw new TypeError("Dependencies must be object");
         }
@@ -228,6 +224,7 @@ var MODULE_DEBUG = true;
             throw new TypeError("Body must be a function");
         }
 
+        moduleWasCalled = true;
         module._resolveDependencies(dependencies);
 
         var url = ourUrl;
@@ -258,7 +255,7 @@ var MODULE_DEBUG = true;
             var d = dependencies[key];
             if (typeof d === "function") {
                 // Nothing.  d is a function of (url, onComplete)
-            } else if (d.constructor === String) {
+            } else if (typeof d === "string") {
                 d = importJs.bind(undefined, d);
             }
 
