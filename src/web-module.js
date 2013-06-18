@@ -278,6 +278,8 @@ var MODULE_DEBUG = true;
             }
         }
 
+        var resolved = false;
+
         function complete() {
             var exportTable;
             try {
@@ -287,7 +289,12 @@ var MODULE_DEBUG = true;
                 C.error('failed to evaluate module:', e);
                 throw e;
             }
-            futureAndResolver.resolver.resolve(exportTable);
+            if (resolved) {
+                C.error("Don't call module twice");
+            } else {
+                futureAndResolver.resolver.resolve(exportTable);
+                resolved = true;
+            }
         }
     }
     _.extend(module, IMVU.moduleCommon);
