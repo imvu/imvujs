@@ -278,8 +278,6 @@ var MODULE_DEBUG = true;
             }
         }
 
-        var resolved = false;
-
         function complete() {
             var exportTable;
             try {
@@ -289,11 +287,11 @@ var MODULE_DEBUG = true;
                 C.error('failed to evaluate module:', e);
                 throw e;
             }
-            if (resolved) {
+            if (futureAndResolver.resolved) {
                 C.error("Don't call module twice");
             } else {
                 futureAndResolver.resolver.resolve(exportTable);
-                resolved = true;
+                futureAndResolver.resolved = true;
             }
         }
     }
