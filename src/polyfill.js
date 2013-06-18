@@ -1,8 +1,10 @@
 (function() {
     'use strict';
 
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
     function setConstant(o, k, v) {
-        if (!o.hasOwnProperty(k)) {
+        if (!hasOwnProperty.call(o, k)) {
             o[k] = v;
         }
     }
