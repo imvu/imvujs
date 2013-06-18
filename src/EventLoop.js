@@ -35,7 +35,7 @@ var IMVU = IMVU || {};
     IMVU.EventLoop = {
         queueTask: function(fn) {
             queue.push(fn);
-            if (queue.length > 1) {
+            if (queue.length === 1) {
                 impl(flushTaskQueue);
             }
         }
