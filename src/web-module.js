@@ -94,7 +94,7 @@ var MODULE_DEBUG = true;
                 return promises[arg];
             } else {
                 var promise = new Promise(function(resolver) {
-                    fn(arg, resolver.resolve.bind(resolver));
+                    resolver.resolve(fn(arg));
                 });
                 promises[arg] = promise;
                 return promise;
@@ -104,7 +104,12 @@ var MODULE_DEBUG = true;
 
     var ModuleError = module.ModuleError = IMVU.extendError(Error, 'ModuleError');
 
-    function actualFetchJs(url, onComplete) {
+    function actualFetchJs(url) {
+        var resolver;
+        var promise = new Promise(function(r) {
+            resolver = r;
+        });
+
         C.log("fetch", url);
         fetch(url, onFetched);
 
@@ -143,8 +148,10 @@ var MODULE_DEBUG = true;
                 ourUrl = saveUrl;
             }
 
-            onComplete(result);
+            resolver.accept(result);
         }
+
+        return promise;
     }
 
     function importJs(url, onComplete) {
