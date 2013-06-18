@@ -6,38 +6,39 @@ import subprocess
 def generate(env):
     def depend_on_combiner(target, source, env):
         env.Depends(target, env['MODULE_COMBINE'])
-        env.Depends(target, env.File(str(env['MODULE_COMBINE']) + '.js'))
         env.Depends(target, env['MODULE_SCAN'])
-        env.Depends(target, env.File(str(env['MODULE_SCAN']) + '.js'))
 
         return target, source
 
     def combine(target, source, env, for_signature):
-        # TODO: could replace bash invocation with direct node module-combine.js call
         aliases = ["--alias %s=%s" % (key, value) for key, value in env['MODULE_ALIASES'].items()]
-        return 'bash $MODULE_COMBINE ' + ' '.join(aliases) + ' $SOURCE > $TARGET'
+        module_combine = os.path.relpath(env.subst('$MODULE_COMBINE'), env['MODULE_COMBINE'].cwd or os.getcwd())
+        return '$NODEJS ' + module_combine + ' ' + ' '.join(aliases) + ' $SOURCE > $TARGET'
     
-    path = os.path.abspath(os.path.join(
-        os.path.dirname(__file__),
+    path = os.path.join(
+        os.path.relpath(os.path.dirname(__file__)),
         '..',
         'bin',
-        'combine'))
+        'combine.js'
+    )
     env['MODULE_COMBINE'] = env.File(path)
 
-    path = os.path.abspath(os.path.join(
-        os.path.dirname(__file__),
+    path = os.path.join(
+        os.path.relpath(os.path.dirname(__file__)),
         '..',
         'bin',
-        'scan-dependencies'))
+        'scan-dependencies.js'
+    )
     env['MODULE_SCAN'] = env.File(path)
-
     env['MODULE_ALIASES'] = {}
 
     def scan_module_dependencies(node, env, path):
-        # could replace shell script with node scan-dependencies.js
         # TODO: maybe we should pass the list of aliases and loaders to the tool rather than parsing the @ here
+        import os
+        module_scan = os.path.relpath(env.subst('$MODULE_SCAN'), env['MODULE_SCAN'].cwd or os.getcwd())
+        cmd = [env.subst('$NODEJS'), module_scan, str(node)]
         popen = subprocess.Popen(
-            ['bash', env.subst('$MODULE_SCAN'), str(node)],
+            cmd,
             stdout=subprocess.PIPE)
         stdout, _ = popen.communicate()
         if popen.returncode:
