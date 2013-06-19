@@ -132,5 +132,24 @@ module({
             this.eventLoop._flushTasks();
             assert.equal(e, caught);
         });
+
+        test("Promise.any empty", function() {
+            this.Promise.any([]).then(this.acceptCallback);
+            this.eventLoop._flushTasks();
+            assert.deepEqual([undefined], this.accepts);
+        });
+
+        test("Promise.any: one reject, one accept", function() {
+            var r1, r2;
+            var p1 = new this.Promise(function(resolver) { r1 = resolver; });
+            var p2 = new this.Promise(function(resolver) { r2 = resolver; });
+            this.Promise.any([p1, p2]).then(this.acceptCallback, this.rejectCallback);
+            r1.reject(1);
+            r2.accept(2);
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([], this.accepts);
+            assert.deepEqual([1], this.rejects);
+        });
     });
 });

@@ -74,11 +74,13 @@ var IMVU = IMVU || {};
             });
         };
 
-        Promise.resolve = function(value) {
+        function resolveWrap(value) {
             return new Promise(function(resolver) {
                 resolver.resolve(value);
             });
-        };
+        }
+
+        Promise.resolve = resolveWrap;
 
         Promise.reject = function(value) {
             return new Promise(function(resolver) {
@@ -87,6 +89,19 @@ var IMVU = IMVU || {};
         };
 
         Promise.any = function(values) {
+            return new Promise(function(resolver) {
+                var length = values.length;
+                if (length === 0) {
+                    resolver.resolve(undefined);
+                    return;
+                }
+
+                var acceptCallback = resolver.resolve.bind(resolver);
+                var rejectCallback = resolver.reject.bind(resolver);
+                for (var i = 0; i < length; ++i) {
+                    resolveWrap(values[i]).then(acceptCallback, rejectCallback);
+                }
+            });
         };
 
         Promise.every = function(values) {

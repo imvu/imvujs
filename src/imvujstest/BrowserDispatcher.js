@@ -23,7 +23,9 @@ module({
                     test: testUrl,
                     superfixtures: superfixtureUrl
                 }, function (imports) {
-                    run_all(testUrl, reporter);
+                    run_all(testUrl, reporter, function onComplete(success) {
+                        // What do I do here?
+                    });
                 });
             };
 
