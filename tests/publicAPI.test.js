@@ -108,7 +108,6 @@
               'Random',
               'moduleCommon',
               'EventLoop',
-              'AlreadyResolved',
               'PromiseFactory' ],
             Object.keys(IMVU));
     });

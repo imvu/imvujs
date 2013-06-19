@@ -9,8 +9,6 @@ var IMVU = IMVU || {};
     // Promise.some.  Let's wait and see if they survive
     // standardization.
 
-    var AlreadyResolved = IMVU.AlreadyResolved = IMVU.extendError(Error, "AlreadyResolved");
-
     function PromiseResolver(promise) {
         this.promise = promise;
     }
@@ -18,7 +16,7 @@ var IMVU = IMVU || {};
     PromiseResolver.prototype.accept = function(value) {
         var promise = this.promise;
         if (promise.state !== 'pending') {
-            throw new AlreadyResolved("accept failed: promise is already " + promise.state);
+            return;
         }
         promise.state = 'accepted';
         promise.result = value;
@@ -53,7 +51,7 @@ var IMVU = IMVU || {};
     PromiseResolver.prototype.reject = function(value) {
         var promise = this.promise;
         if (promise.state !== 'pending') {
-            throw new AlreadyResolved("reject failed: promise is already " + promise.state);
+            return;
         }
         promise.state = 'rejected';
         promise.result = value;
@@ -86,6 +84,15 @@ var IMVU = IMVU || {};
             return new Promise(function(resolver) {
                 resolver.reject(value);
             });
+        };
+
+        Promise.any = function(values) {
+        };
+
+        Promise.every = function(values) {
+        };
+
+        Promise.some = function(values) {
         };
 
         function processCallbacks(callbacks, result) {

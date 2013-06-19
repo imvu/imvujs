@@ -51,15 +51,17 @@ module({
             assert.deepEqual(["bye"], this.rejects);
         });
 
-        test("second accept throws", function() {
+        test("second accept is ignored", function() {
             var r;
-            new this.Promise(function(resolver) {
+            var p = new this.Promise(function(resolver) {
                 r = resolver;
             });
+            p.then(this.acceptCallback);
             r.accept("hello");
-            assert.throws(IMVU.AlreadyResolved, function() {
-                r.accept("two");
-            });
+            r.accept("two");
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual(["hello"], this.accepts);
         });
 
         test("resolve", function() {
