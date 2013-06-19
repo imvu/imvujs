@@ -177,5 +177,30 @@ module({
             assert.deepEqual([[1, 2]], this.accepts);
             assert.deepEqual([], this.rejects);
         });
+
+        test("Promise.some: one accept returns", function() {
+            var r1, r2;
+            var p1 = new this.Promise(function(resolver) { r1 = resolver; });
+            var p2 = new this.Promise(function(resolver) { r2 = resolver; });
+            this.Promise.some([p1, p2]).then(this.acceptCallback, this.rejectCallback);
+            r2.accept(2);
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([2], this.accepts);
+            assert.deepEqual([], this.rejects);
+        });
+
+        test("Promise.some: all rejections returns list", function() {
+            var r1, r2;
+            var p1 = new this.Promise(function(resolver) { r1 = resolver; });
+            var p2 = new this.Promise(function(resolver) { r2 = resolver; });
+            this.Promise.some([p1, p2]).then(this.acceptCallback, this.rejectCallback);
+            r1.reject(1);
+            r2.reject(2);
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([], this.accepts);
+            assert.deepEqual([[1, 2]], this.rejects);
+        });
     });
 });
