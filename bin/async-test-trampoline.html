@@ -3,7 +3,9 @@
 <script src="../out/imvu.js"></script>
 <script>
     module.caching = false;
-    module.importJs('../src/imvujstest/imvutest.async.js', function (imvutest) {
-        imvutest.start('../tests/asyncsuperfixture.js');
+    module.run({
+        imvutest: '../src/imvujstest/imvutest.async.js'
+    }, function(imports) {
+        imports.imvutest.start('../tests/asyncsuperfixture.js');
     });
 </script>

@@ -32,61 +32,52 @@ var MODULE_DEBUG = true;
         warn: nop,
         info: nop
     };
-    //C = console;
     function setLogger(logger) {
         var old = C;
         C = logger;
         return old;
     }
 
-    function hasProperties(o) {
-        for (var k in o) {
-            if (o.hasOwnProperty(k)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function fetch(url, callback) {
+    // fetch(url) -> Promise<xhr>
+    function fetch(url) {
         // This is an interim solution for a more robust push versioning build system.
         var version = window.module.versionedUrls[url] || window.module.versionedUrls['/' + url];
         if (version){
             url = url + '?v=' + version;
         }
 
-        var xhr = new XHRFactory();
-        xhr.open('GET', url);
-        if (!window.module.caching) {
-            xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
-        }
-        xhr.onreadystatechange = function () {
-            if (this.readyState === this.DONE) {
-                callback(this);
+        return new Promise(function(resolver) {
+            var xhr = new XHRFactory();
+            xhr.open('GET', url);
+            xhr.withCredentials = true; // use cross-origin requests if supported
+            if (!window.module.caching) {
+                xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
             }
-        };
-        xhr.send();
+            xhr.onreadystatechange = function () {
+                if (this.readyState === this.DONE) {
+                    resolver.accept(this);
+                }
+            };
+            xhr.send();
+        });
     }
 
     var ourUrl = window.location.pathname; // todo: should be href (support cross-domain references)
 
     function _reset() {
-        completeJs = {};
-        moduleWasCalled = false;
-        fetchJs = coallescer(actualFetchJs);
+        loadModule = coalescer(actualLoadModule);
+        currentModuleResolver = undefined;
     }
-    var completeJs; // url : {promise: Promise<exportTable>, resolver: PromiseResolver}
-    var moduleWasCalled;
-    var fetchJs;
+    var loadModule; // function(moduleReference) -> Promise<exports>
+    var currentModuleResolver; // undefined if no load started, PromiseResolver otherwise
     _reset();
 
-    /* Returns a function which implements memoization and request coallescing
+    /* Returns a function which implements memoization and request coalescing
      * for the function 'fn'
      *
-     * 'fn' must have the signature function(arg, onComplete)
-     * where onComplete is itself a function that takes the result as its sole parameter.
+     * 'fn' must have the signature function(arg) -> Promise
      */
-    function coallescer(fn) {
+    function coalescer(fn) {
         var promises = {}; // arg : Promise
 
         return function coalescedWrapper(arg) {
@@ -104,16 +95,9 @@ var MODULE_DEBUG = true;
 
     var ModuleError = module.ModuleError = IMVU.extendError(Error, 'ModuleError');
 
-    function actualFetchJs(url) {
-        var resolver;
-        var promise = new Promise(function(r) {
-            resolver = r;
-        });
-
+    function actualLoadModule(url) {
         C.log("fetch", url);
-        fetch(url, onFetched);
-
-        function onFetched(xhr) {
+        return fetch(url).then(function fetched(xhr) {
             if (xhr.status !== 200) {
                 C.error("Failed to fetch " + url);
                 throw new ModuleError("Failed to fetch " + url + ".  Status code " + xhr.status);
@@ -131,62 +115,25 @@ var MODULE_DEBUG = true;
                 throw e;
             }
 
-            var saveUrl = ourUrl;
+            return new Promise(function(resolver) {
+                var saveUrl = ourUrl;
+                ourUrl = url;
+                currentModuleResolver = resolver;
 
-            ourUrl = url;
-            moduleWasCalled = false;
-
-            var result;
-            try {
                 try {
-                    result = evaluated.call(window);
+                    evaluated.call(window);
+                    if (currentModuleResolver) {
+                        // then no module() or define() was called
+                        resolver.accept(undefined);
+                    }
                 } catch (e) {
                     C.error('failed to evaluate script:', e);
+                    resolver.reject(e);
                     throw e;
+                } finally {
+                    ourUrl = saveUrl;
+                    currentModuleResolver = undefined;
                 }
-            } finally {
-                ourUrl = saveUrl;
-            }
-
-            resolver.accept(result);
-        }
-
-        return promise;
-    }
-
-    function importJs(url, onComplete) {
-        url = IMVU.moduleCommon.toAbsoluteUrl(url, ourUrl);
-
-        if (completeJs.hasOwnProperty(url)) {
-            completeJs[url].promise.then(onComplete);
-        } else {
-            var thing = {};
-            thing.promise = new Promise(function(resolver) {
-                thing.resolver = resolver;
-            });
-            completeJs[url] = thing;
-
-            fetchJs(url).then(function(result) {
-                if (!moduleWasCalled) {
-                    thing.resolver.resolve(result);
-                }
-            });
-            thing.promise.then(onComplete);
-        }
-    }
-
-    function dynamicImport(urls, onComplete) {
-        ourUrl = window.location.pathname; // todo: use href, support cross-domain references
-        onComplete = onComplete || function() {};
-        /* TODO var progressCallback = onProgress || function() {}; */
-
-        var newImports = [];
-        var callback = _.after(_.keys(urls).length, onComplete);
-
-        _.each(urls, function(url, key) {
-            importJs(url, function(result) {
-                newImports[key] = result;
-                callback(newImports);
             });
         });
     }
@@ -202,25 +149,36 @@ var MODULE_DEBUG = true;
         }
     }
 
-    /*
-     * `define(callback)` shortcut for hacky AMD compatibility
-     * Note that the "real" AMD define() signature is roughly
-     * define(optional moduleName, optional dependencies, callback)
-     */
-    function define(callback) {
-        if (Object.prototype.toString.call(callback) === '[object Array]') {
-            callback = arguments[1];
-        }
-        if (1 === arguments.length) {
-            module({}, function() { return callback; });
+    // dependencyReference -> Promise<exports>
+    function loadDependency(thisURL, dependency) {
+        if (typeof dependency === "function") {
+            // TODO: kill this path and implement proper module loader plugins
+            return new Promise(function(resolver) {
+                dependency(function(exports) {
+                    resolver.accept(exports);
+                }, {
+                    getAbsoluteURL: function(url) {
+                        return IMVU.moduleCommon.toAbsoluteUrl(url, thisURL);
+                    }
+                });
+            });
         } else {
-            module({}, callback);
+            return loadModule(
+                IMVU.moduleCommon.toAbsoluteUrl(
+                    IMVU.moduleCommon._resolveDependency(dependency),
+                    thisURL));
         }
     }
-    define.amd = {};
 
-    function require() {
-        throw new SyntaxError('CommonJS require modules are not supported');
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+    function bubbleErrorToBrowser(e) {
+        /*
+        var st = (typeof test === 'function' && typeof test.originals === 'object' && typeof test.originals.setTimeout === 'function') ?
+            test.originals.setTimeout :
+            setTimeout;
+        st(function() { throw e; }, 0);
+        */
     }
 
     function module(dependencies, body) {
@@ -231,92 +189,93 @@ var MODULE_DEBUG = true;
             throw new TypeError("Body must be a function");
         }
 
-        moduleWasCalled = true;
-        module._resolveDependencies(dependencies);
+        // TODO: assert there's a module resolver
+        var thisModuleResolver = currentModuleResolver;
+        currentModuleResolver = undefined;
 
-        var url = ourUrl;
-        var futureAndResolver;
-        if (completeJs.hasOwnProperty(url)) {
-            futureAndResolver = completeJs[url];
-        } else {
-            futureAndResolver = {};
-            futureAndResolver.promise = new Promise(function(resolver) {
-                futureAndResolver.resolver = resolver;
-            });
-            completeJs[url] = futureAndResolver;
-        }
+        var imports = {};
+        var remainingDependencies = 0;
 
-        var result = {};
-
-        var remainingDependencies = Object.keys(dependencies).length;
-        if (remainingDependencies === 0) {
-            complete();
-            return;
-        }
-
-        for (var key in dependencies) {
-            if (!dependencies.hasOwnProperty(key)) {
+        for (var name in dependencies) {
+            if (!hasOwnProperty.call(dependencies, name)) {
                 continue;
             }
 
-            var d = dependencies[key];
-            if (typeof d === "function") {
-                // Nothing.  d is a function of (url, onComplete)
-            } else if (typeof d === "string") {
-                d = importJs.bind(undefined, d);
-            }
+            ++remainingDependencies;
 
-            d(handleResolution.bind(undefined, key), {
-                getAbsoluteURL: function(url) {
-                    return IMVU.moduleCommon.toAbsoluteUrl(url, ourUrl);
+            var dependency = dependencies[name];
+            loadDependency(ourUrl, dependency).then(function(name, exports) {
+                imports[name] = exports;
+                if (--remainingDependencies === 0) {
+                    complete();
                 }
+            }.bind(undefined, name))['catch'](function(error) {
+                bubbleErrorToBrowser(error);
             });
         }
 
-        function handleResolution(name, value) {
-            result[name] = value;
-
-            --remainingDependencies;
-            if (0 === remainingDependencies) {
-                complete();
-            }
+        if (0 === remainingDependencies) {
+            complete();
         }
 
+        var url = ourUrl;
+
         function complete() {
-            var exportTable;
+            var exports;
             try {
-                exportTable = body.call(undefined, result);
+                exports = body.call(undefined, imports);
             }
             catch (e) {
                 C.error('failed to evaluate module:', e);
                 throw e;
             }
-            if (futureAndResolver.resolved) {
-                C.error("Don't call module twice");
-            } else {
-                futureAndResolver.resolver.resolve(exportTable);
-                futureAndResolver.resolved = true;
+            if (thisModuleResolver) {
+                thisModuleResolver.accept(exports);
             }
         }
     }
-    _.extend(module, IMVU.moduleCommon);
 
-    module.canonicalize = function canonicalize(fp) {
-        return module.toAbsoluteUrl(fp, ourUrl);
+    module.run = function module_run(dependencies, body) {
+        module(dependencies, body);
     };
 
-    window.module = module;
-    window.define = define;
+    function canonicalize(fp) {
+        return module.toAbsoluteUrl(fp, ourUrl);
+    }
 
+    _.extend(module, IMVU.moduleCommon);
     _.extend(module, {
-        importJs: importJs,
-        dynamicImport: dynamicImport,
         setXHRFactory: setXHRFactory,
         setPromiseFactory: setPromiseFactory,
         setLogger: setLogger,
-        _reset: _reset,
         caching: true,
-        versionedUrls: {}
+        versionedUrls: {},
+
+        // I wish this weren't a public symbol.
+        canonicalize: canonicalize,
+
+        // test-only :(
+        _reset: _reset
     });
+
+    /*
+     * `define(callback)` shortcut for hacky AMD compatibility
+     * Note that the "real" AMD define() signature is roughly
+     * define(optional moduleName, optional dependencies, callback)
+     */
+    function define(callback) {
+        if (Object.prototype.toString.call(callback) === '[object Array]') {
+            callback = arguments[1];
+        }
+        if (1 === arguments.length) {
+            module({}, function() { return callback(); });
+        } else {
+            module({}, callback);
+        }
+    }
+    define.amd = {};
+
+    window.module = module;
+    window.define = define;
 
 })();

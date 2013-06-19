@@ -1,4 +1,3 @@
-
 module({
     b:'another/b.js',
     c: 'c.js'

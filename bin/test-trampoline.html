@@ -3,7 +3,16 @@
 <script src="../out/imvu.js"></script>
 <script>
     module.caching = false;
-    module.importJs('../src/imvujstest/imvutest.js', function (imvutest) {
-        imvutest.start('../tests/superfixture.js');
+    var logger = {
+        error: function() { console.error.apply(console, arguments); },
+        warn: function() { console.warn.apply(console, arguments); },
+        info: function() {},
+        log: function() {},
+    };
+    module.setLogger(logger);
+    module.run({
+        imvutest: '../src/imvujstest/imvutest.js'
+    }, function (imports) {
+        imports.imvutest.start('../tests/superfixture.js');
     });
 </script>

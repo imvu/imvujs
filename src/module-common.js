@@ -90,12 +90,18 @@ var IMVU = IMVU || {};
             aliases[name] = module.canonicalize(path);
         },
 
+        _resolveDependency: function(value) {
+            if ('string' === typeof value && '@' === value.substr(0, 1)) {
+                return alias(value.substr(1));
+            } else {
+                return value;
+            }
+        },
+
         _resolveDependencies: function(dependencies) {
             for (var key in dependencies) {
                 var value = dependencies[key];
-                if ('string' === typeof value && '@' === value.substr(0, 1)) {
-                    dependencies[key] = alias(value.substr(1));
-                }
+                dependencies[key] = module._resolveDependency(value);
             }
         }
     };

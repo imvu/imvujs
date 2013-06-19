@@ -2,11 +2,9 @@
 function getB(onComplete) {
     console.log("getjQuery");
 
-    module.importJs('b.js', gotB);
-
-    function gotB() {
+    module.run({b: 'b.js'}, function(imports) {
         onComplete(null, null);
-    }
+    });
 }
 
 module({_unused: getB}, function(imports) {

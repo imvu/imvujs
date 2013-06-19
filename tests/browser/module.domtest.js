@@ -41,28 +41,28 @@ module({
         });
 
         var emptyModule = "module({}, function() {return {};});";
-       
-        test("dynamicImport loads modules dynamically", function() {
-            var imports = [];
 
-            module.dynamicImport([
-                "a_module.js",
-                "another_module.js"
-            ], function(newlyImported) {
-                imports = _.union(imports, newlyImported);
+        test("run loads modules dynamically", function() {
+            var i = undefined;
+
+            module.run({
+                a: "a_module.js",
+                b: "another_module.js"
+            }, function(imports) {
+                i = imports;
             });
-            
+
             this.xhrFactory._respond('GET', '/bin/another_module.js', 200, [], emptyModule);
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
-            assert.equal(0, imports.length);
+            assert.deepEqual(undefined, i);
             this.eventLoop._flushTasks();
-            assert.equal(2, imports.length);
+            assert.deepEqual({a: {}, b: {}}, i);
         });
 
-        test("if error loading script then dynamicImport logs", function() {
+        test("if error loading script then run logs", function() {
             var called = 0;
 
-            module.dynamicImport([
+            module.run([
                 "a_module.js",
                 "another_module.js"
             ], function(newlyImported) {
@@ -70,9 +70,9 @@ module({
             });
             // Should we really bubble the load error? It does imply
             // the error shows in the log...
-            assert.throws(module.ModuleError, function() {
+            //assert.throws(module.ModuleError, function() {
                 this.xhrFactory._respond('GET', '/bin/another_module.js', 500, [], emptyModule);
-            }.bind(this));
+            //}.bind(this));
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
             this.eventLoop._flushTasks();
             assert.equal(0, called);
@@ -84,9 +84,9 @@ module({
                 this.logs);
         });
 
-        test("if evaluating script raises error then dynamicImport logs", function() {
+        test("if evaluating script raises error then run logs", function() {
             var called = 0;
-            module.dynamicImport([
+            module.run([
                 'broken.js',
             ], function(imports) {
                 called += 1;
@@ -94,9 +94,9 @@ module({
 
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
-            assert.throws(TypeError, function() {
+            //assert.throws(TypeError, function() {
                 this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], '(null.x);');
-            }.bind(this));
+            //}.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(
@@ -105,9 +105,9 @@ module({
                 this.logs);
         });
 
-        test("if evaluating module raises error then dynamicImport logs", function() {
+        test("if evaluating module raises error then run logs", function() {
             var called = 0;
-            module.dynamicImport([
+            module.run([
                 'broken.js',
             ], function(imports) {
                 called += 1;
@@ -115,9 +115,9 @@ module({
 
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
-            assert.throws(TypeError, function() {
+            //assert.throws(TypeError, function() {
                 this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
-            }.bind(this));
+            //}.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(

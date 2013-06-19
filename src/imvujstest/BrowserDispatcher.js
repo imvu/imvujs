@@ -19,7 +19,7 @@ module({
 
             var runTest = function () {
                 var testUrl = window.location.hash.substr(1);
-                module.dynamicImport({
+                module.run({
                     test: testUrl,
                     superfixtures: superfixtureUrl
                 }, function (imports) {
