@@ -1,0 +1,7 @@
+#!/bin/bash
+
+python -m SimpleHTTPServer &
+URL="http://127.0.0.1:8000/bin/test-trampoline.html?count=1#$1"
+echo "opening $URL"
+#python -m webbrowser -t "http://127.0.0.1:8000/bin/test-trampoline.html?count=1#$1"
+wait
