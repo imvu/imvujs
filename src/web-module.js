@@ -217,7 +217,7 @@ var MODULE_DEBUG = true;
             module({}, callback);
         }
     }
-    define.amd = true;
+    define.amd = {};
 
     function require() {
         throw new SyntaxError('CommonJS require modules are not supported');
