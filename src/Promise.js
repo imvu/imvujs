@@ -105,6 +105,25 @@ var IMVU = IMVU || {};
         };
 
         Promise.every = function(values) {
+            return new Promise(function(resolver) {
+                var length = values.length;
+                if (0 === length) {
+                    resolver.resolve(undefined);
+                    return;
+                }
+                var countdown = length;
+                var args = new Array(countdown);
+                var rejectCallback = resolver.reject.bind(resolver);
+                for (var i = 0; i < length; ++i) {
+                    var acceptCallback = function(i, a) {
+                        args[i] = a;
+                        if (--countdown === 0) {
+                            resolver.resolve(args); // per spec: synchronous=true
+                        }
+                    }.bind(undefined, i);
+                    resolveWrap(values[i]).then(acceptCallback, rejectCallback);
+                }
+            });
         };
 
         Promise.some = function(values) {
