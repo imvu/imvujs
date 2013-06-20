@@ -233,14 +233,7 @@ var MODULE_DEBUG = true;
         }
 
         function complete() {
-            var exports;
-            try {
-                exports = body.call(undefined, imports);
-            }
-            catch (e) {
-                C.error('failed to evaluate module:', e);
-                throw e;
-            }
+            var exports = body.call(undefined, imports);
             if (thisModuleResolver) {
                 thisModuleResolver.accept(exports);
             }

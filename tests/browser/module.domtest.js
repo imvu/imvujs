@@ -120,7 +120,6 @@ module({
 
             assert.deepEqual(
                 [ 'log: fetch /bin/broken.js',
-                  "error: failed to evaluate module: TypeError: Cannot read property 'x' of null",
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null" ],
                 this.logs);
         });

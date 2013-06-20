@@ -38,16 +38,20 @@ var IMVU = IMVU || {};
         if (typeof then === "function") {
             var accept = this.resolve.bind(this);
             var reject = this.reject.bind(this);
-            try {
+            if (promise.exposeErrors) {
                 then.call(value, accept, reject);
-            } catch (e) {
-                this.reject(e);
+            } else {
+                try {
+                    then.call(value, accept, reject);
+                } catch (e) {
+                    this.reject(e);
+                }
             }
             return;
         }
         this.accept(value);
     };
-    
+
     PromiseResolver.prototype.reject = function(value) {
         var promise = this.promise;
         if (promise.state !== 'pending') {
@@ -210,7 +214,7 @@ var IMVU = IMVU || {};
                     resolver.resolve(value); // per spec: synchronous=true
                 };
             }
-            
+
             this.acceptCallbacks.push(
                 acceptCallback ?
                     promiseWrapperCallback(acceptCallback) :

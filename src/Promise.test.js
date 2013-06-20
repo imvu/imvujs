@@ -242,5 +242,30 @@ module({
                 r.accept(10);
             });
         });
+
+        test("", function() {
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: true,
+                exposeErrors: true
+            });
+
+            p.then(function(x) {
+                return new this.Promise(function(resolver) {
+                    resolver.accept(10);
+                }, {
+                    immediateCallbacks: true,
+                    exposeErrors: true
+                });
+            }.bind(this)).then(function(x) {
+                throw new SyntaxError();
+            });
+
+            assert.throws(SyntaxError, function() {
+                r.accept(10);
+            });
+        });
     });
 });
