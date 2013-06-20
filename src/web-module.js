@@ -187,6 +187,10 @@ var MODULE_DEBUG = true;
         */
     }
 
+    module.inModuleDependency = function() {
+        return currentModuleURL !== undefined;
+    };
+
     function module(dependencies, body) {
         if ("object" !== typeof dependencies) {
             throw new TypeError("Dependencies must be object");
@@ -195,7 +199,7 @@ var MODULE_DEBUG = true;
             throw new TypeError("Body must be a function");
         }
 
-        if (currentModuleURL === undefined) {
+        if (!module.inModuleDependency()) {
             throw new SyntaxError("module() called as root module, use module.run instead");
         }
 
@@ -204,7 +208,7 @@ var MODULE_DEBUG = true;
         currentModuleResolver = undefined;
 
         var imports = {};
-        var remainingDependencies = 0;
+        var remainingDependencies = 1;
 
         for (var name in dependencies) {
             if (!hasOwnProperty.call(dependencies, name)) {
@@ -224,7 +228,7 @@ var MODULE_DEBUG = true;
             });
         }
 
-        if (0 === remainingDependencies) {
+        if (--remainingDependencies === 0) {
             complete();
         }
 
