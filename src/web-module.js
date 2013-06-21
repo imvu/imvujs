@@ -62,14 +62,15 @@ var MODULE_DEBUG = true;
         });
     }
 
-    var ourUrl = window.location.pathname; // todo: should be href (support cross-domain references)
-
     function _reset() {
         loadModule = coalescer(actualLoadModule);
         currentModuleResolver = undefined;
+        currentModuleURL = undefined;
     }
     var loadModule; // function(moduleReference) -> Promise<exports>
     var currentModuleResolver; // undefined if no load started, PromiseResolver otherwise
+    var currentModuleURL;
+
     _reset();
 
     /* Returns a function which implements memoization and request coalescing
@@ -116,8 +117,8 @@ var MODULE_DEBUG = true;
             }
 
             return new Promise(function(resolver) {
-                var saveUrl = ourUrl;
-                ourUrl = url;
+                var saveUrl = currentModuleURL;
+                currentModuleURL = url;
                 currentModuleResolver = resolver;
 
                 try {
@@ -131,7 +132,7 @@ var MODULE_DEBUG = true;
                     resolver.reject(e);
                     throw e;
                 } finally {
-                    ourUrl = saveUrl;
+                    currentModuleURL = saveUrl;
                     currentModuleResolver = undefined;
                 }
             });
@@ -189,6 +190,10 @@ var MODULE_DEBUG = true;
             throw new TypeError("Body must be a function");
         }
 
+        if (currentModuleURL === undefined) {
+            throw new SyntaxError("module() called as root module, use module.run instead");
+        }
+
         // TODO: assert there's a module resolver
         var thisModuleResolver = currentModuleResolver;
         currentModuleResolver = undefined;
@@ -204,7 +209,7 @@ var MODULE_DEBUG = true;
             ++remainingDependencies;
 
             var dependency = dependencies[name];
-            loadDependency(ourUrl, dependency).then(function(name, exports) {
+            loadDependency(currentModuleURL, dependency).then(function(name, exports) {
                 imports[name] = exports;
                 if (--remainingDependencies === 0) {
                     complete();
@@ -217,8 +222,6 @@ var MODULE_DEBUG = true;
         if (0 === remainingDependencies) {
             complete();
         }
-
-        var url = ourUrl;
 
         function complete() {
             var exports;
@@ -236,11 +239,20 @@ var MODULE_DEBUG = true;
     }
 
     module.run = function module_run(dependencies, body) {
-        module(dependencies, body);
+        var oldUrl = currentModuleURL;
+        if (!currentModuleURL) {
+            currentModuleURL = window.location.pathname; // TODO: should be window.location.href so we can support cross-domain URLs
+        }
+        try {
+            module(dependencies, body);
+        }
+        finally {
+            currentModuleURL = oldUrl;
+        }
     };
 
     function canonicalize(fp) {
-        return module.toAbsoluteUrl(fp, ourUrl);
+        return module.toAbsoluteUrl(fp, currentModuleURL);
     }
 
     _.extend(module, IMVU.moduleCommon);

@@ -5,7 +5,7 @@
 
   window.trace = [];
 
-  module({a:'a.js'}, function(imports) {
+  module.run({a:'a.js'}, function(imports) {
       imports.a.invoke();
 
       var failures = 0;

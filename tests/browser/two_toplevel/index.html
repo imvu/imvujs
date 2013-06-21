@@ -23,10 +23,10 @@
   }
 
   try {
-      module({}, function(imports) {
+      module.run({}, function(imports) {
           gate();
       });
-      module({}, function(imports) {
+      module.run({}, function(imports) {
           gate();
       });
   } catch (e) {

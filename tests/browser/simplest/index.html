@@ -8,7 +8,7 @@
 
   window.trace = [];
 
-  module([], function(a) {
+  module.run([], function(a) {
       var failures = 0;
       var message = 'PhantomJS test runner: ' + (1 - failures) + ' tests of 1 passed, ' + failures + ' failed';
       var tt = document.createElement('tt');

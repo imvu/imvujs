@@ -8,7 +8,7 @@
 
   window.trace = [];
 
-  module({a: 'subdir/a.js'}, function(imports) {
+  module.run({a: 'subdir/a.js'}, function(imports) {
       imports.a.invoke();
 
       var failures = 0;
