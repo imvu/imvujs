@@ -2,17 +2,11 @@
 <title>Browser Module Example</title>
 <script src="../../out/imvu.js"></script>
 <script>
-    module.importJs('Foo.js', function (Foo) {
-        Foo.log('module.importJs() example:');
-        Foo.doFoo('Hello there!');
-    });
-</script>
-<script>
-    module.dynamicImport({
+    module.run({
         Foo: 'Foo.js',
         Bar: 'Bar.js'
     }, function (imports) {
-        imports.Foo.log('module.dynamicImport() example:');
+        imports.Foo.log('module.run() example:');
         imports.Foo.doFoo('How are you doing?');
         imports.Bar.doBar('Very well, thanks!');
     });

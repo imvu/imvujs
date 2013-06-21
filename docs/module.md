@@ -6,11 +6,12 @@ All of these examples have code available in the [module](module/) subdirectory.
 
 imvujs modules have a set of named dependencies and a module body.
 
-In a browser, there are three functions to declare a module and run code dependent on other modules:
+There are two functions to declare a module and run code dependent on other modules:
 
+* `module.run(dependencies, body)` -- loads dependencies and executes
+  body.  should be used to load the first set of modules from an
+  inline `<script>` on the page, or to dynamically load modules later on
 * `module(dependencies, body)` -- used to define a module that has N dependencies 
-* `module.importJs(dependency, body)` -- used in an inline `<script>` to run a function with a single dependency
-* `module.dynamicImport(dependencies, body)` -- used in an inline `<script>` to run a function that has multiple dependencies
 
 ---
 
@@ -51,17 +52,11 @@ module({
 <title>Browser Module Example</title>
 <script src="../../out/imvu.js"></script>
 <script>
-    module.importJs('Foo.js', function (Foo) {
-        Foo.log('module.importJs() example:');
-        Foo.doFoo('Hello there!');
-    });
-</script>
-<script>
-    module.dynamicImport({
+    module.run({
         Foo: 'Foo.js',
         Bar: 'Bar.js'
     }, function (imports) {
-        imports.Foo.log('module.dynamicImport() example:');
+        imports.Foo.log('module.run() example:');
         imports.Foo.doFoo('How are you doing?');
         imports.Bar.doBar('Very well, thanks!');
     });
@@ -71,9 +66,7 @@ module({
 Loading the html file in your browser will result in the following output lines:
 
 ```
-module.importJs() example:
-Foo.doFoo: Hello there!
-module.dynamicImport() example:
+module.run() example:
 Foo.doFoo: How are you doing?
 Foo.doFoo: Very well, thanks! <- came from Bar.js
 ```
@@ -113,8 +106,10 @@ module({
 <title>Custom Dependency Example</title>
 <script src="../../out/imvu.js"></script>
 <script>
-    module.importJs('customDependency.js', function (customDependency) {
-        alert('static.txt: "' + customDependency.staticFile + '"');
+    module.run({
+        customDependency: 'customDependency.js'
+    }, function (imports) {
+        alert('static.txt: "' + imports.customDependency.staticFile + '"');
     });
 </script>
 ```
