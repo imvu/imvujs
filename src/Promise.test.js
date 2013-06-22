@@ -223,5 +223,24 @@ module({
                 r.accept(10);
             });
         });
+
+        test("handlers run immediately and errors bubble even if chained", function() {
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: true,
+                exposeErrors: true
+            });
+
+            p.then().then(function(x) {
+                return x;
+            }).then(function(x) {
+                throw new SyntaxError('boom');
+            });
+            assert.throws(SyntaxError, function() {
+                r.accept(10);
+            });
+        });
     });
 });

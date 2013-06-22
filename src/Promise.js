@@ -188,6 +188,8 @@ var IMVU = IMVU || {};
             var promise = new Promise(function(r) {
                 resolver = r;
             }, {
+                immediateCallbacks: this.immediateCallbacks,
+                exposeErrors: this.exposeErrors
             });
 
             var exposeErrors = this.exposeErrors;

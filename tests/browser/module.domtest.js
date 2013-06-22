@@ -54,8 +54,6 @@ module({
 
             this.xhrFactory._respond('GET', '/bin/another_module.js', 200, [], emptyModule);
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
-            assert.deepEqual(undefined, i);
-            this.eventLoop._flushTasks();
             assert.deepEqual({a: {}, b: {}}, i);
         });
 
