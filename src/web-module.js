@@ -38,6 +38,11 @@ var MODULE_DEBUG = true;
         return old;
     }
 
+    var promiseOptions = {
+        immediateCallbacks: true,
+        exposeErrors: true
+    };
+
     // fetch(url) -> Promise<xhr>
     function fetch(url) {
         // This is an interim solution for a more robust push versioning build system.
@@ -59,7 +64,7 @@ var MODULE_DEBUG = true;
                 }
             };
             xhr.send();
-        });
+        }, promiseOptions);
     }
 
     function _reset() {
@@ -87,7 +92,7 @@ var MODULE_DEBUG = true;
             } else {
                 var promise = new Promise(function(resolver) {
                     resolver.resolve(fn(arg));
-                });
+                }, promiseOptions);
                 promises[arg] = promise;
                 return promise;
             }
@@ -135,7 +140,7 @@ var MODULE_DEBUG = true;
                     currentModuleURL = saveUrl;
                     currentModuleResolver = undefined;
                 }
-            });
+            }, promiseOptions);
         });
     }
 
@@ -162,7 +167,7 @@ var MODULE_DEBUG = true;
                         return IMVU.moduleCommon.toAbsoluteUrl(url, thisURL);
                     }
                 });
-            });
+            }, promiseOptions);
         } else {
             return loadModule(
                 IMVU.moduleCommon.toAbsoluteUrl(

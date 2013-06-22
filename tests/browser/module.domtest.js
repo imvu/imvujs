@@ -70,9 +70,9 @@ module({
             });
             // Should we really bubble the load error? It does imply
             // the error shows in the log...
-            //assert.throws(module.ModuleError, function() {
+            assert.throws(module.ModuleError, function() {
                 this.xhrFactory._respond('GET', '/bin/another_module.js', 500, [], emptyModule);
-            //}.bind(this));
+            }.bind(this));
             this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
             this.eventLoop._flushTasks();
             assert.equal(0, called);
@@ -94,9 +94,9 @@ module({
 
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
-            //assert.throws(TypeError, function() {
+            assert.throws(TypeError, function() {
                 this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], '(null.x);');
-            //}.bind(this));
+            }.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(
@@ -115,9 +115,9 @@ module({
 
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
-            //assert.throws(TypeError, function() {
+            assert.throws(TypeError, function() {
                 this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
-            //}.bind(this));
+            }.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(

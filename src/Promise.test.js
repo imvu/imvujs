@@ -1,7 +1,7 @@
 module({
     FakeEventLoop: '../fakes/FakeEventLoop.js'
 }, function(imports) {
-    fixture("Promise tests", function() {
+    var BaseFixture = fixture("promises", function() {
         this.setUp(function() {
             this.eventLoop = new imports.FakeEventLoop();
             this.Promise = new IMVU.PromiseFactory(this.eventLoop);
@@ -12,7 +12,9 @@ module({
             this.acceptCallback = this.accepts.push.bind(this.accepts);
             this.rejectCallback = this.rejects.push.bind(this.rejects);
         });
+    });
 
+    BaseFixture.extend("Promise tests", function() {
         test("accept after then", function() {
             var r;
             (new this.Promise(function(resolver) {
@@ -201,6 +203,25 @@ module({
             this.eventLoop._flushTasks();
             assert.deepEqual([], this.accepts);
             assert.deepEqual([[1, 2]], this.rejects);
+        });
+    });
+
+    BaseFixture.extend("immediate & error extension", function() {
+        test("handlers run immediately and errors bubble", function() {
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: true,
+                exposeErrors: true
+            });
+
+            p.then(function(x) {
+                throw new SyntaxError('boom');
+            });
+            assert.throws(SyntaxError, function() {
+                r.accept(10);
+            });
         });
     });
 });

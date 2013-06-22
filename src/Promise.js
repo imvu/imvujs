@@ -59,12 +59,22 @@ var IMVU = IMVU || {};
         promise._scheduleCallbacks();
     };
 
+    function getOption(o, k, d) {
+        return o[k] === undefined ? d : o[k];
+    }
+
     IMVU.PromiseFactory = function(eventLoop) {
-        function Promise(init) {
+        function Promise(init, settings) {
+            settings = settings || {};
+
             this.acceptCallbacks = [];
             this.rejectCallbacks = [];
             this.state = 'pending';
             this.result = undefined;
+
+            this.immediateCallbacks = getOption(settings, 'immediateCallbacks', false);
+            this.exposeErrors = getOption(settings, 'exposeErrors', false);
+
             init(new PromiseResolver(this));
         }
 
@@ -148,14 +158,20 @@ var IMVU = IMVU || {};
             });
         };
 
-        function processCallbacks(callbacks, result) {
-            eventLoop.queueTask(function() {
-                // todo: try {
+        function processCallbacks(callbacks, result, immediateCallbacks) {
+            if (immediateCallbacks) {
                 while (callbacks.length) {
                     callbacks.shift()(result);
                 }
-                // } catch (e) schedule another task
-            });
+            } else {
+                eventLoop.queueTask(function() {
+                    // todo: try {
+                    while (callbacks.length) {
+                        callbacks.shift()(result);
+                    }
+                    // } catch (e) schedule another task
+                });
+            }
         }
 
         Promise.prototype._scheduleCallbacks = function() {
@@ -163,23 +179,31 @@ var IMVU = IMVU || {};
                 this.state === 'accepted' ?
                     this.acceptCallbacks :
                     this.rejectCallbacks,
-                this.result);
+                this.result,
+                this.immediateCallbacks);
         };
 
         Promise.prototype.then = function(acceptCallback, rejectCallback) {
             var resolver;
             var promise = new Promise(function(r) {
                 resolver = r;
+            }, {
             });
+
+            var exposeErrors = this.exposeErrors;
 
             function promiseWrapperCallback(callback) {
                 return function(argument) {
                     var value;
-                    try {
+                    if (exposeErrors) {
                         value = callback.call(promise, argument);
-                    } catch (e) {
-                        resolver.reject(e); // per spec: synchronous=true
-                        return;
+                    } else {
+                        try {
+                            value = callback.call(promise, argument);
+                        } catch (e) {
+                            resolver.reject(e); // per spec: synchronous=true
+                            return;
+                        }
                     }
                     resolver.resolve(value); // per spec: synchronous=true
                 };
