@@ -36,7 +36,7 @@ module({
                     name: name,
                     body: fn });
             } else {
-                var fixtureName = (undefined !== this.activeFixture) ? this.activeFixture.name + ': ' : '';
+                var fixtureName = (this.activeFixture !== undefined) ? this.activeFixture.name + ': ' : '';
                 this.allTests.push({
                     name: fixtureName + name,
                     body: fn,
