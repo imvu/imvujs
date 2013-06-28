@@ -67,9 +67,12 @@ var IMVU = IMVU || {};
         return o[k] === undefined ? d : o[k];
     }
 
-    IMVU.PromiseFactory = function(eventLoop) {
+    IMVU.PromiseFactory = function(eventLoop, globalSettings) {
+        globalSettings = globalSettings || {};
+
         function Promise(init, settings) {
             settings = settings || {};
+            settings = _.extend(globalSettings, settings);
 
             this.acceptCallbacks = [];
             this.rejectCallbacks = [];

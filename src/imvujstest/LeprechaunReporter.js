@@ -1,3 +1,4 @@
+/* global console */
 module({
 }, function (imports) {
     return IMVU.BaseClass.extend('LeprechaunReporter', {

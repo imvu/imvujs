@@ -268,4 +268,81 @@ module({
             });
         });
     });
+
+    fixture("global options fixture", function() {
+        this.setUp(function(){
+            this.eventLoop = new imports.FakeEventLoop();
+
+            this.accepts = [];
+            this.rejects = [];
+
+            this.acceptCallback = this.accepts.push.bind(this.accepts);
+            this.rejectCallback = this.rejects.push.bind(this.rejects);
+
+        });
+
+        test('set exposeErrors', function() {
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop, {exposeErrors: true});
+
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            });
+
+            p.then(function(x) {
+                throw new SyntaxError('boom');
+            });
+            r.accept(10);
+            assert.throws(SyntaxError, function() {
+                this.eventLoop._flushTasks();
+            }.bind(this));
+        });
+
+        test('override exposeErrors', function() {
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop, {exposeErrors: true});
+
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                exposeErrors: false
+            });
+
+            p.then(function(x) {
+                throw new SyntaxError('boom');
+            });
+            r.accept(10);
+        });
+
+        test('set immediateCallbacks', function() {
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop, {immediateCallbacks: true});
+
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            });
+            p.then(this.acceptCallback, this.rejectCallback);
+
+            r.accept(10);
+            assert.deepEqual([10], this.accepts);
+        });
+
+        test('override immediateCallbacks', function() {
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop, {immediateCallbacks: true});
+
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: false
+            });
+            p.then(this.acceptCallback, this.rejectCallback);
+
+            r.accept(10);
+            assert.deepEqual([], this.accepts);
+            this.eventLoop._flushTasks();
+            assert.deepEqual([10], this.accepts);
+        });
+    });
+
 });
