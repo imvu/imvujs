@@ -11,7 +11,5 @@ function error_exit() {
 trap error_exit ERR
 
 set -x
-git pull -r
-s/update_submodules
-
-s/installgithooks
+git submodule sync
+git submodule update --init --recursive
