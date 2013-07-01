@@ -12,6 +12,8 @@ trap error_exit ERR
 
 set -x
 git pull -r
-s/update_submodules
+
+git submodule sync
+git submodule update --init --recursive
 
 s/installgithooks
