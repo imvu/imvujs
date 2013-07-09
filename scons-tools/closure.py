@@ -6,10 +6,16 @@ def generate(env):
         env.Depends(target, env['CLOSURE_COMPILER'])
         return target, source
 
-    ClosureCompiler = Builder(
-        action='$JAVA $JAVAFLAGS -jar $CLOSURE_COMPILER $CLOSURE_FLAGS --js_output_file $TARGET $SOURCES',
-        emitter=depend_on_closure_compiler
-    )
+    if env['PLATFORM'] == 'cygwin':
+        ClosureCompiler = Builder(
+            action='$JAVA $JAVAFLAGS -jar `cygpath -w $CLOSURE_COMPILER` $CLOSURE_FLAGS --js_output_file $TARGET $SOURCES',
+            emitter=depend_on_closure_compiler
+        )
+    else:
+        ClosureCompiler = Builder(
+            action='$JAVA $JAVAFLAGS -jar $CLOSURE_COMPILER $CLOSURE_FLAGS --js_output_file $TARGET $SOURCES',
+            emitter=depend_on_closure_compiler
+        )
 
     closure = os.path.join(
         os.path.dirname(__file__),
