@@ -30,7 +30,6 @@ module({
             };
 
             runTest();
-            window.addEventListener('hashchange', runTest);
         }
     };
 });

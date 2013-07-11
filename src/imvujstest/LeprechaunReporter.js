@@ -1,4 +1,4 @@
-/* global console */
+/*global console*/
 module({
 }, function (imports) {
     return IMVU.BaseClass.extend('LeprechaunReporter', {
@@ -15,8 +15,8 @@ module({
         error: function (errorMsg, url, lineNumber) {
             this._report({
                 type: 'test-complete',
-                verdict: 'FAIL',
-                stack: 'Test Failed',
+                success: false,
+                stack: 'No stack available',
                 name: window.location.hash.substr(1)
             });
         },
@@ -31,8 +31,8 @@ module({
             }
             this._report({
                 type: 'test-complete',
+                success: passed,
                 name: name,
-                verdict: passed ? 'PASS' : 'FAIL',
                 stack: stack
             });
         },

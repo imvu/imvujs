@@ -1,77 +1,78 @@
-/*global leprechaun*/
+/*global leprechaun, console*/
 
-var tests = leprechaun.args.slice(2);
-var trampoline = leprechaun.args[1];
-
-var count = 0;
-
-var testframe = document.createElement('iframe');
-testframe.style = 'position: absolute; left: 0; top: 0; width: 100%; height: 100%;';
-testframe.width = '100%';
-testframe.height = '900px';
-testframe.addEventListener('load', function () {
-    testframe.contentWindow.addEventListener('TestComplete', next, true);
-    testframe.contentWindow.addEventListener('message', onMessage, true);
-}, true);
-
-document.body.appendChild(testframe);
-
-leprechaun.log('Running '+ tests.length + ' tests.');
-
-function getTime(){
-    return (Date.now() / 1000.0);
+function Runner(trampoline, tests) {
+    this.trampoline = trampoline;
+    this.tests = tests;
+    this.done = false;
+    this.startTime = null;
+    this.lastRunTime = null;
+    this.testframe = null;
 }
-
-var overallStartTime = getTime();
-var individualStartTime;
-
-next();
-
-function next() {
-    if (tests.length === 0) {
-        leprechaun.log('No tests remain.  Exiting.');
-        leprechaun.log('Total time: ' + (getTime() - overallStartTime).toFixed(3) + 's');
-        leprechaun.exit(0);
-    } else {
-        ++count;
-
-        var nextTest = tests.shift();
-        var url = trampoline + '?count=' + count + '#/' + nextTest;
-
-        leprechaun.log('Running test: ' + url);
-        individualStartTime = getTime();
-        testframe.contentWindow.location.assign(url);
-    }
-}
-
-function onMessage(evt) {
-    var msg = JSON.parse(evt.data);
-
-    switch (msg.type) {
-    case 'all-tests-complete':
-        leprechaun.log('Test Complete! ' + (getTime() - individualStartTime).toFixed(3) + 's');
-        leprechaun.log('------------------------------');
-        return next();
-    case 'test-start':
-        return undefined;
-    case 'test-complete':
-        if (msg.verdict === "FAIL"){
-            leprechaun.log('FAILURE in test: "' + msg.name + '"');
-
-            msg.stack.split('\n').forEach(function(line){
-                leprechaun.log(line);
-            });
-
-            leprechaun.exit(1);
-            return void 1;
-        } else if (msg.verdict === "PASS"){
-            return undefined;
+Runner.prototype = {
+    runTest: function (url) {
+        if (this.testframe) {
+            document.body.removeChild(this.testframe);
         }
-        break;
+
+        this.testframe = document.createElement('iframe');
+        this.testframe.style.position = 'absolute';
+        this.testframe.style.top = '0';
+        this.testframe.style.left = '0';
+        this.testframe.style.width = '100%';
+        this.testframe.style.height = '900px';
+        this.testframe.style.border = 'none';
+        document.body.appendChild(this.testframe);
+
+        this.testframe.addEventListener('load', function (evt) {
+            this.lastTestStartTime = new Date();
+            this.testframe.contentWindow.addEventListener('message', this.onMessage.bind(this), true);
+        }.bind(this), true);
+
+        this.testframe.setAttribute('src', url);
+    },
+    start: function () {
+        this.startTime = new Date();
+        console.log('Running '+ this.tests.length + ' tests.');
+        this.nextTest();
+    },
+    timeDelta: function (end, start) {
+        return ((end - start) / 1000).toFixed(3);
+    },
+    stop: function (success, reason) {
+        this.done = true;
+        var endTime = new Date();
+        console.log('Stopping tests: ' + reason);
+        console.log('Total time: ' + this.timeDelta(endTime, this.startTime) + 's');
+        leprechaun.exit(success ? 0 : 1);
+    },
+    nextTest: function () {
+        if (this.tests.length === 0) {
+            this.stop(true, 'No more tests');
+        } else {
+            var nextTest = this.tests.shift();
+            var url = this.trampoline + '?now=' + Date.now() + '#/' + nextTest;
+            this.runTest(url);
+        }
+    },
+    onMessage: function (evt) {
+        if (this.done) {
+            return;
+        }
+        var msg = JSON.parse(evt.data);
+
+        if (msg.type === 'all-tests-complete') {
+            this.nextTest();
+        }
+        if (msg.type === 'test-complete') {
+            if (!msg.success) {
+                this.stop(false, 'Test failure');
+            }
+        }
     }
-    leprechaun.log('unknown message type: '+ msg.type);
-    return undefined;
-}
+};
+
+var runner = new Runner(leprechaun.args[1], leprechaun.args.slice(2));
+runner.start();
 
 function onNewBrowser() {
 }
