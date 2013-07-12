@@ -107,8 +107,8 @@ With this file in hand, you can construct a minimal html file that will be the t
 <!-- include any static <script> dependencies here -->
 <script>
     module.caching = false;
-    module.importJs('out/imvutest.js', function (imvutest) {
-        imvutest.start('my/superfixtures.js');
+    module.run({ imvutest: 'out/imvutest.js' }, function (imports) {
+        imports.imvutest.start('my/superfixtures.js');
     });
 </script>
 ```
