@@ -22,6 +22,9 @@ module({
         var counter = {num:0};
 
         function FakeXMLHttpRequest() {
+            if (!(this instanceof FakeXMLHttpRequest)) {
+                return new FakeXMLHttpRequest;
+            }
             this.requestHeaders = {};
             this.readyState = this.UNSENT;
             this._responseType = '';
@@ -63,7 +66,7 @@ module({
         _.extend(FakeXMLHttpRequest.prototype, {
             _error: false,
             withCredentials: false,
-            
+
             onloadstart: defaultEventHandler,
             onprogress: defaultEventHandler,
             onabort: defaultEventHandler,
@@ -93,14 +96,14 @@ module({
                 if (expectations[key]) {
                     var expectation = expectations[key];
                     delete expectations[key];
-                    
+
                     this._headersReceived(expectation.code, {}, expectation.headers);
                     this._dataReceived(expectation.body);
                     this._done();
                     expectation.callback(this, body);
                     return;
                 }
-                
+
                 this.onreadystatechange();
                 this.onloadstart();
                 pending[key] = this;
@@ -273,7 +276,7 @@ module({
         FakeXMLHttpRequest._getAllPending = function() {
             return _.keys(pending);
         };
-        
+
         return FakeXMLHttpRequest;
     }
     FakeXMLHttpRequestFactory.InvalidStateError = InvalidStateError;

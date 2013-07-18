@@ -25,23 +25,35 @@ module({
             this.FakeXMLHttpRequest._respond('GET', '/foo/bar/baz');
             assert.deepEqual(['readyState 1', 'readyState 1', 'readyState 2', 'readyState 3', 'readyState 4'], calls);
         });
-        
+
         test("_getAllPending returns pending keys", function() {
             var xhr = new this.FakeXMLHttpRequest();
             xhr.open('GET', 'http://test_url');
             xhr.send();
-            
+
             xhr = new this.FakeXMLHttpRequest();
             xhr.open('POST', 'http://another_test');
             xhr.send();
-            
+
             assert.deepEqual(
                 ['GET http://test_url', 'POST http://another_test'],
                 this.FakeXMLHttpRequest._getAllPending());
         });
-        
+
         test('expected request', function () {
-            var xhr = new this.FakeXMLHttpRequest();
+            var xhr = new this.FakeXMLHttpRequest;
+            xhr.open('GET', '/foo/bar/baz');
+            this.FakeXMLHttpRequest._expect('GET', '/foo/bar/baz', 200, {
+                "Content-Type": "text/plain"
+            }, 'Huzzah!');
+            xhr.send();
+            assert.equal(xhr.readyState, xhr.DONE);
+            assert.equal(xhr.responseText, 'Huzzah!');
+            assert.equal(xhr.getResponseHeader('Content-Type'), 'text/plain');
+        });
+
+        test('create without new', function () {
+            var xhr = this.FakeXMLHttpRequest();
             xhr.open('GET', '/foo/bar/baz');
             this.FakeXMLHttpRequest._expect('GET', '/foo/bar/baz', 200, {
                 "Content-Type": "text/plain"
@@ -141,7 +153,7 @@ module({
         this.setUp(function() {
             this.FakeXMLHttpRequest = new imports.FakeXMLHttpRequestFactory;
             this.calls = [];
-            
+
             this.xhr = new this.FakeXMLHttpRequest;
 
             this.xhr.onloadstart = this.callback('loadstart');
@@ -163,7 +175,7 @@ module({
                 });
             };
         };
-        
+
         this.expectCalls = function(expected) {
             assert.deepEqual(expected, this.calls);
             while (this.calls.length) {
@@ -277,7 +289,7 @@ module({
             this.xhr.send();
 
             this.FakeXMLHttpRequest._respond('GET', 'http://url', 200, {}, 'body');
-            
+
             assert.equal(4, this.xhr.readyState);
             assert['true'](loaded);
             assert.equal('body', this.xhr.response);
