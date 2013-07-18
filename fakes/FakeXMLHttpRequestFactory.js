@@ -2,6 +2,16 @@
 
 module({
 }, function (imports) {
+    var definePropertyWorks = (function() {
+        try {
+            var object = {};
+            Object.defineProperty(object, "sentinel", {});
+            return "sentinel" in object;
+        } catch (exception) {
+            return false;
+        }
+    })();
+
     // Implemented per
     // http://www.w3.org/TR/XMLHttpRequest/
 
@@ -27,7 +37,12 @@ module({
             }
             this.requestHeaders = {};
             this.readyState = this.UNSENT;
-            this._responseType = '';
+            if (definePropertyWorks) {
+                this._responseType = '';
+            } else {
+                this.responseType = '';
+                this.responseText = '';
+            }
             counter.num += 1;
         }
 
@@ -37,31 +52,33 @@ module({
         _.extend(FakeXMLHttpRequest, commonProperties);
         _.extend(FakeXMLHttpRequest.prototype, commonProperties);
 
-        Object.defineProperties(FakeXMLHttpRequest.prototype, {
-            'responseType': {
-                get: function() {
-                    return this._responseType;
+        if (definePropertyWorks) {
+            Object.defineProperties(FakeXMLHttpRequest.prototype, {
+                'responseType': {
+                    get: function() {
+                        return this._responseType;
+                    },
+                    set: function(v) {
+                        if (this.readyState >= this.LOADING) {
+                            throw new InvalidStateError;
+                        }
+                        this._responseType = v;
+                    }
                 },
-                set: function(v) {
-                    if (this.readyState >= this.LOADING) {
-                        throw new InvalidStateError;
+                'responseText': {
+                    get: function() {
+                        if (this.responseType !== '' && this.responseType !== 'text') {
+                            throw new InvalidStateError;
+                        }
+                        if (this.readyState < this.LOADING) {
+                            return '';
+                        }
+                        // error flag? per 4.7.9, item 3
+                        return this.response;
                     }
-                    this._responseType = v;
                 }
-            },
-            'responseText': {
-                get: function() {
-                    if (this.responseType !== '' && this.responseType !== 'text') {
-                        throw new InvalidStateError;
-                    }
-                    if (this.readyState < this.LOADING) {
-                        return '';
-                    }
-                    // error flag? per 4.7.9, item 3
-                    return this.response;
-                }
-            }
-        });
+            });
+        }
 
         _.extend(FakeXMLHttpRequest.prototype, {
             _error: false,
@@ -161,6 +178,9 @@ module({
                     }
                 } else {
                     this.response = data;
+                    if (!definePropertyWorks) {
+                        this.responseText = data;
+                    }
                 }
                 this.__changeReadyState(this.LOADING);
             },
