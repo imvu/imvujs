@@ -362,20 +362,8 @@ function emitModules(rootPath, modules) {
             })
         ]
     }));
+    body.push.apply(body, rootModule.body.body);
     rootModule.body.argnames = [];
-    body.push(new uglify.AST_SimpleStatement({
-        body: new uglify.AST_Call({
-            expression: new uglify.AST_Symbol({
-                name: 'module'
-            }),
-            args: [
-                new uglify.AST_Object({
-                    properties: []
-                }),
-                rootModule.body
-            ]
-        })
-    }));
     return body;
 }
 
@@ -403,12 +391,18 @@ function combine(m, rootPath) {
         body: [
             new uglify.AST_SimpleStatement({
                 body: new uglify.AST_Call({
-                    expression: new uglify.AST_Function({
-                        name: null,
-                        argnames: [],
-                        body: emitModules(rootPath, modules)
+                    expression: new uglify.AST_Symbol({
+                        name: 'module'
                     }),
-                    args: []
+                    args: [
+                        new uglify.AST_Object({
+                            properties: []
+                        }),
+                        new uglify.AST_Function({
+                            argnames: [],
+                            body: emitModules(rootPath, modules)
+                        })
+                    ]
                 })
             })
         ]

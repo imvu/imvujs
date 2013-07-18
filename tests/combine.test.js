@@ -2,9 +2,10 @@ module({}, function(imports) {
     var uglify = require('uglify-js');
     var path = require('path');
     var combine = require('../bin/combine.js');
+    var fs = require('fs');
 
     var expected = [
-        '(function() {',
+        'module({}, function() {',
         '    var $module$1 = function(imports) {',
         '        var $module$exports;',
         '        function define(a, b) {',
@@ -40,16 +41,14 @@ module({}, function(imports) {
         '        b: $module$3,',
         '        c: $module$4',
         '    };',
-        '    module({}, function() {',
-        '        return d_export_table;',
-        '    });',
-        '})();'].join('\n');
-
+        '    return d_export_table;',
+        '});'
+    ].join('\n');
     function sorted(ls) {
         var rv = ls.slice(0);
         rv.sort();
         return rv;
-    };
+    }
 
     fixture('functional', function() {
         this.setUp(function() {
@@ -66,6 +65,22 @@ module({}, function(imports) {
             assert.equal(expected, combine.gen_code(q, {
                 beautify: true
             }));
+        });
+
+        test('expected is equal to combined in filesystem', function () {
+            // if we had a fake filesystem, we wouldn't need this sillyness
+            var fsData = fs.readFileSync('combine/combined.js', 'utf-8');
+            assert.equal(expected + '\n', fsData);
+        });
+
+        test('combined module can be combined', function () {
+            var q = combine.combine(combine.readModules('combine/needs_combined.js'), 'combine/needs_combined.js');
+            // if we had a fake filesystem, we wouldn't need this sillyness
+            var expected = fs.readFileSync('combine/needs_combined_combined.js', 'utf-8');
+            var actual = combine.gen_code(q, {
+                beautify: true
+            });
+            assert.equal(expected,  actual + '\n');
         });
 
         test('combine produces error if any modules are missing', function() {
