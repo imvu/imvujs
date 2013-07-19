@@ -150,7 +150,11 @@ module({
                 if (this.readyState !== this.OPENED) {
                     throw new InvalidStateError('send() must have been called before _headersReceived');
                 }
-                this._status = statusCode;
+                if (definePropertyWorks) {
+                    this._status = statusCode;
+                } else {
+                    this.status = statusCode;
+                }
                 this.statusText = statusText;
                 this.responseHeaders = responseHeaders;
                 this.__changeReadyState(this.HEADERS_RECEIVED);
@@ -224,19 +228,21 @@ module({
             }
         });
 
-        Object.defineProperty(FakeXMLHttpRequest.prototype, 'status', {
-            get: function() {
-                if (
-                    this.readyState === this.UNSENT ||
-                    this.readyState === this.OPENED ||
-                    this._error
-                ) {
-                    return 0;
-                } else {
-                    return this._status;
+        if (definePropertyWorks) {
+            Object.defineProperty(FakeXMLHttpRequest.prototype, 'status', {
+                get: function() {
+                    if (
+                        this.readyState === this.UNSENT ||
+                        this.readyState === this.OPENED ||
+                        this._error
+                    ) {
+                        return 0;
+                    } else {
+                        return this._status;
+                    }
                 }
-            }
-        });
+            });
+        }
 
         FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, callback) {
             if (responseBody instanceof Object && !(responseBody instanceof ArrayBuffer)) {
