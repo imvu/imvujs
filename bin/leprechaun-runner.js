@@ -65,6 +65,7 @@ Runner.prototype = {
         }
         if (msg.type === 'test-complete') {
             if (!msg.success) {
+                console.log('Test failed: ' + msg.name);
                 this.stop(false, 'Test failure');
             }
         }
