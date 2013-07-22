@@ -9,7 +9,7 @@ module({}, function (imports) {
 
         _log: function (msg) {
             var $logItem = $('<li class="log">').text(msg);
-            this.$el.append($logItem);
+            this.$el.find('ul').append($logItem);
             this.el.scrollTop = this.el.scrollHeight;
             return $logItem;
         },
