@@ -1,4 +1,4 @@
-/*global leprechaun, console*/
+/*global leprechaun*/
 
 function Runner(trampoline, tests) {
     this.trampoline = trampoline;
@@ -10,6 +10,8 @@ function Runner(trampoline, tests) {
 }
 Runner.prototype = {
     runTest: function (url) {
+        leprechaun.log('Running test: ' + url);
+
         if (this.testframe) {
             document.body.removeChild(this.testframe);
         }
@@ -30,21 +32,25 @@ Runner.prototype = {
 
         this.testframe.setAttribute('src', url);
     },
+
     start: function () {
         this.startTime = new Date();
-        console.log('Running '+ this.tests.length + ' tests.');
+        leprechaun.log('Running '+ this.tests.length + ' tests.');
         this.nextTest();
     },
+
     timeDelta: function (end, start) {
         return ((end - start) / 1000).toFixed(3);
     },
+
     stop: function (success, reason) {
         this.done = true;
         var endTime = new Date();
-        console.log('Stopping tests: ' + reason);
-        console.log('Total time: ' + this.timeDelta(endTime, this.startTime) + 's');
+        leprechaun.log('Stopping tests: ' + reason);
+        leprechaun.log('Total time: ' + this.timeDelta(endTime, this.startTime) + 's');
         leprechaun.exit(success ? 0 : 1);
     },
+
     nextTest: function () {
         if (this.tests.length === 0) {
             this.stop(true, 'No more tests');
@@ -54,6 +60,7 @@ Runner.prototype = {
             this.runTest(url);
         }
     },
+
     onMessage: function (evt) {
         if (this.done) {
             return;
@@ -65,7 +72,7 @@ Runner.prototype = {
         }
         if (msg.type === 'test-complete') {
             if (!msg.success) {
-                console.log('Test failed: ' + msg.name);
+                leprechaun.log(msg.stack);
                 this.stop(false, 'Test failure');
             }
         }
