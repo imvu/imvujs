@@ -1,0 +1,80 @@
+import ibb
+import re
+
+KNOWN_EXTENSIONS = [
+    '.js',
+    '.html',
+    '.css',
+    '.scss',
+    '.tml',
+    '.hb',
+]
+
+class SourceListNode(ibb.Node):
+    def __init__(self, sourceDir):
+        ibb.Node.__init__(self)
+        self.__sourceDir = sourceDir
+        self.__dirty = True
+        self.__sourceList = []
+
+        self.addDependency(sourceDir)
+        sourceDir.addDependent(self)
+
+    def invalidate(self):
+        ibb.Node.invalidate(self)
+        self.__dirty = True
+        self.__sourceList = True
+
+    @property
+    def value(self):
+        if self.__dirty:
+            self.build()
+        return self.__sourceList
+
+    def build(self):
+        self.__sourceList = [
+            node
+            for node in self.__sourceDir.walk()
+            if any(node.abspath.endswith(ext) for ext in KNOWN_EXTENSIONS)]
+        self.__dirty = False
+
+_sourceListNodes = []
+for sourceDir in ['src', 'fakes', 's', 'bin', 'tests']:
+    _sourceListNodes.append(SourceListNode(build.File(sourceDir)))
+
+@build.subcommand
+def search(args):
+    count = 0
+    [pattern] = args
+    matcher = re.compile(pattern.encode('latin-1'), re.IGNORECASE)
+    for sourceListNode in _sourceListNodes:
+        for node in sourceListNode.value:
+            if node.data is None:
+                continue
+            q = matcher.search(node.data)
+            if q:
+                d = node.data.decode('latin-1')
+                s = q.span()
+                l = 0
+                printed = False
+                for lin in d.splitlines():
+                    l = l + 1
+                    match = matcher.search(lin.encode('latin-1'))
+                    if match:
+                        printed = True
+                        print("%s(%d): %s" % (node.abspath, l, lin))
+                        count += 1
+                if not printed:
+                    print("%s{%d}: match found" % (node.abspath, d[0:q.span()[0]].count("\n")+1));
+    print('found', count, 'matches')
+
+@build.subcommand
+def find(args):
+    [pattern] = args
+    matcher = re.compile(pattern, re.IGNORECASE)
+    for sourceListNode in _sourceListNodes:
+        for node in sourceListNode.value:
+            if node.data is None:
+                continue
+            q = matcher.search(node.abspath)
+            if q: print(node.abspath)
