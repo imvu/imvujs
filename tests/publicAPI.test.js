@@ -100,6 +100,7 @@
         assert.deepEqual(
             [ 'repr',
               'new',
+              'getCookies',
               'extendError',
               'isSubClass',
               'createNamedFunction',
