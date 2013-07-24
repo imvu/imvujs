@@ -8,7 +8,7 @@ FIRST_SOURCES = [
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'src/es6-collections.js',
-    'ext/underscore-1.4.2.js',
+    'ext/underscore-1.5.1.js',
 ]
 
 BASE_SOURCES = [
