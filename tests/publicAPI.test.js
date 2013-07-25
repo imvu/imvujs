@@ -98,7 +98,9 @@
 
     test("IMVU export list", function() {
         assert.deepEqual(
-            [ 'repr',
+            [ 'URI',
+              'URIQuery',
+              'repr',
               'new',
               'getCookies',
               'extendError',
