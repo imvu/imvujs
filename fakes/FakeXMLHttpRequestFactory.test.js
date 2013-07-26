@@ -379,6 +379,15 @@ module({
             this.FakeXMLHttpRequest._verify();
         });
 
+        test('request body expectation supports JSON', function() {
+            var xhr = new this.FakeXMLHttpRequest;
+            this.FakeXMLHttpRequest._expect('POST', 'http://url', 200, {}, '', {'foo': 1, 'bar': 2});
+            xhr.open('POST', 'http://url');
+            xhr.setRequestHeader('Content-Type', 'application/json; charset=1');
+            xhr.send(JSON.stringify({foo: 1, bar: 2}));
+            this.FakeXMLHttpRequest._verify();
+        });
+
         test("_verify throws if POST did not match expectation", function() {
             var xhr = new this.FakeXMLHttpRequest;
             this.FakeXMLHttpRequest._expect('POST', 'http://url', 200, {}, '', {'foo': '1', 'bar': '2'});

@@ -51,9 +51,26 @@ module({
                 return;
             } else if (typeof expectation === 'object' && expectation !== null) {
                 pendingVerifications.push(function() {
-                    // TODO: detect and support multipart form data? JSON?
-                    // only supports application/x-url-encoded now
-                    var asObject = parseURLEncoded(body);
+                    var requestContentType = xhr.requestHeaders['content-type'];
+                    if (requestContentType !== undefined) {
+                        requestContentType = requestContentType.split(';')[0];
+                    }
+                    if (!requestContentType) {
+                        requestContentType = 'application/x-www-form-urlencoded';
+                    }
+
+                    var asObject;
+                    switch (requestContentType) {
+                        case 'application/x-www-form-urlencoded':
+                            asObject = parseURLEncoded(body);
+                            break;
+                        case 'application/json':
+                            asObject = JSON.parse(body);
+                            break;
+                        default:
+                            asObject = body;
+                            break;
+                    }
                     if (!_.isEqual(expectation, asObject)) {
                         throw new VerificationError('Request body ' + IMVU.repr(body) + ' did not match expectation: ' + IMVU.repr(expectation));
                     }
