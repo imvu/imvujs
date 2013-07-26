@@ -17,6 +17,8 @@ module({
 
     var InvalidStateError = IMVU.extendError(Error, 'InvalidStateError');
 
+    var VerificationError = IMVU.extendError(Error, 'VerificationError');
+
     var commonProperties = {
         UNSENT: 0,
         OPENED: 1,
@@ -25,11 +27,39 @@ module({
         DONE: 4
     };
 
+    function parseURLEncoded(urlParams) {
+        var vars = {}, hash, i;
+        var hashes = urlParams.split('&');
+        for (i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars[hash[0]] = decodeURIComponent(hash[1]).replace(/\+/g, ' ');
+        }
+        return vars;
+    }
+
     function FakeXMLHttpRequestFactory() {
         var expectations = {};
         var pending = {};
         var factory = this;
-        var counter = {num:0};
+        var instanceCount = 0;
+        var pendingVerifications = [];
+
+        function handleExpectation(expectation, xhr, body) {
+            if (typeof expectation === 'function') {
+                expectation(xhr, body);
+            } if (expectation === undefined) {
+                return;
+            } else if (typeof expectation === 'object' && expectation !== null) {
+                pendingVerifications.push(function() {
+                    // TODO: detect and support multipart form data? JSON?
+                    // only supports application/x-url-encoded now
+                    var asObject = parseURLEncoded(body);
+                    if (!_.isEqual(expectation, asObject)) {
+                        throw new VerificationError('Request body ' + IMVU.repr(body) + ' did not match expectation: ' + IMVU.repr(expectation));
+                    }
+                });
+            }
+        }
 
         function FakeXMLHttpRequest() {
             if (!(this instanceof FakeXMLHttpRequest)) {
@@ -43,7 +73,7 @@ module({
                 this.responseType = '';
                 this.responseText = '';
             }
-            counter.num += 1;
+            instanceCount += 1;
         }
 
         function defaultEventHandler() {
@@ -117,7 +147,7 @@ module({
                     this._headersReceived(expectation.code, {}, expectation.headers);
                     this._dataReceived(expectation.body);
                     this._done();
-                    expectation.callback(this, body);
+                    handleExpectation(expectation.requestBodyExpectation, this, body);
                     return;
                 }
 
@@ -244,9 +274,17 @@ module({
             });
         }
 
-        FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, callback) {
+        FakeXMLHttpRequest._expect = function (method, url, responseCode, responseHeaders, responseBody, requestBodyExpectation) {
             if (responseBody instanceof Object && !(responseBody instanceof ArrayBuffer)) {
-                throw new TypeError('Invalid type for expectation');
+                throw new TypeError('Invalid responseBody: expected Object or ArrayBuffer');
+            }
+
+            if (
+                requestBodyExpectation !== undefined &&
+                typeof requestBodyExpectation !== 'function' &&
+                (typeof requestBodyExpectation !== 'object' || requestBodyExpectation === null)
+            ) {
+                throw new TypeError('Invalid requestBodyExpectation: expected undefined, function, or object');
             }
 
             var normalizedHeaders = {};
@@ -261,7 +299,7 @@ module({
                 code: responseCode,
                 headers: normalizedHeaders,
                 body: responseBody,
-                callback: callback || function () {}
+                requestBodyExpectation: requestBodyExpectation
             };
         };
 
@@ -296,15 +334,30 @@ module({
         };
 
         FakeXMLHttpRequest._getCount = function () {
-            return counter.num;
+            return instanceCount;
         };
 
         FakeXMLHttpRequest._getAllPending = function() {
             return _.keys(pending);
         };
 
+        FakeXMLHttpRequest._verify = function() {
+            for (var p in pending) {
+                if (!pending.hasOwnProperty(p)) {
+                    continue;
+                }
+                throw new VerificationError('Unhandled requests: [' + _.keys(pending).join(', ') + ']');
+            }
+
+            for (var i = 0; i < pendingVerifications.length; ++i) {
+                pendingVerifications[i]();
+            }
+            pendingVerifications = [];
+        };
+
         return FakeXMLHttpRequest;
     }
     FakeXMLHttpRequestFactory.InvalidStateError = InvalidStateError;
+    FakeXMLHttpRequestFactory.VerificationError = VerificationError;
     return FakeXMLHttpRequestFactory;
 });

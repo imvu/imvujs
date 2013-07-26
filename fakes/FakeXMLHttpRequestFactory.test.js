@@ -2,6 +2,7 @@ module({
     FakeXMLHttpRequestFactory: 'FakeXMLHttpRequestFactory.js'
 }, function (imports) {
     var InvalidStateError = imports.FakeXMLHttpRequestFactory.InvalidStateError;
+    var VerificationError = imports.FakeXMLHttpRequestFactory.VerificationError;
 
     var BaseFixture = fixture('BaseFixture', function() {
         this.setUp(function () {
@@ -353,6 +354,41 @@ module({
             assert.equal(1, view[0]);
             assert.equal(2, view[1]);
             assert.equal(3, view[2]);
+        });
+    });
+
+    BaseFixture.extend("_verify tests", function() {
+        test("_verify throws if outstanding request", function() {
+            var xhr = new this.FakeXMLHttpRequest;
+            this.FakeXMLHttpRequest._verify();
+
+            xhr.open('GET', 'http://url');
+            xhr.send();
+            var e = assert.throws(VerificationError, function() {
+                this.FakeXMLHttpRequest._verify();
+            }.bind(this));
+
+            assert.equal('Unhandled requests: [GET http://url]', e.message);
+        });
+
+        test('_verify succeeds if expectation matches', function() {
+            var xhr = new this.FakeXMLHttpRequest;
+            this.FakeXMLHttpRequest._expect('POST', 'http://url', 200, {}, '', {'foo': '1', 'bar': '2'});
+            xhr.open('POST', 'http://url');
+            xhr.send('foo=1&bar=2');
+            this.FakeXMLHttpRequest._verify();
+        });
+
+        test("_verify throws if POST did not match expectation", function() {
+            var xhr = new this.FakeXMLHttpRequest;
+            this.FakeXMLHttpRequest._expect('POST', 'http://url', 200, {}, '', {'foo': '1', 'bar': '2'});
+            xhr.open('POST', 'http://url');
+            xhr.send('foo=2&bar=1');
+            
+            var e = assert.throws(
+                VerificationError,
+                this.FakeXMLHttpRequest._verify.bind(this.FakeXMLHttpRequest));
+            assert.equal("Request body 'foo=2&bar=1' did not match expectation: {bar: '2', foo: '1'}", e.message);
         });
     });
 });
