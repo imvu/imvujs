@@ -358,12 +358,17 @@ module({
             return _.keys(pending);
         };
 
-        FakeXMLHttpRequest._verify = function() {
-            for (var p in pending) {
-                if (!pending.hasOwnProperty(p)) {
-                    continue;
+        FakeXMLHttpRequest._verify = function(config) {
+            config = config || {};
+            var allowPendingRequests = 'allowPendingRequests' in config ? config.allowPendingRequests : false;
+
+            if (!allowPendingRequests) {
+                for (var p in pending) {
+                    if (!pending.hasOwnProperty(p)) {
+                        continue;
+                    }
+                    throw new VerificationError('Unhandled requests: [' + _.keys(pending).join(', ') + ']');
                 }
-                throw new VerificationError('Unhandled requests: [' + _.keys(pending).join(', ') + ']');
             }
 
             for (var i = 0; i < pendingVerifications.length; ++i) {

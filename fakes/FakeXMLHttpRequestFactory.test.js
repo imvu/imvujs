@@ -399,5 +399,13 @@ module({
                 this.FakeXMLHttpRequest._verify.bind(this.FakeXMLHttpRequest));
             assert.equal("Request body 'foo=2&bar=1' did not match expectation: {bar: '2', foo: '1'}", e.message);
         });
+
+        test("_verify does not throw if pending set to false", function() {
+            var xhr = new this.FakeXMLHttpRequest;
+            xhr.open('POST', 'http://url');
+            xhr.send('');
+
+            this.FakeXMLHttpRequest._verify({allowPendingRequests: true});
+        });
     });
 });
