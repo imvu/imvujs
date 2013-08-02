@@ -37,9 +37,9 @@ var IMVU = IMVU || {};
         return newer.apply(undefined, arguments);
 
         /*
-         * The following code is illustrative about the spec, but does
-         * not support objects like typed arrays, that absolutely must
-         * be constructed with operator new.  Thus, the above code
+         * The following code illustrates the spec, but does not
+         * support objects like typed arrays, which absolutely must be
+         * constructed with operator new.  Thus, the above code
          * generation approach.
          */
 
