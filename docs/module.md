@@ -75,10 +75,17 @@ Foo.doFoo: Very well, thanks! <- came from Bar.js
 
 ## Custom dependencies
 
-Sometimes, you want to have a dependency on an asset (or resource) that is available asynchronously. Some example use cases would be to load an asset via XMLHttpRequest, or set up and initialize a web worker.
+**WARNING**: This approach to custom module loaders is deprecated.
+They break the module combiner tools, and we plan to replace them with
+registered loader plugins.
 
-If instead of being a string which is the relativ path to javascript, the dependency can be a function that takes two
-parameters:
+Sometimes, you want to have a dependency on an asset (or resource)
+that is available asynchronously. Some example use cases would be to
+load an asset via XMLHttpRequest, or set up and initialize a web
+worker.
+
+If instead of being a string which is the relative path to javascript,
+the dependency can be a function that takes two parameters:
 
 ```js
 /* customDependency.js */
