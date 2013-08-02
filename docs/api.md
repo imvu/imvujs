@@ -151,7 +151,26 @@ and so on.
 
 ## `IMVU.ServiceProvider`
 
-TBD
+`IMVU.ServiceProvider` is a simple dependency injection framework.
+
+```javascript
+var someService = {};
+var sp = new IMVU.ServiceProvider;
+sp.register('someService', someService);
+sp.get('someService'); // returns someService
+
+function Constructor(args) {
+    this.someService = args.someService;
+}
+Constructor.dependencies = ['someService'];
+
+var instance = sp.new(Constructor);
+// dependency was automatically filled
+instance.someService === someService;
+```
+
+Dependency injection is one of those things where you'll know if you
+need it.
 
 ## `IMVU.Random`
 
