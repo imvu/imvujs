@@ -178,8 +178,7 @@ We also support dom assertions, which all accept jquery-wrappable objects:
 
 Notes:
 
-* If you must write ES4-compatible tests, use string-access for `assert['true']` and other keywords.
-* If you must write ES3-compatible tests, use `assert.false_` and `assert.true_`
+* If you must write ES3-compatible tests, use string-access for `assert['true']` or underscore-suffix for `assert.true_` and other keywords.
 
 
 Test Runner Internals
