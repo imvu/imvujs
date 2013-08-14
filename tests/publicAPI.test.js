@@ -111,7 +111,10 @@
               'Random',
               'moduleCommon',
               'EventLoop',
-              'PromiseFactory' ],
+              'PromiseFactory',
+              'NamedView',
+              'NamedModel',
+              'NamedCollection' ],
             Object.keys(IMVU));
     });
 })(this);

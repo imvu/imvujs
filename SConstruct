@@ -26,6 +26,7 @@ BASE_SOURCES = [
     'src/module-common.js',
     'src/EventLoop.js',
     'src/Promise.js',
+    'src/NamedBackbone.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [
