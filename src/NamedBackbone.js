@@ -7,15 +7,16 @@ var IMVU = IMVU || {};
             constructor: { value: NamedConstructor }
         });
         NamedConstructor.extend = function (name, def, classDef) {
-            var realInitialize = def.initialize || function () {};
-            def.initialize = function () {
+            var Result = IMVU.BaseClass.extend.call(this, name, def, classDef);
+            var initialize = Result.prototype.initialize;
+            Result.prototype.initialize = function () {
                 var thisFunction = this.initialize;
                 this.initialize = function () {};
                 Constructor.apply(this, arguments);
                 this.initialize = thisFunction;
-                realInitialize.apply(this, arguments);
+                initialize.apply(this, arguments);
             };
-            return IMVU.BaseClass.extend.call(this, name, def, classDef);
+            return Result;
         };
         return NamedConstructor;
     }

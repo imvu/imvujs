@@ -14,10 +14,41 @@ module({}, function (imports) {
         assert.equal('FooModel', instance.constructor.name);
     });
     test('NamedModel gets a cid', function () {
-        var FooModel = IMVU.NamedModel.extend('FooModel', {
-        });
+        var FooModel = IMVU.NamedModel.extend('FooModel', {});
         var instance = new FooModel();
         assert.hasKey('cid', instance);
+    });
+
+    test('Inheritance is supported with initialize (yes, no, yes)', function () {
+        var GrandparentModel = IMVU.NamedModel.extend('GrandparentModel', {
+            initialize: function () {
+                IMVU.NamedModel.prototype.initialize.apply(this, arguments);
+                this.gp = true;
+            }
+        });
+        var ParentModel = GrandparentModel.extend('ParentModel', {});
+        var ChildModel = ParentModel.extend('ParentModel', {
+            initialize: function () {
+                ParentModel.prototype.initialize.apply(this, arguments);
+                this.c = true;
+            }
+        });
+        var instance = new ChildModel();
+        assert['true'](instance.gp);
+        assert['true'](instance.c);
+    });
+
+    test('Inheritance is supported with initialize (no, yes, no)', function () {
+        var GrandparentModel = IMVU.NamedModel.extend('GrandparentModel', {});
+        var ParentModel = GrandparentModel.extend('ParentModel', {
+            initialize: function () {
+                GrandparentModel.prototype.initialize.apply(this, arguments);
+                this.p = true;
+            }
+        });
+        var ChildModel = ParentModel.extend('ParentModel', {});
+        var instance = new ChildModel();
+        assert['true'](instance.p);
     });
 
     test('NamedCollection is a Backbone.Collection', function () {
