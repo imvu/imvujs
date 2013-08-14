@@ -2,23 +2,16 @@
 var IMVU = IMVU || {};
 (function (root) {
     function MakeNamedBackboneConstructor(Constructor) {
-        var NamedConstructor = IMVU.createNamedFunction('Named' + Constructor.name, Constructor);
-        NamedConstructor.prototype = Object.create(Constructor.prototype, {
-            constructor: { value: NamedConstructor }
-        });
-        NamedConstructor.extend = function (name, def, classDef) {
-            var Result = IMVU.BaseClass.extend.call(this, name, def, classDef);
-            var initialize = Result.prototype.initialize;
-            Result.prototype.initialize = function () {
-                var thisFunction = this.initialize;
+        return IMVU.BaseClass.extend.call(Constructor, 'Named' + Constructor.name, {
+            initialize: function () {
+                var oldInitialize = this.initialize;
                 this.initialize = function () {};
                 Constructor.apply(this, arguments);
-                this.initialize = thisFunction;
-                initialize.apply(this, arguments);
-            };
-            return Result;
-        };
-        return NamedConstructor;
+                this.initialize = oldInitialize;
+            }
+        }, {
+            extend: IMVU.BaseClass.extend
+        });
     }
 
     IMVU.NamedView = MakeNamedBackboneConstructor(root.Backbone.View);
