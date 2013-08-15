@@ -137,4 +137,32 @@ module({
             assert.deepEqual([2,3,1], a);
         });
     });
+
+    base.extend("strings", function() {
+        test('set and get a couple random strings', function(){
+            this.random._setStringValues(['foo', 'bar']);
+
+            assert.equal('foo', this.random.getString());
+            assert.equal('bar', this.random.getString());
+
+            var error = assert.throws(Error, this.random.getString.bind(this.random));
+            assert.equal('FakeRandom getString called without a valid string value.', error.message);
+        });
+
+        test('set a default random string', function(){
+            this.random._defaultString = 'foobar';
+
+            assert.equal('foobar', this.random.getString());
+            assert.equal('foobar', this.random.getString());
+        });
+
+        test('explicit set strings override default while they last', function(){
+            this.random._setStringValues(['foo', 'bar']);
+            this.random._defaultString = 'foobar';
+
+            assert.equal('foo', this.random.getString());
+            assert.equal('bar', this.random.getString());
+            assert.equal('foobar', this.random.getString());
+        });
+    });
 });

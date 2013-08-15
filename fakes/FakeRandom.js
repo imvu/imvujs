@@ -6,6 +6,7 @@ module({
             this.__shuffleValues = [];
             this.__choiceIndex = 0;
             this.__shuffleRotate = 0;
+            this.__stringValues = [];
         },
 
         getInteger: function(min, max) {
@@ -47,6 +48,14 @@ module({
             return a;
         },
 
+        getString: function(){
+            var s = this.__stringValues.shift() || this._defaultString;
+            if (!s || !_.isString(s)){
+                throw new Error('FakeRandom getString called without a valid string value.');
+            }
+            return s;
+        },
+
         shuffle: function(sequence) {
             var a = this.__shuffleValues.shift();
             if (a === undefined) {
@@ -84,6 +93,10 @@ module({
             _.each(values, function(value) {
                 this.__values.push(value);
             }, this);
+        },
+
+        _setStringValues: function(values){
+            this.__stringValues = values;
         },
 
         _setShuffleValues: function(value) {

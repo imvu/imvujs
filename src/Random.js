@@ -20,8 +20,11 @@ var IMVU = IMVU || {};
             if (arguments.length < 2)
                 throw new Error("getFloat expected (min, max)");
 
-            var a = Math.random() * (max-min) + min;
-            return a;
+            return Math.random() * (max-min) + min;
+        },
+
+        getString: function(){
+            return Math.random().toString(36).slice(2);
         },
 
         sample: function(sequence, numElements) {
