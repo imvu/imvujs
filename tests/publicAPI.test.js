@@ -110,6 +110,7 @@
               'ServiceProvider',
               'Random',
               'moduleCommon',
+              'mustBeDefined',
               'EventLoop',
               'PromiseFactory',
               'NamedView',

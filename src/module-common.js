@@ -44,6 +44,10 @@ var IMVU = IMVU || {};
             }
             aliases[name] = module.canonicalize(path);
         },
+        
+        mustBeDefined: function(variableName) {
+            throw new ReferenceError(variableName + ' has not been defined in args');
+        },
 
         _resolveDependency: function(value) {
             if ('string' === typeof value && '@' === value.substr(0, 1)) {
@@ -59,5 +63,9 @@ var IMVU = IMVU || {};
                 dependencies[key] = module._resolveDependency(value);
             }
         }
+    };
+
+    IMVU.mustBeDefined = function(functionName, variableName) {
+        throw new ReferenceError(functionName + ': ' + variableName + ' has not been defined in args');
     };
 })();
