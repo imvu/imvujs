@@ -297,6 +297,27 @@ module({
         });
     });
 
+    BaseFixture.extend("withCredentials", function() {
+        this.setUp(function() {
+            this.xhr = new this.FakeXMLHttpRequest;
+        });
+
+        test("IE10 bug: setting withCredentials before OPEN throws InvalidStateError", function() {
+            assert.throws(InvalidStateError, function() {
+                this.xhr.withCredentials = true;
+            }.bind(this));
+        });
+
+        test("setting withCredentials after receiving throws InvalidStateError", function() {
+            this.xhr.open('GET', 'http://url');
+            this.xhr._headersReceived(200, '', {});
+            this.xhr._dataReceived('foo');
+            assert.throws(InvalidStateError, function() {
+                this.xhr.withCredentials = true;
+            }.bind(this));
+        });
+    });
+
     BaseFixture.extend("responseType", function() {
         this.setUp(function() {
             this.xhr = new this.FakeXMLHttpRequest;
@@ -393,7 +414,7 @@ module({
             this.FakeXMLHttpRequest._expect('POST', 'http://url', 200, {}, '', {'foo': '1', 'bar': '2'});
             xhr.open('POST', 'http://url');
             xhr.send('foo=2&bar=1');
-            
+
             var e = assert.throws(
                 VerificationError,
                 this.FakeXMLHttpRequest._verify.bind(this.FakeXMLHttpRequest));

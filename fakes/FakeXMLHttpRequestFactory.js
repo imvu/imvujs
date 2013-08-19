@@ -86,9 +86,11 @@ module({
             this.readyState = this.UNSENT;
             if (definePropertyWorks) {
                 this._responseType = '';
+                this._withCredentials = false;
             } else {
                 this.responseType = '';
                 this.responseText = '';
+                this.withCredentials = false;
             }
             instanceCount += 1;
         }
@@ -123,13 +125,23 @@ module({
                         // error flag? per 4.7.9, item 3
                         return this.response;
                     }
+                },
+                'withCredentials': {
+                    get: function() {
+                        return this._withCredentials;
+                    },
+                    set: function(v) {
+                        if (this.readyState !== this.OPENED) {
+                            throw new InvalidStateError;
+                        }
+                        this._withCredentials = v;
+                    }
                 }
             });
         }
 
         _.extend(FakeXMLHttpRequest.prototype, {
             _error: false,
-            withCredentials: false,
 
             onloadstart: defaultEventHandler,
             onprogress: defaultEventHandler,
