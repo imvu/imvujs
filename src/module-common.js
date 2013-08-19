@@ -64,8 +64,4 @@ var IMVU = IMVU || {};
             }
         }
     };
-
-    IMVU.mustBeDefined = function(functionName, variableName) {
-        throw new ReferenceError(functionName + ': ' + variableName + ' has not been defined in args');
-    };
 })();

@@ -15,6 +15,7 @@ BASE_SOURCES = [
     'ext/backbone-0.9.10.js',
     'ext/URI.js',
     'src/repr.js',
+    'src/property.js',
     'src/new.js',
     'src/cookie.js',
     'src/error.js',
