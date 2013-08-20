@@ -1,6 +1,6 @@
 module({}, function (imports) {
     return Backbone.View.extend({
-        initilalize: function () {
+        initialize: function () {
         },
 
         render: function () {
