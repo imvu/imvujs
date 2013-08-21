@@ -32,6 +32,9 @@ var MODULE_DEBUG = true;
         warn: nop,
         info: nop
     };
+
+    var Console = window.console || C;
+
     function setLogger(logger) {
         var old = C;
         C = logger;
@@ -148,9 +151,9 @@ var MODULE_DEBUG = true;
         if (MODULE_DEBUG) {
             try {
                 var result = esprima.parse(code);
-                C.log(result);
+                Console.log(result);
             } catch (e) {
-                C.error("Parse error in", url + ':', e.message);
+                Console.error("Parse error in", url + ':', e.message);
             }
         }
     }
