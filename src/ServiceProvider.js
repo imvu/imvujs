@@ -18,7 +18,7 @@ var IMVU = IMVU || {};
         },
 
         'new': function() { // backwards compatibility alias.
-            this.create.apply(this, arguments);
+            return this.create.apply(this, arguments);
         },
 
         create: function(type/*, ..., options*/) {
