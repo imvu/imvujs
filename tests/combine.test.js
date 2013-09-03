@@ -92,16 +92,16 @@ module({}, function(imports) {
 
         test('readModules returns module dependencies', function() {
             var _ref = combine.readModules(path.normalize('combine/d.js'));
-            var modules = _ref[0]
-            var missing = _ref[1];
+            var modules = _ref.resolved;
+            var missing = _ref.missing;
             assert.deepEqual({}, missing);
             assert.deepEqual(["combine/a.js", "combine/c.js", "combine/d.js", "combine/e.js", "combine/subdir/b.js"].map(path.normalize), sorted(Object.keys(modules)));
         });
 
         test('readModules: root can be missing', function() {
             var _ref = combine.readModules('combine/missing.js');
-            var modules = _ref[0];
-            var missing = _ref[1];
+            var modules = _ref.resolved;
+            var missing = _ref.missing;
             assert.deepEqual({
                 'combine/missing.js': {
                     '<root>': true
@@ -113,8 +113,8 @@ module({}, function(imports) {
             var missing_js = path.normalize('combine/missing.js');
             var has_missing_js = path.normalize('combine/has-missing.js');
             var _ref = combine.readModules(has_missing_js);
-            var modules = _ref[0];
-            var missing = _ref[1];
+            var modules = _ref.resolved;
+            var missing = _ref.missing;
             expected = {};
             expected[missing_js] = {};
             expected[missing_js][has_missing_js] = true;

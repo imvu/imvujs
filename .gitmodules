@@ -1,13 +1,15 @@
 [submodule "third-party/node-jshint"]
     path = third-party/node-jshint
     url = git@github.com:imvu/node-jshint.git
-
 [submodule "third-party/es5-shim"]
     path = third-party/es5-shim
     url = git@github.com:imvu/es5-shim.git
 [submodule "third-party/leprechaun-binaries"]
-	path = third-party/leprechaun-binaries
-	url = git@github.com:imvu/leprechaun-binaries.git
+    path = third-party/leprechaun-binaries
+    url = git@github.com:imvu/leprechaun-binaries.git
 [submodule "third-party/UglifyJS2"]
-	path = third-party/UglifyJS2
-	url = git@github.com:imvu/UglifyJS2.git
+    path = third-party/UglifyJS2
+    url = git@github.com:imvu/UglifyJS2.git
+[submodule "third-party/DefinitelyTyped"]
+    path = third-party/DefinitelyTyped
+    url = git@github.com:srhazi-imvu/DefinitelyTyped.git

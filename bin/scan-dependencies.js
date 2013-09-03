@@ -7,8 +7,8 @@ var combine = require('./combine.js');
 
 function scan_dependencies(rootPath) {
     var x = combine.readModules(rootPath);
-    var modules = x[0];
-    var missing = x[1];
+    var modules = x.resolved;
+    var missing = x.missing;
     var written = {}; // path : true
 
     function echoDependencies(path) {
