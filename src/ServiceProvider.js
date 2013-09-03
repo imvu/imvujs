@@ -17,7 +17,11 @@ var IMVU = IMVU || {};
             this.services[name] = instance;
         },
 
-        'new': function(type/*, ..., options*/) {
+        'new': function() { // backwards compatibility alias.
+            this.create.apply(this, arguments);
+        },
+
+        create: function(type/*, ..., options*/) {
             var args = Array.prototype.slice.call(arguments, 1);
             var options = args.pop() || {};
 
