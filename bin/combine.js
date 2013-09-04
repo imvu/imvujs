@@ -396,7 +396,6 @@ var ScriptError = SyntaxError;
 function combine(m, rootPath) {
     var modules = m.resolved;
     var missing = m.missing;
-    console.log(m.missing);
 
     if (Object.keys(missing).length) {
         var msg = '';
