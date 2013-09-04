@@ -50,13 +50,13 @@ def generate(env):
                 try:
                     return env['MODULE_ALIASES'][a]
                 except KeyError:
-                    raise ValueError('Alias "%s" not set in MODULE_ALIASES' % (a,))
+                    return None
             else:
                 return path
 
         paths = filter(None, stdout.split('\n'))
         paths = [path.replace('\\', '/') for path in paths]
-        paths = map(resolveAlias, paths)
+        paths = filter(None, map(resolveAlias, paths))
         return map(env.File, paths)
 
     ModuleScanner = Scanner(
