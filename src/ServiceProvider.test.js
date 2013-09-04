@@ -5,7 +5,7 @@ fixture("ServiceProvider", function() {
 
     test("instantiates objects", function() {
         function Foo(){}
-        assert['instanceof'](this.sp['new'](Foo), Foo);
+        assert['instanceof'](this.sp.create(Foo), Foo);
     });
 
     test("satisfies dependencies", function() {
@@ -16,7 +16,7 @@ fixture("ServiceProvider", function() {
             this.timer = options.timer;
         }
         Foo.dependencies = ['timer'];
-        var instance = this.sp['new'](Foo);
+        var instance = this.sp.create(Foo);
         assert.equal(timer, instance.timer);
     });
 
@@ -28,7 +28,7 @@ fixture("ServiceProvider", function() {
             this.service = options.service;
         }
         Foo.prototype.dependencies = ['service'];
-        var instance = this.sp['new'](Foo);
+        var instance = this.sp.create(Foo);
         assert.equal(service, instance.service);
     });
 
@@ -37,7 +37,7 @@ fixture("ServiceProvider", function() {
         }
         Foo.dependencies = ['timer'];
         var e = assert.throws(ReferenceError, function() {
-            this.sp['new'](Foo);
+            this.sp.create(Foo);
         }.bind(this));
         assert.equal('Unsatisfied dependencies "timer" when constructing Foo', e.message);
     });
@@ -50,7 +50,7 @@ fixture("ServiceProvider", function() {
             this.service = options.service;
         }
         Foo.dependencies = ['service'];
-        var instance = this.sp['new'](Foo, {extra: 10});
+        var instance = this.sp.create(Foo, {extra: 10});
         assert.equal(service, instance.service);
         assert.equal(10, instance.extra);
     });
@@ -63,7 +63,7 @@ fixture("ServiceProvider", function() {
             this.service = options.service;
         }
         Foo.dependencies = ['service'];
-        var instance = this.sp['new'](Foo, {service: service2});
+        var instance = this.sp.create(Foo, {service: service2});
         assert.equal(service2, instance.service);
     });
 
@@ -76,7 +76,7 @@ fixture("ServiceProvider", function() {
             this.service = options.service;
         }
         Foo.dependencies = ['service'];
-        var instance = this.sp['new'](Foo, 'thing', {service: service2});
+        var instance = this.sp.create(Foo, 'thing', {service: service2});
         assert.equal('thing', instance.thing);
         assert.equal(service2, instance.service);
     });
@@ -85,7 +85,7 @@ fixture("ServiceProvider", function() {
         function Foo(options) {
             this.serviceProvider = options.serviceProvider;
         }
-        var instance = this.sp['new'](Foo);
+        var instance = this.sp.create(Foo);
         assert.equal(this.sp, instance.serviceProvider);
     });
 
@@ -97,20 +97,20 @@ fixture("ServiceProvider", function() {
             this.service = options.service;
         }
 
-        var instance = this.sp['new'](Foo);
+        var instance = this.sp.create(Foo);
         assert.equal(undefined, instance.service);
     });
 
     test('trying to create a new undefined thing throws a helpful error', function(){
         var e = assert.throws(ReferenceError, function() {
-            this.sp['new'](undefined);
+            this.sp.create(undefined);
         }.bind(this));
         assert.equal('Passed bad class type "undefined" to ServiceProvider.new()', e.message);
     });
 
     test('trying to create a new int throws a helpful error', function(){
         var e = assert.throws(ReferenceError, function() {
-            this.sp['new'](10);
+            this.sp.create(10);
         }.bind(this));
         assert.equal('Passed bad class type "10" to ServiceProvider.new()', e.message);
     });
