@@ -142,4 +142,28 @@ module({}, function(imports) {
         ast = uglify.parse('module({}, function(imports) { function oh_no_i_have_forgotten_to() { return; } });');
         assert.throws(combine.ScriptError, combine.combine.bind(null, combine.readModules('combine/noreturn.js'), 'combine/noreturn.js'));
     });
+
+    fixture('deferred alias combining', function () {
+        this.expectCombine = function (expected, toCombine) {
+            var q = combine.combine(combine.readModules(toCombine), toCombine);
+            // if we had a fake filesystem, we wouldn't need this sillyness
+            var expected = fs.readFileSync(expected, 'utf-8');
+            var actual = combine.gen_code(q, {
+                beautify: true
+            });
+            assert.equal(expected,  actual + '\n');
+        };
+        test('double_double', function () {
+            this.expectCombine('combine/deferred-alias/double_double.combined.js', 'combine/deferred-alias/double_double.js');
+        });
+        test('simple', function () {
+            this.expectCombine('combine/deferred-alias/simple.combined.js', 'combine/deferred-alias/simple.js');
+        });
+        test('simple_deep', function () {
+            this.expectCombine('combine/deferred-alias/simple_deep.combined.js', 'combine/deferred-alias/simple_deep.js');
+        });
+        test('simple_double', function () {
+            this.expectCombine('combine/deferred-alias/simple_double.combined.js', 'combine/deferred-alias/simple_double.js');
+        });
+    });
 });
