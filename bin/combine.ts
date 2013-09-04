@@ -74,17 +74,21 @@ function toAbsoluteUrl(url: string, relativeTo: string): string {
     }
 }
 
-function matchModuleCall(path: string, node: any): ModuleInfo {
-    if (
-        !(node instanceof uglify.AST_Call) ||
-        !(node.expression instanceof uglify.AST_Symbol) ||
-        node.expression.name !== 'module'
-    ) {
+function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
+    if (!(anyNode instanceof uglify.AST_Call)) {
+        return null;
+    }
+    var node = <uglify.AST_Call>anyNode;
+    if (!(node.expression instanceof uglify.AST_Symbol)) {
+        return null;
+    }
+    var symbol = <uglify.AST_Symbol>node.expression;
+    if (symbol.name !== 'module') {
         return null;
     }
 
-    var deps: any;
-    var body: any;
+    var deps: DependencyInfo;
+    var body: uglify.AST_Function;
 
     var arg0 = node.args[0];
     var arg1 = node.args[1];
@@ -104,10 +108,11 @@ function matchModuleCall(path: string, node: any): ModuleInfo {
         };
     }
 
-    function matchModules(node: any): DependencyInfo {
-        if (!(node instanceof uglify.AST_Object)) {
+    function matchModules(anyNode: any): DependencyInfo {
+        if (!(anyNode instanceof uglify.AST_Object)) {
             return null;
         }
+        var node = <uglify.AST_Object>anyNode;
 
         var properties = node.properties;
 
@@ -520,7 +525,7 @@ function main(argv: string[]) {
     return 0;
 }
 
-function gen_code(ast: uglify.AST_Node, options: any) {
+function gen_code(ast: uglify.AST_Node, options: uglify.OutputStreamOptions) {
     var output = uglify.OutputStream(options);
     ast.print(output);
     return output.toString();

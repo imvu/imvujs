@@ -41,8 +41,16 @@ function toAbsoluteUrl(url, relativeTo) {
     }
 }
 
-function matchModuleCall(path, node) {
-    if (!(node instanceof uglify.AST_Call) || !(node.expression instanceof uglify.AST_Symbol) || node.expression.name !== 'module') {
+function matchModuleCall(path, anyNode) {
+    if (!(anyNode instanceof uglify.AST_Call)) {
+        return null;
+    }
+    var node = anyNode;
+    if (!(node.expression instanceof uglify.AST_Symbol)) {
+        return null;
+    }
+    var symbol = node.expression;
+    if (symbol.name !== 'module') {
         return null;
     }
 
@@ -65,10 +73,11 @@ function matchModuleCall(path, node) {
         };
     }
 
-    function matchModules(node) {
-        if (!(node instanceof uglify.AST_Object)) {
+    function matchModules(anyNode) {
+        if (!(anyNode instanceof uglify.AST_Object)) {
             return null;
         }
+        var node = anyNode;
 
         var properties = node.properties;
 
