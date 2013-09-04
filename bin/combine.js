@@ -1,45 +1,16 @@
+/* global console: true */
+/* global -_ */
 ///<reference path="../third-party/DefinitelyTyped/node/node.d.ts"/>
+///<reference path="../third-party/DefinitelyTyped/underscore/underscore.d.ts"/>
 ///<reference path="../third-party/DefinitelyTyped/uglify2/uglify2.d.ts"/>
-/* global console */
-var fs = require('fs');
+///<reference path="combine_util.ts"/>
+var combine_util = require("./combine_util");
 var uglify = require('uglify-js');
+var _ = require('underscore');
+var fs = require('fs');
 var path = require('path');
 
-var aliases = {};
-
-function splitPath(p) {
-    var i = p.lastIndexOf('/');
-    if (i !== -1) {
-        return {
-            dirname: p.substring(0, i),
-            basename: p.substring(i + 1)
-        };
-    } else {
-        return {
-            dirname: '',
-            basename: p
-        };
-    }
-}
-
-function toAbsoluteUrl(url, relativeTo) {
-    url = url.replace(/\\/g, '/');
-    relativeTo = relativeTo.replace(/\\/g, '/');
-
-    if (url[0] === '/' || typeof relativeTo !== 'string') {
-        return url;
-    }
-
-    relativeTo = splitPath(relativeTo).dirname;
-
-    if (relativeTo === '') {
-        return url;
-    } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
-        return relativeTo + url;
-    } else {
-        return relativeTo + '/' + url;
-    }
-}
+var globalAliases = {};
 
 function matchModuleCall(path, anyNode) {
     if (!(anyNode instanceof uglify.AST_Call)) {
@@ -82,8 +53,7 @@ function matchModuleCall(path, anyNode) {
         var properties = node.properties;
 
         var result = {};
-        for (var i = 0; i < properties.length; ++i) {
-            var param = properties[i];
+        _.each(properties, function (param, i) {
             var alias = param.key;
             var value = matchModulePath(param.value);
             if (value === null) {
@@ -92,7 +62,7 @@ function matchModuleCall(path, anyNode) {
             } else {
                 result[alias] = value;
             }
-        }
+        });
 
         return result;
     }
@@ -110,9 +80,9 @@ function readModule(path, ast) {
     var result = null;
     ast.walk(new uglify.TreeWalker(function (node) {
         if (result === null) {
-            var mc = matchModuleCall(path, node);
-            if (mc !== null) {
-                result = mc;
+            var moduleInfo = matchModuleCall(path, node);
+            if (moduleInfo !== null) {
+                result = moduleInfo;
             }
         }
     }));
@@ -199,18 +169,7 @@ function readModule(path, ast) {
 
     return result;
 }
-
-function objectValues(o) {
-    var r = [];
-    for (var k in o) {
-        if (!o.hasOwnProperty(k)) {
-            continue;
-        }
-
-        r.push(o[k]);
-    }
-    return r;
-}
+exports.readModule = readModule;
 
 function errorExit() {
     var args = [];
@@ -222,10 +181,11 @@ function errorExit() {
     console.error();
     process.exit(1);
 }
+exports.errorExit = errorExit;
 
 function readModules(root) {
-    var resolved = {};
-    var unresolved = [
+    var registry = {};
+    var remaining = [
         {
             referrer: '<root>',
             filename: root
@@ -233,33 +193,36 @@ function readModules(root) {
     ];
     var missing = {};
 
-    while (unresolved.length) {
-        var unresolvedItem = unresolved.shift();
-        var referrer = unresolvedItem.referrer;
-        var next = unresolvedItem.filename;
+    while (remaining.length) {
+        var item = remaining.shift();
+        var referrer = item.referrer;
+        var filename = item.filename;
 
-        if (!resolved.hasOwnProperty(next)) {
+        if (!registry.hasOwnProperty(filename)) {
             var module;
-            if (fs.existsSync(next)) {
-                var code = fs.readFileSync(next, 'utf8');
+            if (fs.existsSync(filename)) {
+                var code = fs.readFileSync(filename, 'utf8');
                 var ast;
                 try  {
                     ast = uglify.parse(code, {
-                        filename: next
+                        filename: filename
                     });
                 } catch (e) {
-                    errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+                    exports.errorExit("Error in", filename, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
                 }
 
-                module = readModule(next, ast);
+                module = exports.readModule(filename, ast);
                 if (module === null) {
-                    throw "Invalid module " + next;
+                    throw "Invalid module " + filename;
+                }
+                if (module === undefined) {
+                    throw 'Invalid module (undefined)?!?!? ' + filename;
                 }
             } else {
-                if (!missing.hasOwnProperty(next)) {
-                    missing[next] = {};
+                if (!missing.hasOwnProperty(filename)) {
+                    missing[filename] = {};
                 }
-                missing[next][referrer] = true;
+                missing[filename][referrer] = true;
 
                 module = {
                     deps: {},
@@ -267,23 +230,23 @@ function readModules(root) {
                 };
             }
 
-            resolved[next] = module;
+            registry[filename] = module;
 
             var deps = module.deps;
             for (var k in deps) {
                 var dep = deps[k];
 
                 if (dep[0] === '@') {
-                    dep = aliases[dep.substr(1)] || dep;
+                    dep = globalAliases[dep.substr(1)] || dep;
                 } else {
-                    dep = toAbsoluteUrl(dep, next);
+                    dep = combine_util.toAbsoluteUrl(dep, filename);
                 }
                 deps[k] = path.normalize(dep);
             }
 
-            unresolved = unresolved.concat(objectValues(deps).map(function (dep) {
+            remaining = remaining.concat(_.map(deps, function (dep, i) {
                 return {
-                    referrer: next,
+                    referrer: filename,
                     filename: dep
                 };
             }));
@@ -291,16 +254,17 @@ function readModules(root) {
     }
 
     return {
-        resolved: resolved,
+        resolved: registry,
         missing: missing
     };
 }
+exports.readModules = readModules;
 
-function checkModule(name, module) {
+function assertModuleReturns(name, module) {
     var statements = module.body.body;
     var last = statements[statements.length - 1];
     if (!(last instanceof uglify.AST_Return)) {
-        throw new ScriptError("Module " + name + " does not end with a return statement.  Modules must return export tables!");
+        throw new exports.ScriptError("Module " + name + " does not end with a return statement.  Modules must return export tables!");
     }
 }
 
@@ -322,9 +286,7 @@ function emitModules(rootPath, modules) {
 
         var args = [];
 
-        for (var depAlias in module.deps) {
-            var depPath = module.deps[depAlias];
-
+        _.each(module.deps, function (depPath, depAlias) {
             emitDependencies(depPath, modules[depPath]);
 
             args.push(new uglify.AST_ObjectKeyVal({
@@ -333,7 +295,7 @@ function emitModules(rootPath, modules) {
                     name: aliases[depPath]
                 })
             }));
-        }
+        });
 
         var alias = newAlias();
         aliases[path] = alias;
@@ -359,9 +321,7 @@ function emitModules(rootPath, modules) {
     var rootModule = modules[rootPath];
     var args = [];
 
-    for (var depAlias in rootModule.deps) {
-        var depPath = rootModule.deps[depAlias];
-
+    _.each(rootModule.deps, function (depPath, depAlias) {
         emitDependencies(depPath, modules[depPath]);
 
         args.push(new uglify.AST_ObjectKeyVal({
@@ -370,7 +330,7 @@ function emitModules(rootPath, modules) {
                 name: aliases[depPath]
             })
         }));
-    }
+    });
 
     // Promote the root module's "imports" argument to be a file-scoped local and
     // make the root module no longer declare any dependencies.
@@ -390,8 +350,9 @@ function emitModules(rootPath, modules) {
     rootModule.body.argnames = [];
     return body;
 }
+exports.emitModules = emitModules;
 
-var ScriptError = SyntaxError;
+exports.ScriptError = SyntaxError;
 
 function combine(m, rootPath) {
     var modules = m.resolved;
@@ -402,14 +363,12 @@ function combine(m, rootPath) {
         for (var mm in missing) {
             msg += "Module '" + mm + "' is missing, referred to by: " + Object.keys(missing[mm]).join(', ');
         }
-        throw new ScriptError(msg);
+        throw new exports.ScriptError(msg);
     }
 
-    for (var k in modules) {
-        if (modules.hasOwnProperty(k)) {
-            checkModule(k, modules[k]);
-        }
-    }
+    _.each(modules, function (module, name) {
+        return assertModuleReturns(name, module);
+    });
 
     return new uglify.AST_Toplevel({
         body: [
@@ -424,7 +383,7 @@ function combine(m, rootPath) {
                         }),
                         new uglify.AST_Function({
                             argnames: [],
-                            body: emitModules(rootPath, modules)
+                            body: exports.emitModules(rootPath, modules)
                         })
                     ]
                 })
@@ -432,6 +391,7 @@ function combine(m, rootPath) {
         ]
     });
 }
+exports.combine = combine;
 
 function usage() {
     console.log('usage: combine file.js > newfile.js');
@@ -446,7 +406,7 @@ function main(argv) {
     for (var i = 2; i < argv.length; ++i) {
         if (argv[i] === '--alias' && (i + 1) < argv.length) {
             var eq = argv[i + 1].split('=', 2);
-            aliases[eq[0]] = eq[1];
+            globalAliases[eq[0]] = eq[1];
             ++i;
         } else {
             if (fileName) {
@@ -462,8 +422,8 @@ function main(argv) {
     }
 
     try  {
-        var m = readModules(fileName);
-        var newScript = combine(m, fileName);
+        var m = exports.readModules(fileName);
+        var newScript = exports.combine(m, fileName);
 
         console.log("/*");
         console.log('Source files:');
@@ -475,10 +435,10 @@ function main(argv) {
         console.log('');
         console.log("*/");
 
-        console.log(gen_code(newScript, { beautify: true }));
+        console.log(exports.gen_code(newScript, { beautify: true }));
     } catch (e) {
-        if (e instanceof ScriptError) {
-            errorExit(e.message);
+        if (e instanceof exports.ScriptError) {
+            exports.errorExit(e.message);
         }
         throw e;
     }
@@ -491,16 +451,9 @@ function gen_code(ast, options) {
     ast.print(output);
     return output.toString();
 }
+exports.gen_code = gen_code;
 
 if (null === module.parent) {
     process.exit(main(process.argv));
-} else {
-    exports.readModule = readModule;
-    exports.readModules = readModules;
-    exports.emitModules = emitModules;
-    exports.errorExit = errorExit;
-    exports.combine = combine;
-    exports.gen_code = gen_code;
-    exports.ScriptError = ScriptError;
 }
 

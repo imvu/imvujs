@@ -1,78 +1,48 @@
-///<reference path="../third-party/DefinitelyTyped/node/node.d.ts"/>
-///<reference path="../third-party/DefinitelyTyped/uglify2/uglify2.d.ts"/>
-/* global console */
+/* global console: true */
+/* global -_ */
 
-interface SplitPath {
-    dirname: string;
-    basename: string;
-}
+///<reference path="../third-party/DefinitelyTyped/node/node.d.ts"/>
+///<reference path="../third-party/DefinitelyTyped/underscore/underscore.d.ts"/>
+///<reference path="../third-party/DefinitelyTyped/uglify2/uglify2.d.ts"/>
+
+///<reference path="combine_util.ts"/>
+
+import combine_util = require('combine_util');
+import uglify       = require('uglify-js');
+import _            = require('underscore');
+import fs           = require('fs');
+import path         = require('path');
 
 interface UnresolvedModule {
     referrer: string;
     filename: string;
 }
 
-interface DependencyInfo {
+export interface DependencyMap {
     [ alias: string ]: string;
 }
 
-interface ModuleInfo {
-    deps: DependencyInfo;
+export interface ModuleInfo {
+    deps: DependencyMap;
     body: uglify.AST_Function;
 }
 
-interface ModuleRegistry {
+export interface ModuleRegistry {
     [ name: string ]: ModuleInfo
 }
 
-interface ReadModulesResult {
+export interface MissingModules {
+    [abspath: string]: {
+        [referrerpath: string]: boolean
+    }
+}
+
+export interface ReadModulesResult {
     resolved: ModuleRegistry;
-    missing: {
-        [abspath: string]: {
-            [referrerpath: string]: boolean
-        }
-    };
+    missing: MissingModules;
 }
 
-var fs        = require('fs');
-import uglify = require('uglify-js');
-var path      = require('path');
-
-var aliases = {};
-
-function splitPath(p: string): SplitPath {
-    var i = p.lastIndexOf('/');
-    if (i !== -1) {
-        return {
-            dirname: p.substring(0, i),
-            basename: p.substring(i + 1)
-        };
-    } else {
-        return {
-            dirname: '',
-            basename: p
-        };
-    }
-}
-
-function toAbsoluteUrl(url: string, relativeTo: string): string {
-    url = url.replace(/\\/g, '/');
-    relativeTo = relativeTo.replace(/\\/g, '/');
-
-    if (url[0] === '/' || typeof relativeTo !== 'string') {
-        return url;
-    }
-
-    relativeTo = splitPath(relativeTo).dirname;
-
-    if (relativeTo === '') {
-        return url;
-    } else if (url[0] === '/' || relativeTo[relativeTo.length - 1] === '/') {
-        return relativeTo + url;
-    } else {
-        return relativeTo + '/' + url;
-    }
-}
+var globalAliases: DependencyMap = {};
 
 function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
     if (!(anyNode instanceof uglify.AST_Call)) {
@@ -87,7 +57,7 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
         return null;
     }
 
-    var deps: DependencyInfo;
+    var deps: DependencyMap;
     var body: uglify.AST_Function;
 
     var arg0 = node.args[0];
@@ -108,7 +78,7 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
         };
     }
 
-    function matchModules(anyNode: any): DependencyInfo {
+    function matchModules(anyNode: any): DependencyMap {
         if (!(anyNode instanceof uglify.AST_Object)) {
             return null;
         }
@@ -117,8 +87,7 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
         var properties = node.properties;
 
         var result = {};
-        for (var i = 0; i < properties.length; ++i) {
-            var param = properties[i];
+        _.each(properties, function (param, i): void {
             var alias = param.key;
             var value = matchModulePath(param.value);
             if (value === null) {
@@ -127,7 +96,7 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
             } else {
                 result[alias] = value;
             }
-        }
+        });
 
         return result;
     }
@@ -145,13 +114,13 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
     }
 }
 
-function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
+export function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
     var result: ModuleInfo = null;
     ast.walk(new uglify.TreeWalker(function(node : uglify.AST_Node) {
         if (result === null) {
-            var mc = matchModuleCall(path, node);
-            if (mc !== null) {
-                result = mc;
+            var moduleInfo = matchModuleCall(path, node);
+            if (moduleInfo !== null) {
+                result = moduleInfo;
             }
         }
     }));
@@ -240,62 +209,53 @@ function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
     return result;
 }
 
-function objectValues(o: any) {
-    var r: any[] = [];
-    for (var k in o) {
-        if (!o.hasOwnProperty(k)) {
-            continue;
-        }
-
-        r.push(o[k]);
-    }
-    return r;
-}
-
-function errorExit(...args: any[]): void {
+export function errorExit(...args: any[]): void {
     console.error();
     console.error.apply(console.error, args);
     console.error();
     process.exit(1);
 }
 
-function readModules(root: string): ReadModulesResult {
-    var resolved = {}; // abspath : module
-    var unresolved: UnresolvedModule[] = [
+export function readModules(root: string): ReadModulesResult {
+    var registry: ModuleRegistry = {};
+    var remaining: UnresolvedModule[] = [
         {
             referrer: '<root>',
             filename: root
         }
     ];
-    var missing = {}; // abspath : {referrerpath: true}
+    var missing: MissingModules = {};
 
-    while (unresolved.length) {
-        var unresolvedItem = unresolved.shift();
-        var referrer = unresolvedItem.referrer;
-        var next = unresolvedItem.filename;
+    while (remaining.length) {
+        var item = remaining.shift();
+        var referrer = item.referrer;
+        var filename = item.filename;
 
-        if (!resolved.hasOwnProperty(next)) {
+        if (!registry.hasOwnProperty(filename)) {
             var module: ModuleInfo;
-            if (fs.existsSync(next)) {
-                var code = fs.readFileSync(next, 'utf8');
+            if (fs.existsSync(filename)) {
+                var code = fs.readFileSync(filename, 'utf8');
                 var ast: uglify.AST_Toplevel;
                 try {
                     ast = uglify.parse(code, {
-                        filename: next
+                        filename: filename
                     });
                 } catch (e) {
-                    errorExit("Error in", next, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+                    errorExit("Error in", filename, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
                 }
 
-                module = readModule(next, ast);
+                module = readModule(filename, ast);
                 if (module === null) {
-                    throw "Invalid module " + next;
+                    throw "Invalid module " + filename;
+                }
+                if (module === undefined) {
+                    throw 'Invalid module (undefined)?!?!? ' + filename;
                 }
             } else {
-                if (!missing.hasOwnProperty(next)) {
-                    missing[next] = {};
+                if (!missing.hasOwnProperty(filename)) {
+                    missing[filename] = {};
                 }
-                missing[next][referrer] = true;
+                missing[filename][referrer] = true;
 
                 module = {
                     deps: {},
@@ -303,7 +263,7 @@ function readModules(root: string): ReadModulesResult {
                 };
             }
 
-            resolved[next] = module;
+            registry[filename] = module;
 
             var deps = module.deps;
             for (var k in deps) {
@@ -311,17 +271,17 @@ function readModules(root: string): ReadModulesResult {
                 // TODO: put this in some common part of the code?
                 // There may be duplication between this code, the node.js module loader, and the web module loader.
                 if (dep[0] === '@') {
-                    dep = aliases[dep.substr(1)] || dep;
+                    dep = globalAliases[dep.substr(1)] || dep;
                 } else {
-                    dep = toAbsoluteUrl(dep, next);
+                    dep = combine_util.toAbsoluteUrl(dep, filename);
                 }
                 deps[k] = path.normalize(dep);
             }
 
-            unresolved = unresolved.concat(
-                objectValues(deps).map(function(dep: string): UnresolvedModule {
+            remaining = remaining.concat(
+                _.map(deps, function (dep, i): UnresolvedModule {
                     return {
-                        referrer: next,
+                        referrer: filename,
                         filename: dep
                     };
                 })
@@ -330,12 +290,12 @@ function readModules(root: string): ReadModulesResult {
     }
 
     return {
-        resolved: resolved,
+        resolved: registry,
         missing: missing
     };
 }
 
-function checkModule(name: string, module: ModuleInfo) {
+function assertModuleReturns(name: string, module: ModuleInfo) {
     var statements = module.body.body;
     var last = statements[statements.length - 1];
     if (!(last instanceof uglify.AST_Return)) {
@@ -343,9 +303,9 @@ function checkModule(name: string, module: ModuleInfo) {
     }
 }
 
-function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Statement[] {
+export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Statement[] {
     var emitted: ModuleInfo[] = [];
-    var aliases: DependencyInfo = {}; // path : alias
+    var aliases: DependencyMap = {}; // path : alias
 
     var body: uglify.AST_Statement[] = [];
 
@@ -361,9 +321,7 @@ function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Stat
 
         var args: uglify.AST_ObjectProperty[] = [];
 
-        for (var depAlias in module.deps) {
-            var depPath = module.deps[depAlias];
-
+        _.each(module.deps, function (depPath, depAlias) {
             emitDependencies(depPath, modules[depPath]);
 
             args.push(new uglify.AST_ObjectKeyVal({
@@ -372,7 +330,7 @@ function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Stat
                     name: aliases[depPath]
                 })
             }));
-        }
+        });
 
         var alias = newAlias();
         aliases[path] = alias;
@@ -396,9 +354,7 @@ function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Stat
     var rootModule = modules[rootPath];
     var args: uglify.AST_ObjectProperty[] = [];
 
-    for (var depAlias in rootModule.deps) {
-        var depPath = rootModule.deps[depAlias];
-
+    _.each(rootModule.deps, function (depPath, depAlias) {
         emitDependencies(depPath, modules[depPath]);
 
         args.push(new uglify.AST_ObjectKeyVal({
@@ -407,7 +363,7 @@ function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Stat
                 name: aliases[depPath]
             })
         }));
-    }
+    });
 
     // Promote the root module's "imports" argument to be a file-scoped local and
     // make the root module no longer declare any dependencies.
@@ -428,9 +384,9 @@ function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Stat
     return body;
 }
 
-var ScriptError = SyntaxError;
+export var ScriptError = SyntaxError;
 
-function combine(m: ReadModulesResult, rootPath: string) {
+export function combine(m: ReadModulesResult, rootPath: string) {
     var modules = m.resolved;
     var missing = m.missing;
 
@@ -442,11 +398,7 @@ function combine(m: ReadModulesResult, rootPath: string) {
         throw new ScriptError(msg);
     }
 
-    for (var k in modules) {
-        if (modules.hasOwnProperty(k)) {
-            checkModule(k, modules[k]);
-        }
-    }
+    _.each(modules, (module, name) => assertModuleReturns(name, module));
 
     return new uglify.AST_Toplevel({
         body: [
@@ -483,7 +435,7 @@ function main(argv: string[]) {
     for (var i = 2; i < argv.length; ++i) {
         if (argv[i] === '--alias' && (i + 1) < argv.length) {
             var eq = argv[i + 1].split('=', 2);
-            aliases[eq[0]] = eq[1];
+            globalAliases[eq[0]] = eq[1];
             ++i;
         } else {
             if (fileName) {
@@ -524,7 +476,7 @@ function main(argv: string[]) {
     return 0;
 }
 
-function gen_code(ast: uglify.AST_Node, options: uglify.OutputStreamOptions) {
+export function gen_code(ast: uglify.AST_Node, options: uglify.OutputStreamOptions) {
     var output = uglify.OutputStream(options);
     ast.print(output);
     return output.toString();
@@ -532,12 +484,4 @@ function gen_code(ast: uglify.AST_Node, options: uglify.OutputStreamOptions) {
 
 if (null === module.parent) {
     process.exit(main(process.argv));
-} else {
-    exports.readModule  = readModule;
-    exports.readModules = readModules;
-    exports.emitModules = emitModules;
-    exports.errorExit   = errorExit;
-    exports.combine     = combine;
-    exports.gen_code    = gen_code;
-    exports.ScriptError = ScriptError;
 }
