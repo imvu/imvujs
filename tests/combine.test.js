@@ -5,7 +5,7 @@ module({}, function(imports) {
     var fs = require('fs');
 
     var expected = [
-        'module({}, function() {',
+        'module({}, function($module$aliases) {',
         '    var $module$1 = function(imports) {',
         '        var $module$exports;',
         '        function define(a, b) {',
@@ -144,6 +144,15 @@ module({}, function(imports) {
     });
 
     fixture('deferred alias combining', function () {
+        this.setUp(function() {
+            this.cwd = process.cwd();
+            process.chdir(path.dirname(__filename));
+        });
+
+        this.tearDown(function() {
+            process.chdir(this.cwd);
+        });
+
         this.expectCombine = function (expected, toCombine) {
             var q = combine.combine(combine.readModules(toCombine), toCombine);
             // if we had a fake filesystem, we wouldn't need this sillyness
@@ -153,9 +162,6 @@ module({}, function(imports) {
             });
             assert.equal(expected,  actual + '\n');
         };
-        test('double_double', function () {
-            this.expectCombine('combine/deferred-alias/double_double.combined.js', 'combine/deferred-alias/double_double.js');
-        });
         test('simple', function () {
             this.expectCombine('combine/deferred-alias/simple.combined.js', 'combine/deferred-alias/simple.js');
         });
@@ -164,6 +170,9 @@ module({}, function(imports) {
         });
         test('simple_double', function () {
             this.expectCombine('combine/deferred-alias/simple_double.combined.js', 'combine/deferred-alias/simple_double.js');
+        });
+        test('double_double', function () {
+            this.expectCombine('combine/deferred-alias/double_double.combined.js', 'combine/deferred-alias/double_double.js');
         });
     });
 });

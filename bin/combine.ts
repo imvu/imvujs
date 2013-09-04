@@ -40,6 +40,7 @@ export interface MissingModules {
 export interface ReadModulesResult {
     resolved: ModuleRegistry;
     missing: MissingModules;
+    aliases: string[];
 }
 
 var globalAliases: DependencyMap = {};
@@ -225,6 +226,7 @@ export function readModules(root: string): ReadModulesResult {
         }
     ];
     var missing: MissingModules = {};
+    var aliases: string[] = [];
 
     while (remaining.length) {
         var item = remaining.shift();
@@ -252,10 +254,14 @@ export function readModules(root: string): ReadModulesResult {
                     throw 'Invalid module (undefined)?!?!? ' + filename;
                 }
             } else {
-                if (!missing.hasOwnProperty(filename)) {
-                    missing[filename] = {};
+                if (filename[0] === '@') {
+                    aliases.push(filename);
+                } else {
+                    if (!missing.hasOwnProperty(filename)) {
+                        missing[filename] = {};
+                    }
+                    missing[filename][referrer] = true;
                 }
-                missing[filename][referrer] = true;
 
                 module = {
                     deps: {},
@@ -291,7 +297,8 @@ export function readModules(root: string): ReadModulesResult {
 
     return {
         resolved: registry,
-        missing: missing
+        missing: missing,
+        aliases: aliases
     };
 }
 
@@ -303,7 +310,10 @@ function assertModuleReturns(name: string, module: ModuleInfo) {
     }
 }
 
-export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.AST_Statement[] {
+export function emitModules(rootPath: string, readModules: ReadModulesResult): uglify.AST_Statement[] {
+    var modules = readModules.resolved;
+    var missing = readModules.missing;
+    var deferredAliases = readModules.aliases;
     var emitted: ModuleInfo[] = [];
     var aliases: DependencyMap = {}; // path : alias
 
@@ -314,24 +324,41 @@ export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.A
         return '$module$' + nextIndex++;
     }
 
+    function transformDependenciesObject(deps: DependencyMap): uglify.AST_ObjectProperty[] {
+        var props: uglify.AST_ObjectProperty[] = [];
+        _.each(deps, function (depPath: string, depAlias) {
+            if (depPath[0] === '@' && _(deferredAliases).contains(depPath)) {
+                props.push(new uglify.AST_ObjectKeyVal({
+                    key: depAlias,
+                    value: new uglify.AST_Sub({
+                        expression: new uglify.AST_SymbolRef({
+                            name: "$module$aliases"
+                        }),
+                        property: new uglify.AST_String({
+                            value: depPath
+                        })
+                    })
+                }));
+            } else {
+                emitDependencies(depPath, modules[depPath]);
+
+                props.push(new uglify.AST_ObjectKeyVal({
+                    key: depAlias,
+                    value: new uglify.AST_SymbolRef({
+                        name: aliases[depPath]
+                    })
+                }));
+            }
+        });
+        return props;
+    }
+
     function emitDependencies(path: string, module: ModuleInfo) {
         if (emitted.indexOf(module) !== -1) {
             return;
         }
 
-        var args: uglify.AST_ObjectProperty[] = [];
-
-        _.each(module.deps, function (depPath, depAlias) {
-            emitDependencies(depPath, modules[depPath]);
-
-            args.push(new uglify.AST_ObjectKeyVal({
-                key: depAlias,
-                value: new uglify.AST_Symbol({
-                    name: aliases[depPath]
-                })
-            }));
-        });
-
+        var args = transformDependenciesObject(module.deps);
         var alias = newAlias();
         aliases[path] = alias;
 
@@ -352,18 +379,6 @@ export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.A
     }
 
     var rootModule = modules[rootPath];
-    var args: uglify.AST_ObjectProperty[] = [];
-
-    _.each(rootModule.deps, function (depPath, depAlias) {
-        emitDependencies(depPath, modules[depPath]);
-
-        args.push(new uglify.AST_ObjectKeyVal({
-            key: depAlias,
-            value: new uglify.AST_Symbol({
-                name: aliases[depPath]
-            })
-        }));
-    });
 
     // Promote the root module's "imports" argument to be a file-scoped local and
     // make the root module no longer declare any dependencies.
@@ -374,7 +389,7 @@ export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.A
                     name: 'imports'
                 }),
                 value: new uglify.AST_Object({
-                    properties: args
+                    properties: transformDependenciesObject(rootModule.deps)
                 })
             })
         ]
@@ -386,9 +401,10 @@ export function emitModules(rootPath: string, modules: ModuleRegistry): uglify.A
 
 export var ScriptError = SyntaxError;
 
-export function combine(m: ReadModulesResult, rootPath: string) {
-    var modules = m.resolved;
-    var missing = m.missing;
+export function combine(readModules: ReadModulesResult, rootPath: string) {
+    var modules = readModules.resolved;
+    var missing = readModules.missing;
+    var deferredAliases = readModules.aliases;
 
     if (Object.keys(missing).length) {
         var msg = '';
@@ -398,22 +414,39 @@ export function combine(m: ReadModulesResult, rootPath: string) {
         throw new ScriptError(msg);
     }
 
-    _.each(modules, (module, name) => assertModuleReturns(name, module));
+    _.each(modules, (module, name) => {
+        if (missing[name] !== undefined) {
+            assertModuleReturns(name, module);
+        }
+    });
 
+    var aliasArgs: uglify.AST_ObjectProperty[] = [];
+    _.each(deferredAliases, (alias) => {
+        aliasArgs.push(new uglify.AST_ObjectKeyVal({
+            key: alias,
+            value: new uglify.AST_String({
+                value: alias
+            })
+        }))
+    });
     return new uglify.AST_Toplevel({
         body: [
             new uglify.AST_SimpleStatement({
                 body: new uglify.AST_Call({
-                    expression: new uglify.AST_Symbol({
+                    expression: new uglify.AST_SymbolRef({
                         name: 'module'
                     }),
                     args: <uglify.AST_Node[]> [
                         new uglify.AST_Object({
-                            properties: []
+                            properties: aliasArgs
                         }),
                         new uglify.AST_Function({
-                            argnames: [],
-                            body: emitModules(rootPath, modules)
+                            argnames: [
+                                new uglify.AST_SymbolFunarg({
+                                    name: '$module$aliases'
+                                })
+                            ],
+                            body: emitModules(rootPath, readModules)
                         })
                     ]
                 })

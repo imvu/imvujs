@@ -192,6 +192,7 @@ function readModules(root) {
         }
     ];
     var missing = {};
+    var aliases = [];
 
     while (remaining.length) {
         var item = remaining.shift();
@@ -219,10 +220,14 @@ function readModules(root) {
                     throw 'Invalid module (undefined)?!?!? ' + filename;
                 }
             } else {
-                if (!missing.hasOwnProperty(filename)) {
-                    missing[filename] = {};
+                if (filename[0] === '@') {
+                    aliases.push(filename);
+                } else {
+                    if (!missing.hasOwnProperty(filename)) {
+                        missing[filename] = {};
+                    }
+                    missing[filename][referrer] = true;
                 }
-                missing[filename][referrer] = true;
 
                 module = {
                     deps: {},
@@ -255,7 +260,8 @@ function readModules(root) {
 
     return {
         resolved: registry,
-        missing: missing
+        missing: missing,
+        aliases: aliases
     };
 }
 exports.readModules = readModules;
@@ -268,7 +274,10 @@ function assertModuleReturns(name, module) {
     }
 }
 
-function emitModules(rootPath, modules) {
+function emitModules(rootPath, readModules) {
+    var modules = readModules.resolved;
+    var missing = readModules.missing;
+    var deferredAliases = readModules.aliases;
     var emitted = [];
     var aliases = {};
 
@@ -279,24 +288,41 @@ function emitModules(rootPath, modules) {
         return '$module$' + nextIndex++;
     }
 
+    function transformDependenciesObject(deps) {
+        var props = [];
+        _.each(deps, function (depPath, depAlias) {
+            if (depPath[0] === '@' && _(deferredAliases).contains(depPath)) {
+                props.push(new uglify.AST_ObjectKeyVal({
+                    key: depAlias,
+                    value: new uglify.AST_Sub({
+                        expression: new uglify.AST_SymbolRef({
+                            name: "$module$aliases"
+                        }),
+                        property: new uglify.AST_String({
+                            value: depPath
+                        })
+                    })
+                }));
+            } else {
+                emitDependencies(depPath, modules[depPath]);
+
+                props.push(new uglify.AST_ObjectKeyVal({
+                    key: depAlias,
+                    value: new uglify.AST_SymbolRef({
+                        name: aliases[depPath]
+                    })
+                }));
+            }
+        });
+        return props;
+    }
+
     function emitDependencies(path, module) {
         if (emitted.indexOf(module) !== -1) {
             return;
         }
 
-        var args = [];
-
-        _.each(module.deps, function (depPath, depAlias) {
-            emitDependencies(depPath, modules[depPath]);
-
-            args.push(new uglify.AST_ObjectKeyVal({
-                key: depAlias,
-                value: new uglify.AST_Symbol({
-                    name: aliases[depPath]
-                })
-            }));
-        });
-
+        var args = transformDependenciesObject(module.deps);
         var alias = newAlias();
         aliases[path] = alias;
 
@@ -319,18 +345,6 @@ function emitModules(rootPath, modules) {
     }
 
     var rootModule = modules[rootPath];
-    var args = [];
-
-    _.each(rootModule.deps, function (depPath, depAlias) {
-        emitDependencies(depPath, modules[depPath]);
-
-        args.push(new uglify.AST_ObjectKeyVal({
-            key: depAlias,
-            value: new uglify.AST_Symbol({
-                name: aliases[depPath]
-            })
-        }));
-    });
 
     // Promote the root module's "imports" argument to be a file-scoped local and
     // make the root module no longer declare any dependencies.
@@ -341,7 +355,7 @@ function emitModules(rootPath, modules) {
                     name: 'imports'
                 }),
                 value: new uglify.AST_Object({
-                    properties: args
+                    properties: transformDependenciesObject(rootModule.deps)
                 })
             })
         ]
@@ -354,9 +368,10 @@ exports.emitModules = emitModules;
 
 exports.ScriptError = SyntaxError;
 
-function combine(m, rootPath) {
-    var modules = m.resolved;
-    var missing = m.missing;
+function combine(readModules, rootPath) {
+    var modules = readModules.resolved;
+    var missing = readModules.missing;
+    var deferredAliases = readModules.aliases;
 
     if (Object.keys(missing).length) {
         var msg = '';
@@ -367,23 +382,38 @@ function combine(m, rootPath) {
     }
 
     _.each(modules, function (module, name) {
-        return assertModuleReturns(name, module);
+        if (missing[name] !== undefined) {
+            assertModuleReturns(name, module);
+        }
     });
 
+    var aliasArgs = [];
+    _.each(deferredAliases, function (alias) {
+        aliasArgs.push(new uglify.AST_ObjectKeyVal({
+            key: alias,
+            value: new uglify.AST_String({
+                value: alias
+            })
+        }));
+    });
     return new uglify.AST_Toplevel({
         body: [
             new uglify.AST_SimpleStatement({
                 body: new uglify.AST_Call({
-                    expression: new uglify.AST_Symbol({
+                    expression: new uglify.AST_SymbolRef({
                         name: 'module'
                     }),
                     args: [
                         new uglify.AST_Object({
-                            properties: []
+                            properties: aliasArgs
                         }),
                         new uglify.AST_Function({
-                            argnames: [],
-                            body: exports.emitModules(rootPath, modules)
+                            argnames: [
+                                new uglify.AST_SymbolFunarg({
+                                    name: '$module$aliases'
+                                })
+                            ],
+                            body: exports.emitModules(rootPath, readModules)
                         })
                     ]
                 })

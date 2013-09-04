@@ -1,4 +1,4 @@
-module({}, function() {
+module({}, function($module$aliases) {
     var $module$1 = function(imports) {
         var $module$exports;
         function define(a, b) {

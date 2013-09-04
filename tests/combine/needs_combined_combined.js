@@ -1,5 +1,5 @@
-module({}, function() {
-    var $module$1 = function() {
+module({}, function($module$aliases) {
+    var $module$1 = function($module$aliases) {
         var $module$1 = function(imports) {
             var $module$exports;
             function define(a, b) {
