@@ -13,3 +13,9 @@
 [submodule "third-party/DefinitelyTyped"]
     path = third-party/DefinitelyTyped
     url = git@github.com:srhazi-imvu/DefinitelyTyped.git
+[submodule "third-party/libxdr"]
+    path = third-party/libxdr
+    url = git@github.com:imvu/libxdr.git
+[submodule "third-party/pmxdr"]
+    path = third-party/pmxdr
+    url = git@github.com:imvu/pmxdr.git
