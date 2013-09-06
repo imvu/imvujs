@@ -8,7 +8,7 @@ module({
         initialize: function () {
             IMVU.ServiceProvider.prototype.initialize.call(this);
             this.register('random', new imports.FakeRandom());
-            this.register('timer', new imports.FakeRandom());
+            this.register('timer', new imports.FakeTimer());
             this.register('_eventLoop', new imports.FakeEventLoop()); // test-only
             this.register('Promise', new IMVU.PromiseFactory(this.get('_eventLoop'), {
                 immediateCallbacks: true,
