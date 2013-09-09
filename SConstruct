@@ -51,7 +51,7 @@ env = Environment(
     tools=['node', 'closure', 'uglify', 'gzip', 'module_combine'])
 
 BASE_CLOSURE_FLAGS = [
-    '--language_in', 'ECMASCRIPT5',
+    '--language_in', 'ECMASCRIPT3',
     '--jscomp_error', 'ambiguousFunctionDecl',
     '--jscomp_error', 'checkDebuggerStatement',
     '--jscomp_error', 'checkRegExp',
