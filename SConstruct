@@ -87,6 +87,18 @@ targets += env.ClosureCompiler(
     NODE_SOURCES,
     CLOSURE_FLAGS=BASE_CLOSURE_FLAGS+['--formatting', 'PRETTY_PRINT', '--compilation_level', 'WHITESPACE_ONLY'])
 
+targets += env.ClosureCompiler(
+    'out/pmxdr-host.min.js',
+    'third-party/pmxdr/pmxdr-host.js'
+)
+
+targets += env.Command(
+    'out/pmxdr-host.html',
+    ['third-party/pmxdr/pmxdr-host.prefix.html', 'out/pmxdr-host.min.js', 'third-party/pmxdr/pmxdr-host.suffix.html'],
+    'cat $SOURCES > $TARGET'
+)
+
+
 #targets += env.UglifyJS(
 #    'out/imvu.uglify.js',
 #    WEB_SOURCES)
