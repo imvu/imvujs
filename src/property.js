@@ -1,11 +1,11 @@
 /*global IMVU:true*/
 var IMVU = IMVU || {};
 (function() {
-    IMVU.requireKey = function(args, key, functionName) {
-        if (key in args) {
-            return args[key];
+    IMVU.requireProperty = function(obj, propertyName, messagePrefix) {
+        if (propertyName in obj) {
+            return obj[propertyName];
         }
-        functionName = functionName ? functionName + ': ' : '';
-        throw new ReferenceError(functionName + key + ' has not been defined in args');
+        messagePrefix = messagePrefix ? messagePrefix + ': ' : '';
+        throw new ReferenceError(messagePrefix + 'object has no property ' + propertyName);
     };
 }) ();

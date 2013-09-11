@@ -68,7 +68,7 @@
 
         assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
-    
+
         var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
         assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
     });
@@ -78,7 +78,7 @@
 
         assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
-    
+
         var expected_symbols = _.union(NODE_SYMBOLS, IMVUJS_SYMBOLS, IMVUJSTEST_SYMBOLS);
         assert.deepEqual([], _.difference(actual_symbols, expected_symbols));
     });
@@ -101,7 +101,7 @@
             [ 'URI',
               'URIQuery',
               'repr',
-              'requireKey',
+              'requireProperty',
               'new',
               'getCookies',
               'extendError',
