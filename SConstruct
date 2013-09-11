@@ -32,7 +32,6 @@ BASE_SOURCES = [
 
 WEB_SOURCES = FIRST_SOURCES + [
     'ext/jquery-1.8.3.js',
-    'ext/easyXDM-2.4.15.118.js',
 ] + BASE_SOURCES + [
     'src/web-module.js',
     'src/Timer.js',
