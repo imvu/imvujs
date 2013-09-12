@@ -8,4 +8,5 @@ var IMVU = IMVU || {};
         messagePrefix = messagePrefix ? messagePrefix + ': ' : '';
         throw new ReferenceError(messagePrefix + 'object has no property ' + propertyName);
     };
+    IMVU.requireKey = IMVU.requireProperty; // TODO: convert all references to IMVU.requireProperty and then remove
 }) ();

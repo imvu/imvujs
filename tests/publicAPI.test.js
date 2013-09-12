@@ -102,6 +102,7 @@
               'URIQuery',
               'repr',
               'requireProperty',
+              'requireKey',
               'new',
               'getCookies',
               'extendError',
