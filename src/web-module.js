@@ -292,7 +292,10 @@ var MODULE_DEBUG = true;
     }
     define.amd = {};
 
-    window.module = module;
-    window.define = define;
-
+    if (window.module === undefined) {
+        window.module = module;
+    }
+    if (window.define === undefined) {
+        window.define = define;
+    }
 })();
