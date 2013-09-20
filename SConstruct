@@ -28,6 +28,8 @@ BASE_SOURCES = [
     'src/EventLoop.js',
     'src/Promise.js',
     'src/NamedBackbone.js',
+    'third-party/pmxdr/pmxdr-client.js',
+    'third-party/libxdr/libxdr.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [

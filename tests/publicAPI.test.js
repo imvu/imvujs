@@ -96,27 +96,36 @@
             sorted(Object.keys(loaded)));
     });
 
+     function sorted(ls) {
+         ls = JSON.parse(JSON.stringify(ls));
+         ls.sort();
+         return ls;
+     }
+
     test("IMVU export list", function() {
         assert.deepEqual(
-            [ 'URI',
-              'URIQuery',
-              'repr',
-              'requireProperty',
-              'requireKey',
-              'new',
-              'getCookies',
-              'extendError',
-              'isSubClass',
-              'createNamedFunction',
+            [
               'BaseClass',
-              'ServiceProvider',
-              'Random',
-              'moduleCommon',
               'EventLoop',
-              'PromiseFactory',
-              'NamedView',
+              'NamedCollection',
               'NamedModel',
-              'NamedCollection' ],
-            Object.keys(IMVU));
+              'NamedView',
+              'PromiseFactory',
+              'Random',
+              'ServiceProvider',
+              'URI',
+              'URIQuery',
+              'XMLHttpRequestFactory',
+              'createNamedFunction',
+              'extendError',
+              'getCookies',
+              'isSubClass',
+              'moduleCommon',
+              'new',
+              'repr',
+              'requireKey',
+              'requireProperty'
+            ],
+            sorted(Object.keys(IMVU)));
     });
 })(this);
