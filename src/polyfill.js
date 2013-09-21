@@ -23,24 +23,31 @@
     }
 
     if ('undefined' !== typeof window) {
-        var polyfillRequestAnimationFrame =
+        var requestAnimationFrame =
+            window.requestAnimationFrame       ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame    ||
             window.oRequestAnimationFrame      ||
             window.msRequestAnimationFrame     ||
-            function( callback, element ) {
-                return window.setTimeout( callback, 1000/60 );
+            function(callback) {
+                return window.setTimeout(callback, 1000 / 60);
             };
 
-        var polyfillCancelAnimationFrame =
+        window.cancelAnimationFrame =
             window.cancelAnimationFrame ||
-            function( id ) {
+            function(id) {
                 window.clearTimeout(id);
             };
 
-        if(!window.requestAnimationFrame) {
-            window.requestAnimationFrame = polyfillRequestAnimationFrame;
-            window.cancelAnimationFrame = polyfillCancelAnimationFrame;
-        }
+        window.requestAnimationFrame = function(callback) {
+            requestAnimationFrame(function(time) {
+                if (typeof time === "number") {
+                    window.requestAnimationFrame = requestAnimationFrame;
+                    callback(time);
+                } else {
+                    callback(Date.now());
+                }
+            });
+        };
     }
 })();
