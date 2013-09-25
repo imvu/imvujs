@@ -9,6 +9,7 @@
 <script>
 requestAnimationFrame(function(time) {
     $('#counter').text(time);
+    requestAnimationFrame(arguments.callee);
 });
 </script>
 </html>
