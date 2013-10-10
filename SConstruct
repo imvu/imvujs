@@ -37,6 +37,7 @@ WEB_SOURCES = FIRST_SOURCES + [
 ] + BASE_SOURCES + [
     'src/web-module.js',
     'src/Timer.js',
+    'src/freeze-globals.js',
 ]
 
 NODE_SOURCES = FIRST_SOURCES + [
