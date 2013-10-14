@@ -226,14 +226,17 @@ module({
 
         // TODO: lift into separate file?
         dom: {
-            present: function(domElement){
-                if (!$(domElement).length) {
-                    fail(new imports.AssertionError(decipherDomElement(domElement) + ' should be present'));
+            present: function(domElementOrSelector, contextElementOrSelector){
+                var $contextElement = contextElementOrSelector ? $(contextElementOrSelector) : $('html');
+                if (!$contextElement.find($(domElementOrSelector)).length) {
+                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should be present in ' + decipherDomElement($contextElement)));
                 }
             },
 
-            notPresent: function(selector){
-                assert.equal(0, $(selector).length);
+            notPresent: function(domElementOrSelector){
+                if ($(domElementOrSelector).length) {
+                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should NOT be present'));
+                }
             },
 
             hasTag: function(tag, domElement) {
