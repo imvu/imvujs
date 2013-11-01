@@ -1,0 +1,218 @@
+module({
+    FakeEventLoop: '../fakes/FakeEventLoop.js',
+}, function (imports) {
+    test('yield es6 tests work correctly', function () {
+        function* gen() {
+            yield 1;
+            yield 2;
+        }
+        var i = gen();
+        assert.equal(1, i.next().value);
+        assert.equal(2, i.next().value);
+        assert.true(i.next().done);
+    })
+
+    var BaseFixture = fixture.abstract('base', function () {
+        this.setUp(function () {
+            this.eventLoop = new imports.FakeEventLoop();
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop);
+            this.Task = new IMVU.TaskFactory(this.Promise);
+        });
+    });
+
+    BaseFixture.extend('synchronous task', function () {
+        this.runTaskSync = function (task) {
+            var rslt;
+            this.Task.run(task).then(function(r) {
+                rslt = r;
+            });
+            this.eventLoop._flushTasks();
+            return rslt;
+        };
+
+        test('can return a value', function () {
+            var task = this.Task(function* () {
+                return 'success';
+            });
+            assert.equal('success', this.runTaskSync(task, []));
+        });
+
+        test('task can launch another task', function () {
+            var sum = this.Task(function* sum(a, b) {
+                return a + b;
+            });
+            var task = this.Task(function* task() {
+                var a = yield sum(1, 2);
+                var b = yield sum(3, 4);
+                return a * b;
+            });
+            assert.equal(21, this.runTaskSync(task));
+        });
+
+        test('task can launch another task, which can launch another task', function () {
+            var incr = this.Task(function* incr(a) {
+                return a + 1;
+            });
+            var sum = this.Task(function* sum(a, b) {
+                var acc = a;
+                for (var i = 0; i < b; ++i) {
+                    acc = yield incr(acc);
+                }
+                return acc;
+            });
+            var task = this.Task(function* task() {
+                var a = yield sum(1, 2);
+                var b = yield sum(3, 4);
+                return a * b;
+            });
+            assert.equal(21, this.runTaskSync(task));
+        });
+
+        test('exception in task rejects task', function () {
+            var e = new Error('oh noes');
+            var task = this.Task(function* task() {
+                throw e;
+            });
+            var succ;
+            var fail;
+            this.Task.run(task).then(function (s) {
+                succ = s;
+            }, function (f) {
+                fail = f;
+            });
+            this.eventLoop._flushTasks();
+            assert.undefined(succ);
+            assert.equal(e, fail);
+        });
+    });
+
+    BaseFixture.extend('asynchronous task (yield on raw promises)', function () {
+        this.setUp(function () {
+            var promise = new this.Promise(function (resolver) {
+                this.resolver = resolver;
+            }.bind(this));
+            var self = this;
+            this.step = 0;
+            this.task = this.Task(function* task() {
+                self.step = 1;
+                var result = yield promise;
+                self.step = 2;
+                return result;
+            });
+            this.taskResult = null;
+            this.taskError = null;
+        });
+
+        this.startTaskAsync = function () {
+            this.Task.run(this.task).then(function (r) {
+                this.taskResult = r;
+            }.bind(this), function (e) {
+                this.taskError = e;
+            }.bind(this));
+        };
+
+        test('resolved promise', function () {
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(0, this.step);
+
+            this.startTaskAsync();
+
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(1, this.step);
+
+            this.resolver.resolve('sweet');
+            this.eventLoop._flushTasks();
+
+            assert.equal('sweet', this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(2, this.step);
+        });
+
+        test('rejected promise', function () {
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(0, this.step);
+
+            this.startTaskAsync();
+
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(1, this.step);
+
+            this.resolver.reject('boo hoo');
+            this.eventLoop._flushTasks();
+
+            assert.null(this.taskResult);
+            assert.equal('boo hoo', this.taskError);
+            assert.equal(1, this.step);
+        });
+    });
+
+    BaseFixture.extend('asynchronous task (yield on wrapped promises, allowing for error handling)', function () {
+        this.setUp(function () {
+            var promise = new this.Promise(function (resolver) {
+                this.resolver = resolver;
+            }.bind(this));
+            var self = this;
+            this.step = 0;
+            this.task = this.Task(function* task() {
+                self.step = 1;
+                var result = yield this.Task.wrapPromiseError(promise);
+                self.step = 2;
+                return result;
+            }.bind(this));
+            this.taskResult = null;
+            this.taskError = null;
+        });
+
+        this.startTaskAsync = function () {
+            this.Task.run(this.task).then(function (r) {
+                this.taskResult = r;
+            }.bind(this), function (e) {
+                this.taskError = e;
+            }.bind(this));
+        };
+
+        test('resolved promise', function () {
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(0, this.step);
+
+            this.startTaskAsync();
+
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(1, this.step);
+
+            this.resolver.resolve('sweet');
+            this.eventLoop._flushTasks();
+
+            assert.equal('sweet', this.taskResult.result);
+            assert.equal(undefined, this.taskResult.error);
+            assert.null(this.taskError);
+            assert.equal(2, this.step);
+        });
+
+        test('rejected promise', function () {
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(0, this.step);
+
+            this.startTaskAsync();
+
+            assert.null(this.taskResult);
+            assert.null(this.taskError);
+            assert.equal(1, this.step);
+
+            this.resolver.reject('boo hoo');
+            this.eventLoop._flushTasks();
+
+            assert.undefined(this.taskResult.result);
+            assert.equal('boo hoo', this.taskResult.error);
+            assert.null(this.taskError);
+            assert.equal(2, this.step);
+        });
+    });
+});

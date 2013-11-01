@@ -6,3 +6,5 @@ out
 *.swp
 debug.log
 out.txt
+src/task.js
+tests/task.test.js

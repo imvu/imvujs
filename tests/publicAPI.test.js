@@ -53,6 +53,9 @@
 
         // AMD compatibility
         'define',
+
+        // regenerator yield compatibility
+        'wrapGenerator',
     ];
 
     var IMVUJSTEST_SYMBOLS = [
@@ -113,6 +116,7 @@
               'PromiseFactory',
               'Random',
               'ServiceProvider',
+              'TaskFactory',
               'URI',
               'URIQuery',
               'XMLHttpRequestFactory',
@@ -124,7 +128,7 @@
               'new',
               'repr',
               'requireKey',
-              'requireProperty'
+              'requireProperty',
             ],
             sorted(Object.keys(IMVU)));
     });

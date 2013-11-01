@@ -30,6 +30,8 @@ BASE_SOURCES = [
     'src/NamedBackbone.js',
     'third-party/pmxdr/pmxdr-client.js',
     'third-party/libxdr/libxdr.js',
+    'node_modules/regenerator/runtime/dev.js',
+    'src/task.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [
@@ -69,7 +71,12 @@ BASE_CLOSURE_FLAGS = [
     '--jscomp_error', 'globalThis',
 ]
 
+# TODO: Build tools for regenerator
+env.Command('src/task.js', ['src/task.js6'], 'node_modules/.bin/regenerator $SOURCES > $TARGET')
+
 targets = []
+
+targets += env.Command('tests/task.test.js', ['tests/task.test.js6'], 'node_modules/.bin/regenerator $SOURCES > $TARGET')
 
 targets += env.ClosureCompiler(
     'out/imvu.js',
@@ -100,7 +107,6 @@ targets += env.Command(
     'cat $SOURCES > $TARGET'
 )
 
-
 #targets += env.UglifyJS(
 #    'out/imvu.uglify.js',
 #    WEB_SOURCES)
@@ -116,7 +122,7 @@ if 'target' in ARGUMENTS:
     env.Install(ARGUMENTS['target'], targets)
     env.Alias('install', ARGUMENTS['target'])
 
-env.Default('out')
+env.Default(['out', 'tests/task.test.js'])
 
 # automated tests for the scons dependency scanner and combiner tool
 @apply

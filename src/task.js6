@@ -1,0 +1,62 @@
+/*global IMVU:true,console:true*/
+var IMVU = IMVU || {};
+(function () {
+    IMVU.TaskFactory = function TaskFactory(Promise) {
+        var Task = function (generator) {
+            // XXX: This whole function is a hack job; TDD at it's finest
+            var task = function () {
+                task.args.push(arguments);
+                return task;
+            };
+            task.toString = function () { return '<task ' + generator.name + '>'; }; // debugging
+            task.__is_task__ = true;
+            task.args = [];
+            task.generator = generator;
+            return task;
+        };
+
+        Task.run = function (task) {
+            return new Promise(function (resolver) {
+                var args = task.args.pop() || [];
+                var gen = task.generator.apply(task, args);
+                function step(result) {
+                    var item;
+                    try {
+                        item = gen.next(result);
+                    } catch (e) {
+                        resolver.reject(e);
+                        return;
+                    }
+                    if (item.done) {
+                        resolver.resolve(item.value);
+                    } else if (!!item.value.__is_task__) {
+                        Task.run(item.value).then(step, resolver.reject.bind(resolver)); 
+                    } else if (item.value instanceof Promise) {
+                        item.value.then(step, resolver.reject.bind(resolver));
+                    } else {
+                        throw Error('Error: task attempted to yielded to a non-task');
+                    }
+                }
+                step(undefined);
+            });
+        };
+
+        Task.wrapPromiseError = function (promise) {
+            return new Promise(function (resolver) {
+                promise.then(function (result) {
+                    resolver.resolve({
+                        result: result,
+                        error: undefined
+                    });
+                }, function (error) {
+                    resolver.resolve({
+                        result: undefined,
+                        error: error
+                    });
+                });
+            });
+        };
+
+        return Task;
+    };
+}());
