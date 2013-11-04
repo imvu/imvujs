@@ -4,11 +4,16 @@ var IMVU = IMVU || {};
     IMVU.ServiceProvider = IMVU.BaseClass.extend('ServiceProvider', {
         initialize: function() {
             this.services = {};
+            this.parent = null;
         },
 
         get: function(name) {
             if (!this.services.hasOwnProperty(name)) {
-                throw new ReferenceError('No service registered for "' + name + '"');
+                if (this.parent) {
+                    return this.parent.get(name);
+                } else {
+                    throw new ReferenceError('No service registered for "' + name + '"');
+                }
             }
             return this.services[name];
         },
@@ -19,6 +24,12 @@ var IMVU = IMVU || {};
 
         'new': function() { // backwards compatibility alias.
             return this.create.apply(this, arguments);
+        },
+
+        nestedProvider: function() {
+            var nested = IMVU['new'].apply(undefined, [IMVU.ServiceProvider]);
+            nested.parent = this;
+            return nested;
         },
 
         create: function(type/*, ..., options*/) {
@@ -43,7 +54,11 @@ var IMVU = IMVU || {};
                 dependencies,
                 _.has.bind(undefined, options));
             if (missing.length) {
-                throw new ReferenceError('Unsatisfied dependencies "' + missing.join(', ') + '" when constructing ' + type.name);
+                if (this.parent) {
+                    return this.parent.create.apply(this.parent, [].concat([type], options, args));
+                } else {
+                    throw new ReferenceError('Unsatisfied dependencies "' + missing.join(', ') + '" when constructing ' + type.name);
+                }
             }
 
             var constructorArgs = [].concat([type], args, [options]);

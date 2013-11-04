@@ -127,4 +127,74 @@ fixture("ServiceProvider", function() {
         this.sp.register('service', service);
         assert.equal(service, this.sp.get('service'));
     });
+
+    test('nested provider can get at services directly', function() {
+        var service = {};
+        var nested = this.sp.nestedProvider();
+        nested.register('service', service);
+        assert.equal(service, nested.get('service'));
+    });
+
+    test('nested provider can get at parent services', function() {
+        var service = {};
+        var nested = this.sp.nestedProvider();
+        this.sp.register('service', service);
+        assert.equal(service, nested.get('service'));
+    });
+
+    test('nested provider does not change parent provider', function() {
+        var service1 = "test";
+        var service2 = "different";
+        this.sp.register('service', service1);
+        var nested = this.sp.nestedProvider();
+        nested.register('service', service2);
+        assert.equal(service2, nested.get('service'));
+        assert.equal(service1, this.sp.get('service'));
+    });
+
+    test('nested provider can satisfy dependency from parent provider', function() {
+        var timer = {};
+        this.sp.register('timer', timer);
+
+        function Foo(options) {
+            this.timer = options.timer;
+        }
+        Foo.dependencies = ['timer'];
+        var nested = this.sp.nestedProvider();
+        var instance = nested.create(Foo);
+        assert.equal(timer, instance.timer);
+    });
+
+    test('nested provider can satisfy dependency from self, even if it is in the parent.', function() {
+        var timer1 = {};
+        var timer2 = {'key': 'value'};
+        this.sp.register('timer', timer1);
+
+        function Foo(options) {
+            this.timer = options.timer;
+        }
+        Foo.dependencies = ['timer'];
+        var nested = this.sp.nestedProvider();
+        nested.register('timer', timer2);
+        var instance = nested.create(Foo);
+        assert.equal(timer2, instance.timer);
+    });
+
+    test('nested provider can satisfy dependency from self, even if it is in the parent and the parent is required for another one.', function() {
+        var timer1 = {};
+        var timer2 = {'key': 'value'};
+        this.sp.register('timer', timer1);
+        this.sp.register('filler', "hi");
+
+        function Foo(options) {
+            this.timer = options.timer;
+            this.filler = options.filler;
+        }
+        Foo.dependencies = ['timer', 'filler'];
+        var nested = this.sp.nestedProvider();
+        nested.register('timer', timer2);
+        var instance = nested.create(Foo);
+        assert.equal(timer2, instance.timer);
+        assert.equal("hi", instance.filler);
+    });
 });
