@@ -13,7 +13,7 @@ module.setPlugin('two', function (args, onComplete) {
 
 module({
     one_a: 'one!a.txt',
-    two_b: 'two!b.txt!extra!arguments',
+    two_b: 'two!b.txt!extra!argu\\!ments',
     include2: 'relativePaths/through_plugin.js'
 }, function(imports) {
     test('single argument', function () {
@@ -26,7 +26,7 @@ module({
         assert.equal(3, imports.two_b.args.length);
         assert.equal('/tests/browser/b.txt', imports.two_b.args[0]);
         assert.equal('extra', imports.two_b.args[1]);
-        assert.equal('arguments', imports.two_b.args[2]);
+        assert.equal('argu!ments', imports.two_b.args[2]);
     });
     test('nested one', function () {
         assert.equal('one', imports.include2.one_a.type);

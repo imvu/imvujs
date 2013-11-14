@@ -166,6 +166,25 @@ var MODULE_DEBUG = true;
         plugins[name] = func;
     }
 
+    function splitUnescapedBangs(s) {
+        // does javascript support look behind regular expressions?
+        var parts = s.split('!');
+        var items = [];
+        var item;
+        for (var i = 0; i < parts.length; ++i) {
+            item = '';
+            while (i < parts.length && parts[i][parts[i].length - 1] === '\\') {
+                item += parts[i].substr(0, parts[i].length - 1) + '!';
+                i += 1;
+            }
+            if (i < parts.length) {
+                items.push(item + parts[i]);
+            } else {
+                items.push(item);
+            }
+        }
+        return items;
+    } 
     // dependencyReference -> Promise<exports>
     function loadDependency(thisURL, dependency) {
         if ('string' !== typeof dependency) {
@@ -173,7 +192,7 @@ var MODULE_DEBUG = true;
         }
         if (dependency.indexOf('!') !== -1) {
             return new Promise(function (resolver) {
-                var params = dependency.split('!');
+                var params = splitUnescapedBangs(dependency);
                 var name = params[0];
                 var args = params.slice(1);
                 args[0] = IMVU.moduleCommon.toAbsoluteUrl(args[0], thisURL);
