@@ -226,16 +226,17 @@ module({
 
         // TODO: lift into separate file?
         dom: {
-            present: function(domElementOrSelector, contextElementOrSelector){
-                var $contextElement = contextElementOrSelector ? $(contextElementOrSelector) : $('html');
-                if (!$contextElement.find($(domElementOrSelector)).length) {
-                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should be present in ' + decipherDomElement($contextElement)));
+            present: function(domElementOrSelector, containerElementOrSelector) {
+                var $container = containerElementOrSelector ? $(containerElementOrSelector) : $('html');
+                if (!$.contains($container.get(0), $(domElementOrSelector).get(0))) {
+                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should be present in ' + decipherDomElement($container)));
                 }
             },
 
-            notPresent: function(domElementOrSelector){
-                if ($(domElementOrSelector).length) {
-                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should NOT be present'));
+            notPresent: function(domElementOrSelector, containerElementOrSelector) {
+                var $container = containerElementOrSelector ? $(containerElementOrSelector) : $('html');
+                if ($.contains($container.get(0), $(domElementOrSelector).get(0))) {
+                    fail(new imports.AssertionError(decipherDomElement(domElementOrSelector) + ' should NOT be present in ' + decipherDomElement($container)));
                 }
             },
 
