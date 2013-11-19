@@ -158,6 +158,14 @@ var MODULE_DEBUG = true;
         }
     }
 
+    var plugins = {};
+    function setPlugin(name, func) {
+        if (plugins[name] !== undefined) {
+            throw new ReferenceError('Cannot redefine plugin: ' + name);
+        }
+        plugins[name] = func;
+    }
+
     // dependencyReference -> Promise<exports>
     function loadDependency(thisURL, dependency) {
         if (typeof dependency === "function") {
@@ -171,6 +179,18 @@ var MODULE_DEBUG = true;
                     }
                 });
             }, promiseOptions);
+        } else if ('string' === typeof dependency && dependency.indexOf('!') !== -1) {
+            return new Promise(function (resolver) {
+                var params = dependency.split('!');
+                var name = params[0];
+                var args = params.slice(1);
+                args[0] = IMVU.moduleCommon.toAbsoluteUrl(args[0], thisURL);
+                if (plugins[name] === undefined) {
+                    resolver.reject('Module referenced unregistered "' + name + '" plugin');
+                } else {
+                    plugins[name](args, resolver.resolve.bind(resolver));
+                }
+            });
         } else {
             return loadModule(
                 IMVU.moduleCommon.toAbsoluteUrl(
@@ -265,6 +285,7 @@ var MODULE_DEBUG = true;
         setXHRFactory: setXHRFactory,
         setPromiseFactory: setPromiseFactory,
         setLogger: setLogger,
+        setPlugin: setPlugin,
         caching: true,
         versionedUrls: {},
 
