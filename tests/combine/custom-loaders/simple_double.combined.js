@@ -1,16 +1,16 @@
 module({
     "action!/path/to/action": "action!/path/to/action"
-}, function($module$aliases) {
+}, function($module$deferred) {
     var $module$1 = function(imports) {
         return {
             loader: imports.loader
         };
     }({
-        loader: $module$aliases["action!/path/to/action"]
+        loader: $module$deferred["action!/path/to/action"]
     });
     var imports = {
         simple: $module$1,
-        loader: $module$aliases["action!/path/to/action"]
+        loader: $module$deferred["action!/path/to/action"]
     };
     return {
         simple: imports.simple,

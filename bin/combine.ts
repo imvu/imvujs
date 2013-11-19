@@ -342,7 +342,7 @@ export function emitModules(rootPath: string, readModules: ReadModulesResult): u
                     key: depAlias,
                     value: new uglify.AST_Sub({
                         expression: new uglify.AST_SymbolRef({
-                            name: "$module$aliases"
+                            name: "$module$deferred"
                         }),
                         property: new uglify.AST_String({
                             value: depPath
@@ -462,7 +462,7 @@ export function combine(readModules: ReadModulesResult, rootPath: string) {
                         new uglify.AST_Function({
                             argnames: [
                                 new uglify.AST_SymbolFunarg({
-                                    name: '$module$aliases'
+                                    name: '$module$deferred'
                                 })
                             ],
                             body: emitModules(rootPath, readModules)

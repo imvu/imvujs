@@ -1,8 +1,8 @@
 module({
     "@alias": "@alias"
-}, function($module$aliases) {
+}, function($module$deferred) {
     var imports = {
-        alias: $module$aliases["@alias"]
+        alias: $module$deferred["@alias"]
     };
     return {
         alias: imports.alias

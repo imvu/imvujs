@@ -1,12 +1,12 @@
 module({
     "@alias": "@alias"
-}, function($module$aliases) {
+}, function($module$deferred) {
     var $module$1 = function(imports) {
         return {
             alias: imports.alias
         };
     }({
-        alias: $module$aliases["@alias"]
+        alias: $module$deferred["@alias"]
     });
     var imports = {
         simple: $module$1
