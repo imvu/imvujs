@@ -143,7 +143,7 @@ module({}, function(imports) {
         assert.throws(combine.ScriptError, combine.combine.bind(null, combine.readModules('combine/noreturn.js'), 'combine/noreturn.js'));
     });
 
-    fixture('deferred alias combining', function () {
+    fixture('deferred alias combining and custom loaders', function () {
         this.setUp(function() {
             this.cwd = process.cwd();
             process.chdir(path.dirname(__filename));
@@ -173,6 +173,15 @@ module({}, function(imports) {
         });
         test('double_double', function () {
             this.expectCombine('combine/deferred-alias/double_double.combined.js', 'combine/deferred-alias/double_double.js');
+        });
+        test('custom action simple', function () {
+            this.expectCombine('combine/custom-loaders/simple.combined.js', 'combine/custom-loaders/simple.js');
+        });
+        test('custom action two references to the same', function () {
+            this.expectCombine('combine/custom-loaders/simple_double.combined.js', 'combine/custom-loaders/simple_double.js');
+        });
+        test('custom action updates relative paths', function () {
+            this.expectCombine('combine/custom-loaders/relative.combined.js', 'combine/custom-loaders/relative.js');
         });
     });
 });

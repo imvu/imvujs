@@ -193,6 +193,7 @@ function readModules(root) {
     ];
     var missing = {};
     var aliases = [];
+    var customActions = [];
 
     while (remaining.length) {
         var item = remaining.shift();
@@ -222,6 +223,8 @@ function readModules(root) {
             } else {
                 if (filename[0] === '@') {
                     aliases.push(filename);
+                } else if (filename.indexOf('!') !== -1) {
+                    customActions.push(filename);
                 } else {
                     if (!missing.hasOwnProperty(filename)) {
                         missing[filename] = {};
@@ -243,6 +246,10 @@ function readModules(root) {
 
                 if (dep[0] === '@') {
                     dep = globalAliases[dep.substr(1)] || dep;
+                } else if (dep.indexOf('!') !== -1) {
+                    var actionArgs = dep.split('!');
+                    actionArgs[1] = combine_util.toAbsoluteUrl(actionArgs[1], filename);
+                    dep = actionArgs.join('!');
                 } else {
                     dep = combine_util.toAbsoluteUrl(dep, filename);
                 }
@@ -261,7 +268,8 @@ function readModules(root) {
     return {
         resolved: registry,
         missing: missing,
-        aliases: aliases
+        aliases: aliases,
+        customActions: customActions
     };
 }
 exports.readModules = readModules;
@@ -278,6 +286,7 @@ function emitModules(rootPath, readModules) {
     var modules = readModules.resolved;
     var missing = readModules.missing;
     var deferredAliases = readModules.aliases;
+    var customActions = readModules.customActions;
     var emitted = [];
     var aliases = {};
 
@@ -291,7 +300,7 @@ function emitModules(rootPath, readModules) {
     function transformDependenciesObject(deps) {
         var props = [];
         _.each(deps, function (depPath, depAlias) {
-            if (depPath[0] === '@' && _(deferredAliases).contains(depPath)) {
+            if ((depPath[0] === '@' && _(deferredAliases).contains(depPath)) || (depPath.indexOf('!') !== -1 && _(customActions).contains(depPath))) {
                 props.push(new uglify.AST_ObjectKeyVal({
                     key: depAlias,
                     value: new uglify.AST_Sub({
@@ -372,6 +381,7 @@ function combine(readModules, rootPath) {
     var modules = readModules.resolved;
     var missing = readModules.missing;
     var deferredAliases = readModules.aliases;
+    var customActions = readModules.customActions;
 
     if (Object.keys(missing).length) {
         var msg = '';
@@ -393,6 +403,14 @@ function combine(readModules, rootPath) {
             key: alias,
             value: new uglify.AST_String({
                 value: alias
+            })
+        }));
+    });
+    _.each(customActions, function (action) {
+        aliasArgs.push(new uglify.AST_ObjectKeyVal({
+            key: action,
+            value: new uglify.AST_String({
+                value: action
             })
         }));
     });

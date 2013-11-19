@@ -41,6 +41,7 @@ export interface ReadModulesResult {
     resolved: ModuleRegistry;
     missing: MissingModules;
     aliases: string[];
+    customActions: string[];
 }
 
 var globalAliases: DependencyMap = {};
@@ -227,6 +228,7 @@ export function readModules(root: string): ReadModulesResult {
     ];
     var missing: MissingModules = {};
     var aliases: string[] = [];
+    var customActions: string[] = [];
 
     while (remaining.length) {
         var item = remaining.shift();
@@ -256,6 +258,8 @@ export function readModules(root: string): ReadModulesResult {
             } else {
                 if (filename[0] === '@') {
                     aliases.push(filename);
+                } else if (filename.indexOf('!') !== -1) {
+                    customActions.push(filename);
                 } else {
                     if (!missing.hasOwnProperty(filename)) {
                         missing[filename] = {};
@@ -278,6 +282,10 @@ export function readModules(root: string): ReadModulesResult {
                 // There may be duplication between this code, the node.js module loader, and the web module loader.
                 if (dep[0] === '@') {
                     dep = globalAliases[dep.substr(1)] || dep;
+                } else if (dep.indexOf('!') !== -1) {
+                    var actionArgs: string[] = dep.split('!');
+                    actionArgs[1] = combine_util.toAbsoluteUrl(actionArgs[1], filename);
+                    dep = actionArgs.join('!');
                 } else {
                     dep = combine_util.toAbsoluteUrl(dep, filename);
                 }
@@ -298,7 +306,8 @@ export function readModules(root: string): ReadModulesResult {
     return {
         resolved: registry,
         missing: missing,
-        aliases: aliases
+        aliases: aliases,
+        customActions: customActions
     };
 }
 
@@ -314,6 +323,7 @@ export function emitModules(rootPath: string, readModules: ReadModulesResult): u
     var modules = readModules.resolved;
     var missing = readModules.missing;
     var deferredAliases = readModules.aliases;
+    var customActions = readModules.customActions;
     var emitted: ModuleInfo[] = [];
     var aliases: DependencyMap = {}; // path : alias
 
@@ -327,7 +337,7 @@ export function emitModules(rootPath: string, readModules: ReadModulesResult): u
     function transformDependenciesObject(deps: DependencyMap): uglify.AST_ObjectProperty[] {
         var props: uglify.AST_ObjectProperty[] = [];
         _.each(deps, function (depPath: string, depAlias) {
-            if (depPath[0] === '@' && _(deferredAliases).contains(depPath)) {
+            if ((depPath[0] === '@' && _(deferredAliases).contains(depPath)) || (depPath.indexOf('!') !== -1 && _(customActions).contains(depPath))) {
                 props.push(new uglify.AST_ObjectKeyVal({
                     key: depAlias,
                     value: new uglify.AST_Sub({
@@ -405,6 +415,7 @@ export function combine(readModules: ReadModulesResult, rootPath: string) {
     var modules = readModules.resolved;
     var missing = readModules.missing;
     var deferredAliases = readModules.aliases;
+    var customActions = readModules.customActions;
 
     if (Object.keys(missing).length) {
         var msg = '';
@@ -426,6 +437,14 @@ export function combine(readModules: ReadModulesResult, rootPath: string) {
             key: alias,
             value: new uglify.AST_String({
                 value: alias
+            })
+        }))
+    });
+    _.each(customActions, (action) => {
+        aliasArgs.push(new uglify.AST_ObjectKeyVal({
+            key: action,
+            value: new uglify.AST_String({
+                value: action
             })
         }))
     });
