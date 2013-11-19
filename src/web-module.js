@@ -168,18 +168,10 @@ var MODULE_DEBUG = true;
 
     // dependencyReference -> Promise<exports>
     function loadDependency(thisURL, dependency) {
-        if (typeof dependency === "function") {
-            // TODO: kill this path and implement proper module loader plugins
-            return new Promise(function(resolver) {
-                dependency(function(exports) {
-                    resolver.accept(exports);
-                }, {
-                    getAbsoluteURL: function(url) {
-                        return IMVU.moduleCommon.toAbsoluteUrl(url, thisURL);
-                    }
-                });
-            }, promiseOptions);
-        } else if ('string' === typeof dependency && dependency.indexOf('!') !== -1) {
+        if ('string' !== typeof dependency) {
+            throw new TypeError('module dependencies must be string values');
+        }
+        if (dependency.indexOf('!') !== -1) {
             return new Promise(function (resolver) {
                 var params = dependency.split('!');
                 var name = params[0];
