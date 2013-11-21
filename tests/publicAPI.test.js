@@ -123,7 +123,6 @@
               'moduleCommon',
               'new',
               'repr',
-              'requireKey',
               'requireProperty'
             ],
             sorted(Object.keys(IMVU)));
