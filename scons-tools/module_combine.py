@@ -57,6 +57,7 @@ def generate(env):
         paths = filter(None, stdout.split('\n'))
         paths = [path.replace('\\', '/') for path in paths]
         paths = filter(None, map(resolveAlias, paths))
+        paths = filter(lambda s: '!' not in s, paths)
         return map(env.File, paths)
 
     ModuleScanner = Scanner(
