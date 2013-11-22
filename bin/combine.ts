@@ -284,7 +284,7 @@ export function readModules(root: string): ReadModulesResult {
                     dep = globalAliases[dep.substr(1)] || dep;
                 } else if (dep.indexOf('!') !== -1) {
                     var actionArgs: string[] = dep.split('!');
-                    actionArgs[1] = combine_util.toAbsoluteUrl(actionArgs[1], filename);
+                    actionArgs[1] = '/' + combine_util.toAbsoluteUrl(actionArgs[1], filename);
                     dep = actionArgs.join('!');
                 } else {
                     dep = combine_util.toAbsoluteUrl(dep, filename);
