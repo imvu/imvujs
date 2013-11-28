@@ -57,7 +57,7 @@ var MODULE_DEBUG = true;
         return new Promise(function(resolver) {
             var xhr = new XHRFactory();
             xhr.open('GET', url);
-            xhr.withCredentials = true; // use cross-origin requests if supported
+            xhr.withCredentials = false; // allows Access-Control-Allow-Origin: *
             if (!window.module.caching) {
                 xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
             }
@@ -184,7 +184,7 @@ var MODULE_DEBUG = true;
             }
         }
         return items;
-    } 
+    }
     // dependencyReference -> Promise<exports>
     function loadDependency(thisURL, dependency) {
         if (typeof dependency === "function") {
