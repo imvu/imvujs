@@ -18,10 +18,5 @@ module({}, function() {
             var pmxdr = new IMVU.pmxdr('http://example.com/foo/bar');
             assert.equal("http://example.com", pmxdr.origin);
         });
-
-        test("opens iframe at correct URL given protocol-relative URL", function() {
-            var pmxdr = new IMVU.pmxdr('//example.com/foo/bar');
-            assert.equal("//example.com", pmxdr.origin);
-        });
     });
 });
