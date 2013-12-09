@@ -285,7 +285,7 @@ var MODULE_DEBUG = true;
     module.run = function module_run(dependencies, body) {
         var oldUrl = currentModuleURL;
         if (!currentModuleURL) {
-            currentModuleURL = window.location.pathname; // TODO: should be window.location.href so we can support cross-domain URLs
+            currentModuleURL = window.location.href;
         }
         try {
             module(dependencies, body);

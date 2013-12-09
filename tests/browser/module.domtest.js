@@ -52,8 +52,8 @@ module({
                 i = imports;
             });
 
-            this.xhrFactory._respond('GET', '/bin/another_module.js', 200, [], emptyModule);
-            this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
+            this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/another_module.js', 200, [], emptyModule);
+            this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/a_module.js', 200, [], emptyModule);
             assert.deepEqual({a: {}, b: {}}, i);
         });
 
@@ -69,16 +69,16 @@ module({
             // Should we really bubble the load error? It does imply
             // the error shows in the log...
             assert.throws(module.ModuleError, function() {
-                this.xhrFactory._respond('GET', '/bin/another_module.js', 500, [], emptyModule);
+                this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/another_module.js', 500, [], emptyModule);
             }.bind(this));
-            this.xhrFactory._respond('GET', '/bin/a_module.js', 200, [], emptyModule);
+            this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/a_module.js', 200, [], emptyModule);
             this.eventLoop._flushTasks();
             assert.equal(0, called);
 
             assert.deepEqual(
-                [ 'log: fetch /bin/a_module.js',
-                  'log: fetch /bin/another_module.js',
-                  'error: Failed to fetch /bin/another_module.js' ],
+                [ 'log: fetch http://127.0.0.1:8001/bin/a_module.js',
+                  'log: fetch http://127.0.0.1:8001/bin/another_module.js',
+                  'error: Failed to fetch http://127.0.0.1:8001/bin/another_module.js' ],
                 this.logs);
         });
 
@@ -93,12 +93,12 @@ module({
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
             assert.throws(TypeError, function() {
-                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], '(null.x);');
+                this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/broken.js', 200, [], '(null.x);');
             }.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(
-                [ 'log: fetch /bin/broken.js',
+                [ 'log: fetch http://127.0.0.1:8001/bin/broken.js',
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null"],
                 this.logs);
         });
@@ -114,12 +114,12 @@ module({
             // Should we really bubble the evaluation error out? It
             // does imply the error would show in the log...
             assert.throws(TypeError, function() {
-                this.xhrFactory._respond('GET', '/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
+                this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/broken.js', 200, [], 'module({}, function() { return (null).x; });');
             }.bind(this));
             this.eventLoop._flushTasks();
 
             assert.deepEqual(
-                [ 'log: fetch /bin/broken.js',
+                [ 'log: fetch http://127.0.0.1:8001/bin/broken.js',
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null" ],
                 this.logs);
         });
