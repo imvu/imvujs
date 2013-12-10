@@ -296,7 +296,7 @@ var MODULE_DEBUG = true;
     };
 
     function canonicalize(fp) {
-        return module.toAbsoluteUrl(fp, currentModuleURL);
+        return module.toAbsoluteUrl(fp, currentModuleURL || window.location.href);
     }
 
     _.extend(module, IMVU.moduleCommon);
