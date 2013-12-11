@@ -321,7 +321,6 @@ module({
 
             assert.equals(4, c);
         });
-
     });
 
     fixture("global options fixture", function() {
