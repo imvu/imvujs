@@ -296,6 +296,32 @@ module({
 
             assert.equals(false, reentrant);
         });
+
+        test("reentrantly-structured code will all get called eventually", function() {
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: true,
+                exposeErrors: true
+            });
+
+            var c = 0;
+
+            var fxn = function() {
+                c++;
+                p.then(function() {
+                    c++;
+                });
+            };
+
+            p.then(fxn);
+            p.then(fxn);
+            r.accept(1);
+
+            assert.equals(4, c);
+        });
+
     });
 
     fixture("global options fixture", function() {
