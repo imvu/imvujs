@@ -1,4 +1,4 @@
-/*global IMVU:true*/
+/*global IMVU:true */
 var IMVU = IMVU || {};
 (function() {
     // Implementation of http://dom.spec.whatwg.org/#dom-future as of
@@ -182,12 +182,18 @@ var IMVU = IMVU || {};
         }
 
         Promise.prototype._scheduleCallbacks = function() {
+            if (this.state === 'processing') {
+                return;
+            }
+            var state = this.state;
+            this.state = 'processing';
             processCallbacks(
-                this.state === 'accepted' ?
+                state === 'accepted' ?
                     this.acceptCallbacks :
                     this.rejectCallbacks,
                 this.result,
                 this.immediateCallbacks);
+            this.state = state;
         };
 
         Promise.prototype.then = function(acceptCallback, rejectCallback) {

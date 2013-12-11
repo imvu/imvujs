@@ -267,6 +267,35 @@ module({
                 r.accept(10);
             });
         });
+
+        test("does not trip reentrancy, even with immediate delivery", function() {
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            }, {
+                immediateCallbacks: true,
+                exposeErrors: true
+            });
+
+            var c = 0;
+            var reentrant = false;
+
+            var fxn = function() {
+                c++;
+                p.then(function() {
+                    if (c > 1) {
+                        reentrant = true;
+                    }
+                });
+                c=0;
+            };
+
+            p.then(fxn);
+            p.then(fxn);
+            r.accept(1);
+
+            assert.equals(false, reentrant);
+        });
     });
 
     fixture("global options fixture", function() {
