@@ -16,7 +16,7 @@ module({}, function (imports) {
     test('NamedModel gets a cid', function () {
         var FooModel = IMVU.NamedModel.extend('FooModel', {});
         var instance = new FooModel();
-        assert.hasKey('cid', instance);
+        assert.hasProperty('cid', instance);
     });
 
     test('Inheritance is supported with initialize (yes, no, yes)', function () {
@@ -86,6 +86,6 @@ module({}, function (imports) {
         var instance = new FooView({
             el: {}
         });
-        assert.hasKey('cid', instance);
+        assert.hasProperty('cid', instance);
     });
 });

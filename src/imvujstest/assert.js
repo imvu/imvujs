@@ -21,6 +21,22 @@ module({
         } else if (typeof selectorOrJQueryObject === 'object') {
             return "'" + selectorOrJQueryObject[0] + "'";
         }
+        return undefined;
+    }
+
+    function requireArgumentCount(expected, actual, name) {
+        if (expected !== actual) {
+            throw new imports.AssertionError('assert.' + name + ' expected ' + expected + ' arguments, but got ' + actual);
+        }
+    }
+
+    function requireArgumentRange(minimum, maximum, actual, name) {
+        if (actual < minimum) {
+            throw new imports.AssertionError('assert.' + name + ' requires at least ' + minimum + ' arguments, but got ' + actual);
+        }
+        if (actual > maximum) {
+            throw new imports.AssertionError('assert.' + name + ' requires at most ' + maximum + ' arguments, but got ' + actual);
+        }
     }
 
     var assert = {
@@ -38,6 +54,8 @@ module({
         // BOOLEAN TESTS
 
         'true': function(value) {
+            requireArgumentCount(1, arguments.length, 'true');
+
             if (!value) {
                 fail(new imports.AssertionError("expected truthy, actual " + formatTestValue(value)),
                      {Value: value});
@@ -45,6 +63,8 @@ module({
         },
 
         'false': function(value) {
+            requireArgumentCount(1, arguments.length, 'false');
+
             if (value) {
                 fail(new imports.AssertionError("expected falsy, actual " + formatTestValue(value)),
                      {Value: value});
@@ -55,6 +75,8 @@ module({
         // SCALAR COMPARISON
 
         equal: function(expected, actual) {
+            requireArgumentCount(2, arguments.length, 'equal');
+
             if (expected !== actual) {
                 fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual)),
                      {Expected: expected, Actual: actual});
@@ -62,30 +84,40 @@ module({
         },
 
         notEqual: function(expected, actual) {
+            requireArgumentCount(2, arguments.length, 'notEqual');
+
             if (expected === actual) {
                 fail(new imports.AssertionError('actual was equal to: ' + formatTestValue(expected)));
             }
         },
 
         greater: function(lhs, rhs) {
+            requireArgumentCount(2, arguments.length, 'greater');
+
             if (lhs <= rhs) {
                 fail(new imports.AssertionError(formatTestValue(lhs) + ' not greater than ' + formatTestValue(rhs)));
             }
         },
 
         less: function(lhs, rhs) {
+            requireArgumentCount(2, arguments.length, 'less');
+
             if (lhs >= rhs) {
                 fail(new imports.AssertionError(formatTestValue(lhs) + ' not less than ' + formatTestValue(rhs)));
             }
         },
 
         greaterOrEqual: function(lhs, rhs) {
+            requireArgumentCount(2, arguments.length, 'greaterOrEqual');
+
             if (lhs < rhs) {
                 fail(new imports.AssertionError(formatTestValue(lhs) + ' not greater than or equal to ' + formatTestValue(rhs)));
             }
         },
 
         lessOrEqual: function(lhs, rhs) {
+            requireArgumentCount(2, arguments.length, 'lessOrEqual');
+
             if (lhs > rhs) {
                 fail(new imports.AssertionError(formatTestValue(lhs) + ' not less than or equal to ' + formatTestValue(rhs)));
             }
@@ -95,6 +127,8 @@ module({
         // DEEP COMPARISON
 
         deepEqual: function(expected, actual) {
+            requireArgumentCount(2, arguments.length, 'deepEqual');
+
             if (!_.isEqual(expected, actual)) {
                 fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual)),
                      {Expected: expected, Actual: actual});
@@ -102,6 +136,8 @@ module({
         },
 
         notDeepEqual: function(expected, actual) {
+            requireArgumentCount(2, arguments.length, 'notDeepEqual');
+
             if (_.isEqual(expected, actual)) {
                 fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ' and actual: ' + formatTestValue(actual) + ' were equal'));
             }
@@ -110,21 +146,23 @@ module({
         ////////////////////////////////////////////////////////////////////////////////
         // FLOATING POINT
 
-        nearEqual: function( expected, actual, tolerance ) {
-            if( tolerance === undefined ) {
+        nearEqual: function(expected, actual, tolerance) {
+            requireArgumentRange(2, 3, arguments.length, 'nearEqual');
+
+            if (tolerance === undefined) {
                 tolerance = 0.0;
             }
-            if( expected instanceof Array && actual instanceof Array ) {
+            if (expected instanceof Array && actual instanceof Array) {
                 assert.equal(expected.length, actual.length);
-                for( var i=0; i<expected.length; ++i ) {
+                for (var i = 0; i < expected.length; ++i) {
                     assert.nearEqual(expected[i], actual[i], tolerance);
                 }
                 return;
             }
-            if( Math.abs(expected - actual) > tolerance ) {
-                fail( new imports.AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual) +
-                                         ', tolerance: ' + formatTestValue(tolerance) + ', diff: ' + formatTestValue(actual-expected) ),
-                      { Expected:expected, Actual:actual, Tolerance:tolerance } );
+            if (Math.abs(expected - actual) > tolerance) {
+                fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual) +
+                                                ', tolerance: ' + formatTestValue(tolerance) + ', diff: ' + formatTestValue(actual-expected) ),
+                     { Expected:expected, Actual:actual, Tolerance:tolerance });
             }
         },
 
@@ -132,6 +170,7 @@ module({
         // STRING
 
         inString: function(expected, string){
+            requireArgumentCount(2, arguments.length, 'inString');
             if (-1 === string.indexOf(expected)){
                 fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ' not in string: ' + formatTestValue(string)),
                      {Expected: expected, 'String': string});
@@ -139,6 +178,7 @@ module({
         },
 
         notInString: function(expected, string){
+            requireArgumentCount(2, arguments.length, 'notInString');
             if (-1 !== string.indexOf(expected)){
                 fail(new imports.AssertionError('unexpected: ' + formatTestValue(expected) + ' in string: ' + formatTestValue(string)),
                      {Expected: expected, 'String': string});
@@ -146,6 +186,7 @@ module({
         },
 
         matches: function(re, string) {
+            requireArgumentCount(2, arguments.length, 'matches');
             if (!re.test(string)) {
                 fail(new imports.AssertionError('regexp ' + re + ' does not match: ' + string));
             }
@@ -155,6 +196,7 @@ module({
         // ARRAY
 
         inArray: function(expected, array) {
+            requireArgumentCount(2, arguments.length, 'inArray');
             var found = false;
             _.each(array, function(element){
                 if (_.isEqual(expected, element)){
@@ -168,6 +210,7 @@ module({
         },
 
         notInArray: function(expected, array) {
+            requireArgumentCount(2, arguments.length, 'notInArray');
             var found = false;
             _.each(array, function(element){
                 if (_.isEqual(expected, element)){
@@ -183,15 +226,17 @@ module({
         ////////////////////////////////////////////////////////////////////////////////
         // OBJECTS
 
-        hasKey: function (key, object) {
+        hasProperty: function (key, object) {
+            requireArgumentCount(2, arguments.length, 'hasProperty');
             if (!(key in object)) {
-                fail(new imports.AssertionError('Key ' + formatTestValue(key) + ' is not in object: ' + formatTestValue(object)));
+                fail(new imports.AssertionError('Property ' + formatTestValue(key) + ' is not in object: ' + formatTestValue(object)));
             }
         },
 
-        notHasKey: function (key, object) {
+        notHasProperty: function (key, object) {
+            requireArgumentCount(2, arguments.length, 'notHasProperty');
             if (key in object) {
-                fail(new imports.AssertionError('Unexpected key ' + formatTestValue(key) + ' is found in object: ' + formatTestValue(object)));
+                fail(new imports.AssertionError('Unexpected property ' + formatTestValue(key) + ' is found in object: ' + formatTestValue(object)));
             }
         },
 
@@ -199,6 +244,8 @@ module({
         // EXCEPTIONS
 
         'throws': function(exception, fn) {
+            requireArgumentCount(2, arguments.length, 'throws');
+
             try {
                 fn();
             } catch (e) {
@@ -215,6 +262,8 @@ module({
         // TYPE
 
         'instanceof': function(actual, type) {
+            requireArgumentCount(2, arguments.length, 'instanceof');
+
             if(!(actual instanceof type)) {
                 fail(new imports.AssertionError(formatTestValue(actual) + ' not instance of ' + formatTestValue(type)),
                     {Type: type, Actual: actual});
