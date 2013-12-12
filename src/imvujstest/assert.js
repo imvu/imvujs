@@ -83,7 +83,7 @@ module({
         // SCALAR COMPARISON
 
         equal: function(expected, actual) {
-            requireArgumentRange(1, 2, arguments.length, 'equal');
+            requireArgumentRange(2, 3, arguments.length, 'equal');
             requireArgumentMessage(arguments[2]);
 
             if (expected !== actual) {
@@ -93,7 +93,7 @@ module({
         },
 
         notEqual: function(expected, actual) {
-            requireArgumentRange(1, 2, arguments.length, 'notEqual');
+            requireArgumentRange(2, 3, arguments.length, 'notEqual');
             requireArgumentMessage(arguments[2]);
 
             if (expected === actual) {
