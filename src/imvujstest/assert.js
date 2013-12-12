@@ -39,6 +39,12 @@ module({
         }
     }
 
+    function requireArgumentMessage(message) {
+        if (message !== undefined && typeof message !== "string") {
+            throw new imports.AssertionError('message must be string or undefined, was ' + formatTestValue(message));
+        }
+    }
+
     var assert = {
         MAX_OUTPUT_SIZE: 1024,
 
@@ -54,7 +60,8 @@ module({
         // BOOLEAN TESTS
 
         'true': function(value) {
-            requireArgumentCount(1, arguments.length, 'true');
+            requireArgumentRange(1, 2, arguments.length, 'true');
+            requireArgumentMessage(arguments[1]);
 
             if (!value) {
                 fail(new imports.AssertionError("expected truthy, actual " + formatTestValue(value)),
@@ -63,7 +70,8 @@ module({
         },
 
         'false': function(value) {
-            requireArgumentCount(1, arguments.length, 'false');
+            requireArgumentRange(1, 2, arguments.length, 'false');
+            requireArgumentMessage(arguments[1]);
 
             if (value) {
                 fail(new imports.AssertionError("expected falsy, actual " + formatTestValue(value)),
@@ -75,7 +83,8 @@ module({
         // SCALAR COMPARISON
 
         equal: function(expected, actual) {
-            requireArgumentCount(2, arguments.length, 'equal');
+            requireArgumentRange(1, 2, arguments.length, 'equal');
+            requireArgumentMessage(arguments[2]);
 
             if (expected !== actual) {
                 fail(new imports.AssertionError('expected: ' + formatTestValue(expected) + ', actual: ' + formatTestValue(actual)),
@@ -84,7 +93,8 @@ module({
         },
 
         notEqual: function(expected, actual) {
-            requireArgumentCount(2, arguments.length, 'notEqual');
+            requireArgumentRange(1, 2, arguments.length, 'notEqual');
+            requireArgumentMessage(arguments[2]);
 
             if (expected === actual) {
                 fail(new imports.AssertionError('actual was equal to: ' + formatTestValue(expected)));
