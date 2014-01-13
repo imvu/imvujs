@@ -116,6 +116,20 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
     }
 }
 
+export function loadModule(filename: string): ModuleInfo {
+    var code = fs.readFileSync(filename, 'utf8');
+    var ast: uglify.AST_Toplevel;
+    try {
+        ast = uglify.parse(code, {
+            filename: filename
+        });
+    } catch (e) {
+        errorExit("Error in", filename, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
+    }
+
+    return readModule(filename, ast);
+}
+
 export function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
     var result: ModuleInfo = null;
     ast.walk(new uglify.TreeWalker(function(node : uglify.AST_Node) {
@@ -131,7 +145,7 @@ export function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
         /*
          * Let's assume that this is a CommonJS module.
          * We'll pretend that the code was written like so:
-         * 
+         *
          * module({}, function() {
          *     var $module$exports;
          *     function define(a, b) {
@@ -141,7 +155,7 @@ export function readModule(path: string, ast: uglify.AST_Toplevel): ModuleInfo {
          *     themodulebody;
          *     return $module$exports;
          * });
-         * 
+         *
          * Possible improvement: Scan the module body for references to an "exports" object
          * to infer NodeJS modules.
          */
@@ -238,17 +252,7 @@ export function readModules(root: string): ReadModulesResult {
         if (!registry.hasOwnProperty(filename)) {
             var module: ModuleInfo;
             if (fs.existsSync(filename)) {
-                var code = fs.readFileSync(filename, 'utf8');
-                var ast: uglify.AST_Toplevel;
-                try {
-                    ast = uglify.parse(code, {
-                        filename: filename
-                    });
-                } catch (e) {
-                    errorExit("Error in", filename, ": '" + e.message + "' at line:", e.line, "col:", e.col, "pos:", e.pos);
-                }
-
-                module = readModule(filename, ast);
+                module = loadModule(filename);
                 if (module === null) {
                     throw "Invalid module " + filename;
                 }

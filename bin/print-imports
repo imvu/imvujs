@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ .$MSYSTEM = .MINGW32 ]; then
+    MYDIR="$0"/../..
+else
+    MYDIR=`dirname "$0"`/..
+fi
+
+"$MYDIR/s/node" "$MYDIR/bin/print-imports.js" "$@"

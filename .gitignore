@@ -6,3 +6,4 @@ out
 *.swp
 debug.log
 out.txt
+bin/combine.js
