@@ -6,7 +6,17 @@ var path   = require('path');
 var combine = require('./combine.js');
 
 function scan_dependencies(rootPath) {
-    var module = combine.loadModule(rootPath);
+    var module;
+    try {
+        module = combine.loadModule(rootPath);
+    }
+    catch (e) {
+        if (e instanceof combine.ScriptError) {
+            return;
+        } else {
+            throw e;
+        }
+    }
     var deps = module.deps;
     for (var m in deps) {
         if (Object.prototype.hasOwnProperty.call(deps, m)) {

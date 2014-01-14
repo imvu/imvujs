@@ -67,11 +67,11 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
 
     if (!(deps = matchModules(arg0))) {
         console.error("Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(arg0));
-        throw new Error("Bad deps");
+        throw new ScriptError("Bad deps");
 
     } else if (!(body = matchModuleBody(arg1))) {
         console.error("Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(arg1));
-        throw new Error("Bad module body");
+        throw new ScriptError("Bad module body");
 
     } else {
         return {
