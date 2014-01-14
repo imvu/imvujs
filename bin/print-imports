@@ -1,8 +1,3 @@
 #!/bin/bash
-if [ .$MSYSTEM = .MINGW32 ]; then
-    MYDIR="$0"/../..
-else
-    MYDIR=`dirname "$0"`/..
-fi
-
+MYDIR=`dirname "$0"`/..
 "$MYDIR/s/node" "$MYDIR/bin/print-imports.js" "$@"

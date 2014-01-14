@@ -16,7 +16,7 @@ function scan_dependencies(rootPath) {
 }
 
 function usage() {
-    console.log("usage: print_imports file.js");
+    console.log("usage: print-imports file.js");
     return 1;
 }
 

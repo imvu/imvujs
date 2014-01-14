@@ -478,6 +478,39 @@ export function combine(readModules: ReadModulesResult, rootPath: string) {
     });
 }
 
+export function saveModule(module: ModuleInfo): uglify.AST_Toplevel {
+    var imports : uglify.AST_ObjectProperty[] = [];
+    var deps = module.deps;
+    for (var key in deps) {
+        if (deps.hasOwnProperty(key)) {
+            imports.push(new uglify.AST_ObjectKeyVal({
+                key: key,
+                value: new uglify.AST_String({
+                    value: deps[key]
+                })
+            }));
+        }
+    }
+
+    return new uglify.AST_Toplevel({
+        body: [
+            new uglify.AST_SimpleStatement({
+                body: new uglify.AST_Call({
+                    expression: new uglify.AST_SymbolRef({
+                        name: 'module'
+                    }),
+                    args: <uglify.AST_Node[]> [
+                        new uglify.AST_Object({
+                            properties: imports
+                        }),
+                        module.body
+                    ]
+                }),
+            })
+        ]
+    });
+}
+
 function usage() {
     console.log('usage: combine file.js > newfile.js');
 }

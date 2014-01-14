@@ -1,0 +1,3 @@
+#!/bin/bash
+MYDIR=`dirname "$0"`/..
+"$MYDIR/s/node" "$MYDIR/bin/replace-imports.js" "$@"
