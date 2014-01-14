@@ -4,7 +4,7 @@ HERE=`dirname "$0"`
 set -e
 
 cd "$HERE"/..
-node_modules/typescript/bin/tsc --target ES5 --module commonjs --noImplicitAny --out bin/combine.js bin/combine.ts
+"$HERE/node" node_modules/typescript/bin/tsc --target ES5 --module commonjs --noImplicitAny --out bin/combine.js bin/combine.ts
 cd -
 
 python "$HERE/../third-party/scons.py" -C "$HERE/.." -Q --debug=explain "$@"
