@@ -12,7 +12,7 @@ module({
 
     var originals = {};
     g.test.originals = originals;
-    
+
     function replace(obj, name, impl) {
         originals[name] = obj[name];
         obj[name] = impl;
@@ -25,6 +25,12 @@ module({
     replace(g, 'setInterval', function() {
         throw new imports.AssertionError("Don't call setInterval in tests.  Use fakes.");
     });
+
+    if (typeof window !== 'undefined') {
+        replace(window, 'XMLHttpRequest', function() {
+            throw new imports.AssertionError("Don't call XMLHttpRequest in tests.  Use fakes.");
+        });
+    }
 
     if (typeof process !== 'undefined') {
         replace(process, 'nextTick', function() {
