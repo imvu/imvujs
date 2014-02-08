@@ -11,7 +11,7 @@ var MODULE_DEBUG = true;
 (function() {
     "use strict";
 
-    var XHRFactory = XMLHttpRequest;
+    var XHRFactory = IMVU.XMLHttpRequest;
     function setXHRFactory(f) {
         var old = XHRFactory;
         XHRFactory = f;
