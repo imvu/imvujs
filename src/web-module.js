@@ -48,12 +48,6 @@ var MODULE_DEBUG = true;
 
     // fetch(url) -> Promise<xhr>
     function fetch(url) {
-        // This is an interim solution for a more robust push versioning build system.
-        var version = window.module.versionedUrls[url] || window.module.versionedUrls['/' + url];
-        if (version){
-            url = url + '?v=' + version;
-        }
-
         return new Promise(function(resolver) {
             var xhr = new XHRFactory();
             xhr.open('GET', url);
@@ -306,7 +300,6 @@ var MODULE_DEBUG = true;
         setLogger: setLogger,
         setPlugin: setPlugin,
         caching: true,
-        versionedUrls: {},
 
         // I wish this weren't a public symbol.
         canonicalize: canonicalize,
