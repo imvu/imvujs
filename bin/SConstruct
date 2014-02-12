@@ -1,0 +1,15 @@
+import os
+
+env = Environment(
+    ENV=os.environ,
+    toolpath=['../scons-tools'],
+    tools=['node'])
+
+env['TSC'] = '../node_modules/typescript/bin/tsc'
+
+[combine_js] = env.Command(
+    ['combine.js'],
+    ['combine.ts'],
+    ['$NODEJS $TSC --target ES5 --module commonjs --noImplicitAny --out $TARGET $SOURCE'])
+env.Depends(combine_js, '$TSC')
+
