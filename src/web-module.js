@@ -108,7 +108,7 @@ var MODULE_DEBUG = true;
 
             var evaluated;
             try {
-                evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//@ sourceURL=" + url);
+                evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//# sourceURL=" + url);
             } catch (e) {
                 C.error("Failed to parse", url);
                 C.log(xhr.responseText);
