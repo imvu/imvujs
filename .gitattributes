@@ -15,4 +15,5 @@ bin/verify             text eol=lf
 
 # All third-party code should not be EOL-normalized
 third-party/**  -text
-node_modules/** -text
+node_modules/typescript/* -text
+node_modules/typescript/bin/* -text
