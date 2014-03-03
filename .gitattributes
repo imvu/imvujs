@@ -1,20 +1,18 @@
+*.js    text
+*.html  text
+*.py    text
+*.md    text
+*.txt   text
 
-*.bat   binary
-*.cmd   binary
-*.exe   binary
-*.jar   binary
+# Shell scripts should *always* be LF, regardless of platfrom
+s/*     text eol=lf
+bin/combine            text eol=lf
+bin/print-imports      text eol=lf
+bin/replace-imports    text eol=lf
+bin/scan-dependencies  text eol=lf
+bin/test               text eol=lf
+bin/verify             text eol=lf
 
-*.js    eol=lf
-*.html  eol=lf
-*.py    eol=lf
-*.md    eol=lf
-*.txt    eol=lf
-
-*.man   eol=crlf
-
-s/*     eol=lf
-
-bin/combine           eol=lf
-bin/scan-dependencies eol=lf
-bin/test              eol=lf
-bin/verify            eol=lf
+# All third-party code should not be EOL-normalized
+third-party/**  -text
+node_modules/** -text
