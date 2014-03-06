@@ -280,6 +280,14 @@ module({
             }
         },
 
+        'isprototypeof': function(actualClass, classExpectedInPrototypeChain) {
+            requireArgumentCount(2, arguments.length, 'isprototypeof');
+
+            if(!(classExpectedInPrototypeChain.prototype.isPrototypeOf(actualClass.prototype))) {
+                fail(new imports.AssertionError(formatTestValue(classExpectedInPrototypeChain) + ' not prototype of ' + formatTestValue(actualClass)));
+            }
+        },
+
         ////////////////////////////////////////////////////////////////////////////////
         // DOM ASSERTIONS
 
