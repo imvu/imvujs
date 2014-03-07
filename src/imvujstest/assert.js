@@ -280,11 +280,18 @@ module({
             }
         },
 
-        'isprototypeof': function(actualClass, classExpectedInPrototypeChain) {
+        'isPrototypeOf': function(ClassExpectedInPrototypeChain, classOrInstance) {
             requireArgumentCount(2, arguments.length, 'isprototypeof');
 
-            if(!(classExpectedInPrototypeChain.prototype.isPrototypeOf(actualClass.prototype))) {
-                fail(new imports.AssertionError(formatTestValue(classExpectedInPrototypeChain) + ' not prototype of ' + formatTestValue(actualClass)));
+            var testValue;
+            if (typeof classOrInstance === 'function') { // class
+                testValue = classOrInstance.prototype;
+            } else if (typeof classOrInstance === 'object') { // instance
+                testValue = classOrInstance;
+            }
+
+            if(!(Object.prototype.isPrototypeOf.call(ClassExpectedInPrototypeChain.prototype, testValue))) {
+                fail(new imports.AssertionError(formatTestValue(ClassExpectedInPrototypeChain) + ' not prototype of ' + formatTestValue(classOrInstance)));
             }
         },
 
