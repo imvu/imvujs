@@ -33,7 +33,16 @@ var IMVU = IMVU || {};
                 throw new ReferenceError('Passed bad class type "' + IMVU.repr(type) + '" to ServiceProvider.new()');
             }
 
-            var dependencies = type.dependencies || type.prototype.dependencies || [];
+            var dependencies = type.dependencies || [];
+
+            var p = type.prototype;
+            while (p){
+                if (p.dependencies){
+                    dependencies = dependencies.concat(p.dependencies);
+                }
+                p = Object.getPrototypeOf(p);
+            }
+
             if (!Array.isArray(dependencies)) {
                 throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));
             }

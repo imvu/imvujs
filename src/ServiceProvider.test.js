@@ -32,6 +32,34 @@ fixture("ServiceProvider", function() {
         assert.equal(service, instance.service);
     });
 
+    test('satisfies nested dependencies', function() {
+        var timer = {};
+        this.sp.register('timer', timer);
+        var rest = {};
+        this.sp.register('rest', rest);
+
+        var ParentClass = IMVU.BaseClass.extend('Parent', {
+            dependencies: ['timer'],
+
+            initialize: function(args){
+                this.timer = args.timer;
+            }
+        });
+
+        var ChildClass = ParentClass.extend('Child', {
+            dependencies: ['rest'],
+
+            initialize: function(args){
+                this.rest = args.rest;
+                ParentClass.prototype.initialize.call(this, args);
+            }
+        });
+
+        var instance = this.sp.create(ChildClass);
+        assert.equal(rest, instance.rest);
+        assert.equal(timer, instance.timer);
+    });
+
     test("throws error if dependency is not satisfied", function() {
         function Foo() {
         }
