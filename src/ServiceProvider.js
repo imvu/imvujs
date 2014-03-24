@@ -43,6 +43,8 @@ var IMVU = IMVU || {};
                 p = Object.getPrototypeOf(p);
             }
 
+            dependencies = _.uniq(dependencies);
+
             if (!Array.isArray(dependencies)) {
                 throw new SyntaxError('Dependencies must be an array, was: ' + IMVU.repr(dependencies));
             }

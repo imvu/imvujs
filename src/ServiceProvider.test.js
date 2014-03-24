@@ -60,6 +60,30 @@ fixture("ServiceProvider", function() {
         assert.equal(timer, instance.timer);
     });
 
+    test('duplicate dependencies are trimmed', function() {
+        var ParentClass = IMVU.BaseClass.extend('Parent', {
+            dependencies: ['timer'],
+
+            initialize: function(args){
+                this.timer = args.timer;
+            }
+        });
+
+        var ChildClass = ParentClass.extend('Child', {
+            dependencies: ['timer'],
+
+            initialize: function(args){
+                this.timer = args.timer;
+                ParentClass.prototype.initialize.call(this, args);
+            }
+        });
+
+        var error = assert.throws(ReferenceError, function() {
+            this.sp.create(ChildClass);
+        }.bind(this));
+        assert.equal('Unsatisfied dependencies "timer" when constructing Child', error.message);
+    });
+
     test("throws error if dependency is not satisfied", function() {
         function Foo() {
         }
