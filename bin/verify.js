@@ -140,6 +140,7 @@ function main(argv) {
                     console.error(":\t", combine.gen_code(node));
                 }
             });
+            combine.errorExit(errors.length + " error(s) found.");
         }
     });
 }
