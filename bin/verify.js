@@ -133,7 +133,7 @@ function main(argv) {
                 var node = e[1];
                 console.error("\t", message);
 
-                if (node[3][0] === 'function') {
+                if (node.length >= 3 && node[3][0] === 'function') {
                     // special case
                     console.error(":\t", combine.gen_code(node[2]), " = function(...) {...}");
                 } else {
