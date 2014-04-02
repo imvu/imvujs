@@ -221,6 +221,10 @@ var MODULE_DEBUG = true;
             setTimeout;
         st(function() { throw e; }, 0);
         */
+        if(window.console !== undefined) { 
+            window.console.error(e);
+        }
+
     }
 
     module.inModuleDependency = function() {
