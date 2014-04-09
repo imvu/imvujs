@@ -268,6 +268,15 @@ module({
             throw new imports.AssertionError('did not throw');
         },
 
+        doesNotThrow: function(fn) {
+            try {
+                fn();
+            } catch(e) {
+                fail(new imports.AssertionError('Expected not to throw anything, actually threw ' + formatTestValue(e) + ': ' + e.message),
+                     { Expected: null, Actual: e });
+            }
+        },
+
         ////////////////////////////////////////////////////////////////////////////////
         // TYPE
 
