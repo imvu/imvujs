@@ -268,7 +268,7 @@ module({
             throw new imports.AssertionError('did not throw');
         },
 
-        doesNotThrow: function(fn) {
+        notThrows: function(fn) {
             try {
                 fn();
             } catch(e) {
