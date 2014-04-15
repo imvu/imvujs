@@ -218,6 +218,9 @@ def find_vc_pdir(msvc_version):
             return vcdir
     except KeyError:
         pass
+    # NOLA cygwin python cannot read the registry
+    if sys.platform == 'cygwin':
+        return None
     root = 'Software\\'
     if common.is_win64():
         root = root + 'Wow6432Node\\'
