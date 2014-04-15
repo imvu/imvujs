@@ -85,7 +85,7 @@ class VisualStudio(object):
             key = root + key
             try:
                 comps = read_reg(key)
-            except WindowsError, e:
+            except SCons.Util.RegError, e:
                 debug('find_vs_dir_by_reg(): no VS registry key %s' % repr(key))
             else:
                 debug('find_vs_dir_by_reg(): found VS in registry: %s' % comps)
@@ -202,6 +202,19 @@ class VisualStudio(object):
 # If you update this list, update the documentation in Tool/msvs.xml.
 
 SupportedVSList = [
+    # Visual Studio 12
+    # The batch file we look for is in the VC directory,
+    # so the devenv.com executable is up in ..\..\Common7\IDE.
+    VisualStudio('12.0',
+                 sdk_version='6.1',
+                 hkeys=[r'Microsoft\VisualStudio\12.0\Setup\VS\ProductDir'],
+                 common_tools_var='VS120COMNTOOLS',
+                 executable_path=r'Common7\IDE\devenv.com',
+                 batch_file_path=r'Common7\Tools\vsvars32.bat',
+                 default_dirname='Microsoft Visual Studio 12',
+                 supported_arch=['x86', 'amd64'],
+    ), 
+
     # Visual Studio 2010
     # TODO: find the settings, perhaps from someone with a CTP copy?
     #VisualStudio('TBD',

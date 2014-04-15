@@ -38,9 +38,11 @@ import SCons.compat
 
 import os
 import platform
+import sys
 from string import digits as string_digits
 
 import SCons.Warnings
+import SCons.Util
 
 import common
 
@@ -131,9 +133,13 @@ def get_host_target(env):
 
     return (host, target,req_target_platform)
 
-_VCVER = ["11.0", "11.0Exp", "10.0", "10.0Exp", "9.0", "9.0Exp","8.0", "8.0Exp","7.1", "7.0", "6.0"]
+_VCVER = ["12.0", "12.0Exp", "11.0", "11.0Exp", "10.0", "10.0Exp", "9.0", "9.0Exp","8.0", "8.0Exp","7.1", "7.0", "6.0"]
 
 _VCVER_TO_PRODUCT_DIR = {
+        '12.0': [
+            r'Microsoft\VisualStudio\12.0\Setup\VC\ProductDir'],
+        '12.0Exp' : [
+            r'Microsoft\VCExpress\12.0\Setup\VC\ProductDir'],
         '11.0': [
             r'Microsoft\VisualStudio\11.0\Setup\VC\ProductDir'],
         '11.0Exp' : [
@@ -193,7 +199,6 @@ def is_host_target_supported(host_target, msvc_version):
         maj, min = msvc_version_to_maj_min(msvc_version)
         if maj < 8:
             return False
-
     return True
 
 def find_vc_pdir(msvc_version):
@@ -204,6 +209,15 @@ def find_vc_pdir(msvc_version):
     ----
     If for some reason the requested version could not be found, an
     exception which inherits from VisualCException will be raised."""
+    # NOLA if VCINSTALLDIR already set, VCVARS32.bat has been run
+    # Avoid looking at the registry (CYGWIN can't do it)
+    try:
+        vcdir = os.environ['VCINSTALLDIR'];
+        if (os.path.exists(vcdir)):
+            debug('find_vc_dir(): VCINSTALLDIR: %s' % vcdir)    
+            return vcdir
+    except KeyError:
+        pass
     root = 'Software\\'
     if common.is_win64():
         root = root + 'Wow6432Node\\'
@@ -217,7 +231,7 @@ def find_vc_pdir(msvc_version):
         key = root + key
         try:
             comps = common.read_reg(key)
-        except WindowsError, e:
+        except SCons.Util.RegError, e:
             debug('find_vc_dir(): no VC registry key %s' % repr(key))
         else:
             debug('find_vc_dir(): found VC in registry: %s' % comps)
@@ -228,33 +242,42 @@ def find_vc_pdir(msvc_version):
                           % comps)
                 raise MissingConfiguration("registry dir %s not found on the filesystem" % comps)
     return None
-
+    
 def find_batch_file(env,msvc_version,host_arch,target_arch):
     """
     Find the location of the batch script which should set up the compiler
     for any TARGET_ARCH whose compilers were installed by Visual Studio/VCExpress
     """
-    pdir = find_vc_pdir(msvc_version)
-    if pdir is None:
-        raise NoVersionFound("No version of Visual Studio found")
-        
-    debug('vc.py: find_batch_file() pdir:%s'%pdir)
+    # NOLA check environment variables first
+    batfilename = ""
+    if sys.platform == "cygwin":
+        pdir = os.environ['VS120COMNTOOLS'];
+        if os.path.exists(pdir):
+            pdir = cygwin_path(pdir)
+            batfilename = pdir +  "vsvars32.bat"
+            debug('vc.py: find_batch_file VS120COMNTOOLS: %s' % batfilename)
+    if batfilename == "":
+        pdir = find_vc_pdir(msvc_version)
+        if pdir is None:
+            raise NoVersionFound("No version of Visual Studio found")
+            
+        debug('vc.py: find_batch_file() pdir:%s'%pdir)
 
-    # filter out e.g. "Exp" from the version name
-    msvc_ver_numeric = ''.join([x for x in msvc_version if x in string_digits + "."])
-    vernum = float(msvc_ver_numeric)
-    if 7 <= vernum < 8:
-        pdir = os.path.join(pdir, os.pardir, "Common7", "Tools")
-        batfilename = os.path.join(pdir, "vsvars32.bat")
-    elif vernum < 7:
-        pdir = os.path.join(pdir, "Bin")
-        batfilename = os.path.join(pdir, "vcvars32.bat")
-    else: # >= 8
-        batfilename = os.path.join(pdir, "vcvarsall.bat")
+        # filter out e.g. "Exp" from the version name
+        msvc_ver_numeric = ''.join([x for x in msvc_version if x in string_digits + "."])
+        vernum = float(msvc_ver_numeric)
+        if 7 <= vernum < 8:
+            pdir = os.path.join(pdir, os.pardir, "Common7", "Tools")
+            batfilename = os.path.join(pdir, "vsvars32.bat")
+        elif vernum < 7:
+            pdir = os.path.join(pdir, "Bin")
+            batfilename = os.path.join(pdir, "vcvars32.bat")
+        else: # >= 8
+            batfilename = os.path.join(pdir, "vcvarsall.bat")
 
-    if not os.path.exists(batfilename):
-        debug("Not found: %s" % batfilename)
-        batfilename = None
+        if not os.path.exists(batfilename):
+            debug("Not found: %s" % batfilename)
+            batfilename = None
     
     installed_sdks=get_installed_sdks()
     for _sdk in installed_sdks:
@@ -451,9 +474,11 @@ def msvc_setup_env(env):
     env['MSVC_VERSION'] = version
     env['MSVS_VERSION'] = version
     env['MSVS'] = {}
-
-    
-    use_script = env.get('MSVC_USE_SCRIPT', True)
+    # NOLA Check environment variable for script name
+    try:
+        use_script = os.environ['MSVC_USE_SCRIPT']
+    except KeyError:
+        use_script = env.get('MSVC_USE_SCRIPT', True)
     if SCons.Util.is_String(use_script):
         debug('vc.py:msvc_setup_env() use_script 1 %s\n' % repr(use_script))
         d = script_env(use_script)
@@ -463,14 +488,22 @@ def msvc_setup_env(env):
         if not d:
             return d
     else:
-        debug('MSVC_USE_SCRIPT set to False')
         warn_msg = "MSVC_USE_SCRIPT set to False, assuming environment " \
                    "set correctly."
         SCons.Warnings.warn(SCons.Warnings.VisualCMissingWarning, warn_msg)
         return None
+    # NOLA if VCVARS32 has already been run on cygwin
+    # use the path, include, lib and libpath from the OS environment
+    if (sys.platform == 'cygwin') and ('VCINSTALLDIR' in os.environ):
+        try:
+            d['PATH'] = os.environ['PATH']
+            d['INCLUDE'] = os.environ['INCLUDE']
+            d['LIBPATH'] = os.environ['LIBPATH']
+            d['LIB'] = os.environ['LIB']
+        except:
+            pass
 
     for k, v in d.items():
-        debug('vc.py:msvc_setup_env() env:%s -> %s'%(k,v))
         env.PrependENVPath(k, v, delete_existing=True)
 
 def msvc_exists(version=None):

@@ -543,10 +543,8 @@ class Delegate(object):
 can_read_reg = 0
 try:
     import winreg
-
     can_read_reg = 1
     hkey_mod = winreg
-
     RegOpenKeyEx    = winreg.OpenKeyEx
     RegEnumKey      = winreg.EnumKey
     RegEnumValue    = winreg.EnumValue
@@ -1323,8 +1321,8 @@ def make_path_relative(path):
 # The original idea for AddMethod() and RenameFunction() come from the
 # following post to the ActiveState Python Cookbook:
 #
-#    ASPN: Python Cookbook : Install bound methods in an instance
-#    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/223613
+#   ASPN: Python Cookbook : Install bound methods in an instance
+#   http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/223613
 #
 # That code was a little fragile, though, so the following changes
 # have been wrung on it:
@@ -1341,8 +1339,8 @@ def make_path_relative(path):
 #   the "new" module, as alluded to in Alex Martelli's response to the
 #   following Cookbook post:
 #
-#    ASPN: Python Cookbook : Dynamically added methods to a class
-#    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81732
+#   ASPN: Python Cookbook : Dynamically added methods to a class
+#   http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81732
 
 def AddMethod(obj, function, name=None):
     """

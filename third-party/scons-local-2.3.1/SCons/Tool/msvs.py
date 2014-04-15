@@ -867,7 +867,7 @@ class _GenerateV7DSP(_DSPGenerator):
             self.PrintHeader()
             self.PrintProject()
             self.file.close()
-            
+
 V10DSPHeader = """\
 <?xml version="1.0" encoding="%(encoding)s"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -1099,7 +1099,7 @@ class _GenerateV10DSP(_DSPGenerator):
                       'Other Files': ''}
         
         cats = sorted([k for k in categories.keys() if self.sources[k]],
-                      key = lambda a: a.lower())
+                key = lambda a: a.lower())
         
         # print vcxproj.filters file first
         self.filters_file.write('\t<ItemGroup>\n')
@@ -1205,7 +1205,9 @@ class _GenerateV7DSW(_DSWGenerator):
         self.version = self.env['MSVS_VERSION']
         self.version_num, self.suite = msvs_parse_version(self.version)
         self.versionstr = '7.00'
-        if self.version_num >= 11.0:
+        if self.version_num >= 12.0:
+            self.versionstr = '13.0'
+        elif self.version_num >= 11.0:
             self.versionstr = '12.00'
         elif self.version_num >= 10.0:
             self.versionstr = '11.00'
@@ -1311,8 +1313,10 @@ class _GenerateV7DSW(_DSWGenerator):
     def PrintSolution(self):
         """Writes a solution file"""
         self.file.write('Microsoft Visual Studio Solution File, Format Version %s\n' % self.versionstr)
-        if self.version_num >= 11.0:
-            self.file.write('# Visual Studio 11\n')
+        if self.version_num >= 12.0:
+             self.file.write('# Visual Studio 2013\n')
+        elif self.version_num >= 11.0:
+            self.file.write('# Visual Studio 2012\n')
         elif self.version_num >= 10.0:
             self.file.write('# Visual Studio 2010\n')
         elif self.version_num >= 9.0:
@@ -1559,7 +1563,6 @@ def GenerateSolution(target, source, env):
 
 def projectEmitter(target, source, env):
     """Sets up the DSP dependencies."""
-
     # todo: Not sure what sets source to what user has passed as target,
     # but this is what happens. When that is fixed, we also won't have
     # to make the user always append env['MSVSPROJECTSUFFIX'] to target.
@@ -1743,7 +1746,11 @@ def generate(env):
     except KeyError:
         env['BUILDERS']['MSVSSolution'] = solutionBuilder
 
-    env['MSVSPROJECTCOM'] = projectAction
+    #
+    # NOLA If MSVSPROJECTCOM was set by the user
+    # it refers to a Python function to generate the project
+    #
+    msvsproj = env.get('MSVSPROJECTCOM', projectAction)
     env['MSVSSOLUTIONCOM'] = solutionAction
 
     if SCons.Script.call_stack:
@@ -1781,7 +1788,7 @@ def generate(env):
     else:
         env['MSVS']['PROJECTSUFFIX']  = '.vcxproj'
         env['MSVS']['SOLUTIONSUFFIX'] = '.sln'
-        
+
     if (version_num >= 10.0):
         env['MSVSENCODING'] = 'utf-8'
     else:

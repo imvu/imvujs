@@ -31,6 +31,7 @@ import copy
 import os
 import subprocess
 import re
+import sys
 
 import SCons.Util
 
@@ -49,8 +50,6 @@ elif logfile:
         debug = logging.debug
 else:
     debug = lambda x: None
-
-
 _is_win64 = None
 
 def is_win64():
@@ -83,7 +82,21 @@ def is_win64():
             _is_win64 = True
     return _is_win64
 
-
+# NOLA translate Windows paths to cygwin paths for Visual Studio support
+def cygwin_path(windowsPath):
+    if sys.platform != "cygwin":
+        return windowsPath
+    if windowsPath.startswith('/'):
+        return windowsPath
+    try:
+        drive, path = windowsPath.split(':', 1)
+        if drive != "":
+            path = '/cygdrive/' + drive + path
+    except:
+        path = windowsPath
+    path = path.replace("\\", "/")
+    return path
+    
 def read_reg(value):
     return SCons.Util.RegGetValue(SCons.Util.HKEY_LOCAL_MACHINE, value)[0]
 
@@ -112,23 +125,27 @@ def normalize_env(env, keys, force=False):
 
     Note: the environment is copied."""
     normenv = {}
+    if sys.platform == 'cygwin':
+        encoding = 'utf-8'
+    else:
+        encoding = 'mbcs'
     if env:
         for k in env.keys():
-            normenv[k] = copy.deepcopy(env[k]).encode('mbcs')
+            result = copy.deepcopy(env[k])
+            normenv[k] = result.encode(encoding)
 
         for k in keys:
             if k in os.environ and (force or not k in normenv):
-                normenv[k] = os.environ[k].encode('mbcs')
+                normenv[k] = os.environ[k].encode(encoding)
 
     # This shouldn't be necessary, since the default environment should include system32,
     # but keep this here to be safe, since it's needed to find reg.exe which the MSVC
     # bat scripts use.
-    sys32_dir = os.path.join(os.environ.get("SystemRoot", os.environ.get("windir",r"C:\Windows\system32")),"System32")
+    #sys32_dir = os.path.join(os.environ.get("SystemRoot", os.environ.get("windir",r"C:\Windows\system32")),"System32")
+    sys32_dir = os.environ.get("SystemRoot", os.environ.get("windir",r"C:\Windows\system32"))
 
     if sys32_dir not in normenv['PATH']:
         normenv['PATH'] = normenv['PATH'] + os.pathsep + sys32_dir
-
-    debug("PATH: %s"%normenv['PATH'])
 
     return normenv
 
@@ -149,6 +166,7 @@ def get_output(vcbat, args = None, env = None):
 # VS100 and VS110: Still set, but modern MSVC setup scripts will
 # discard these if registry has values.  However Intel compiler setup
 # script still requires these as of 2013/2014.
+        'VS120COMNTOOLS',
         'VS110COMNTOOLS',
         'VS100COMNTOOLS',
         'VS90COMNTOOLS',
@@ -157,48 +175,44 @@ def get_output(vcbat, args = None, env = None):
         'VS70COMNTOOLS',
         'VS60COMNTOOLS',
     ]
+    doshell=False
+    execstring = '"%s" %s & set'
+    encoding = "mbcs"
+    # NOLA use CMD.EXE with cygwin python
+    if sys.platform == 'cygwin':
+        encoding = "utf-8"
+        doshell = True
+        execstring = 'cmd /k "%s" %s & set'
     env['ENV'] = normalize_env(env['ENV'], vars, force=False)
-
-    if args:
-        debug("Calling '%s %s'" % (vcbat, args))
-        popen = SCons.Action._subproc(env,
-                                     '"%s" %s & set' % (vcbat, args),
-                                     stdin = 'devnull',
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
-    else:
-        debug("Calling '%s'" % vcbat)
-        popen = SCons.Action._subproc(env,
-                                     '"%s" & set' % vcbat,
-                                     stdin = 'devnull',
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+    if not args:
+        args = ''
+    import subprocess
+    popen = SCons.Action._subproc(env,
+                                execstring % (vcbat, args),
+                                stdin = 'devnull',
+                                universal_newlines=True,
+                                shell=doshell,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
 
     # Use the .stdout and .stderr attributes directly because the
     # .communicate() method uses the threading module on Windows
     # and won't work under Pythons not built with threading.
     stdout = popen.stdout.read()
     stderr = popen.stderr.read()
-
-    # Extra debug logic, uncomment if necessar
-#     debug('get_output():stdout:%s'%stdout)
-#     debug('get_output():stderr:%s'%stderr)
-
     if stderr:
         # TODO: find something better to do with stderr;
         # this at least prevents errors from getting swallowed.
-        import sys
         sys.stderr.write(stderr)
     if popen.wait() != 0:
-        raise IOError(stderr.decode("mbcs"))
-
-    output = stdout.decode("mbcs")
+        raise IOError(stderr.decode(encoding))
+    output = stdout.decode()
+    #debug("get_output: stdout: %s" % output)
     return output
 
 def parse_output(output, keep = ("INCLUDE", "LIB", "LIBPATH", "PATH")):
     # dkeep is a dict associating key: path_list, where key is one item from
     # keep, and pat_list the associated list of paths
-
     dkeep = dict([(i, []) for i in keep])
 
     # rdk will  keep the regex to match the .bat file output line starts
@@ -207,16 +221,29 @@ def parse_output(output, keep = ("INCLUDE", "LIB", "LIBPATH", "PATH")):
         rdk[i] = re.compile('%s=(.*)' % i, re.I)
 
     def add_env(rmatch, key, dkeep=dkeep):
-        plist = rmatch.group(1).split(os.pathsep)
-        for p in plist:
-            # Do not add empty paths (when a var ends with ;)
-            if p:
-                p = p.encode('mbcs')
-                # XXX: For some reason, VC98 .bat file adds "" around the PATH
-                # values, and it screws up the environment later, so we strip
-                # it.
-                p = p.strip('"')
-                dkeep[key].append(p)
+        # NOLA convert Windows style PATH from CMD.EXE output
+        # to CYGWIN path which Scons understands better
+        if sys.platform == "cygwin":
+            plist = rmatch.group(1).split(';')
+            for p in plist:
+                if p:
+                    p = p.encode('utf-8')
+                    if key.endswith("PATH"):
+                        p = p.strip("'")
+                        p = p.replace(';', ':')
+                        p = cygwin_path(p)                  
+                    dkeep[key].append(p)
+        else:
+            plist = rmatch.group(1).split(os.pathsep)
+            for p in plist:
+                # Do not add empty paths (when a var ends with ;)
+                if p:
+                    p = p.encode('mbcs')
+                    # XXX: For some reason, VC98 .bat file adds "" around the PATH
+                    # values, and it screws up the environment later, so we strip
+                    # it.
+                    p = p.strip('"')
+                    dkeep[key].append(p)
 
     for line in output.splitlines():
         for k,v in rdk.items():

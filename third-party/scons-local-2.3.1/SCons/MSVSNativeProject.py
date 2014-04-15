@@ -310,7 +310,7 @@ class _GenerateVCXProj(_ProjGenerator):
                       'Other Files': ''}
         
         cats = sorted([k for k in categories.keys() if self.sources[k]],
-                      key = lambda a: a.lower())
+                    key = lambda a: a.lower())
         
         # print vcxproj.filters file first
         self.filters_file.write('\t<ItemGroup>\n')

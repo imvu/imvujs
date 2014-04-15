@@ -71,6 +71,10 @@ class SDKDefinition(object):
 
         Return None if failed or the directory does not exist.
         """
+        # NOLA Explicitly check environment variable to avoid having to read registry
+        sdk_dir = os.environ['VSSDK120Install']
+        if os.path.exists(sdk_dir):
+            return sdk_dir
         if not SCons.Util.can_read_reg:
             debug('find_sdk_dir(): can not read registry')
             return None
@@ -80,7 +84,7 @@ class SDKDefinition(object):
 
         try:
             sdk_dir = common.read_reg(hkey)
-        except WindowsError, e:
+        except SCons.Util.RegError, e:
             debug('find_sdk_dir(): no SDK registry key %s' % repr(hkey))
             return None
 
@@ -172,6 +176,27 @@ SDK70VCSetupScripts =    { 'x86'      : r'bin\vcvars32.bat',
 #
 # If you update this list, update the documentation in Tool/mssdk.xml.
 SupportedSDKList = [
+    WindowsSDK('7.1A',
+               sanity_check_file=r'bin\SetEnv.Cmd',
+               include_subdir='include',
+               lib_subdir={
+                   'x86'       : ['lib'],
+                   'x86_64'    : [r'lib\x64'],
+                   'ia64'      : [r'lib\ia64'],
+               },
+               vc_setup_scripts = SDK70VCSetupScripts,
+              ),
+
+    WindowsSDK('7.0A',
+               sanity_check_file=r'bin\SetEnv.Cmd',
+               include_subdir='include',
+               lib_subdir={
+                   'x86'       : ['lib'],
+                   'x86_64'    : [r'lib\x64'],
+                   'ia64'      : [r'lib\ia64'],
+               },
+               vc_setup_scripts = SDK70VCSetupScripts,
+              ),
     WindowsSDK('7.0',
                sanity_check_file=r'bin\SetEnv.Cmd',
                include_subdir='include',
@@ -182,6 +207,7 @@ SupportedSDKList = [
                },
                vc_setup_scripts = SDK70VCSetupScripts,
               ),
+              
     WindowsSDK('6.1',
                sanity_check_file=r'bin\SetEnv.Cmd',
                include_subdir='include',
