@@ -36,11 +36,6 @@ def xmlify(s):
     s = s.replace("'", "&apos;")
     s = s.replace('"', "&quot;")
     return s
-
-# Process a CPPPATH list in includes, given the env, target and source.
-# Returns a tuple of nodes.
-def processIncludes(includes, env, target, source):
-    return SCons.PathList.PathList(includes).subst_path(env, target, source)
     
 
 def _generateGUID(slnfile, name):
@@ -125,11 +120,11 @@ V10DSPPropertyGroupCondition = """\
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'" Label="Configuration">
 \t\t<ConfigurationType>%(config_type)s</ConfigurationType>
 \t\t<UseOfMfc>false</UseOfMfc>
-\t\t<PlatformToolset>v120</PlatformToolset>
+\t\t<PlatformToolset>msvs_version</PlatformToolset>
 \t</PropertyGroup>
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'">
-\t\t<IntDir>%(build_dir)s/%(variant)s</IntDir>
-\t\t<OutDir>%(build_dir)s</OutDir>
+\t\t<IntDir>%(build_dir)s/%(variant)s/</IntDir>
+\t\t<OutDir>%(build_dir)s/</OutDir>
 \t</PropertyGroup>
 """
 
@@ -167,6 +162,7 @@ class _GenerateVCXProj(_ProjGenerator):
         scc_provider = env.get('MSVS_SCC_PROVIDER', '')
         scc_project_name = env.get('MSVS_SCC_PROJECT_NAME', '')
         scc_aux_path = env.get('MSVS_SCC_AUX_PATH', '')
+        msvs_version = env.get('MSVS_VERSION')
         # MSVS_SCC_LOCAL_PATH is kept  for backwards compatibility purpose and should
         # be deprecated as soon as possible.
         scc_local_path_legacy = env.get('MSVS_SCC_LOCAL_PATH', '')
@@ -236,6 +232,7 @@ class _GenerateVCXProj(_ProjGenerator):
         
         self.file.write('\t<PropertyGroup Label="UserMacros" />\n')
         includepath = ''
+        includeFiles = []
         for file in self.env.get('CPPPATH', []):
             fname = projectRelativePath(file, self.projectDir)
             includepath += fname + ';'
