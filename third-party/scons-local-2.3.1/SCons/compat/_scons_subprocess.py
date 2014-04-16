@@ -430,7 +430,7 @@ try:
     MAXFD = os.sysconf("SC_OPEN_MAX")
 except KeyboardInterrupt:
     raise       # SCons:  don't swallow keyboard interrupts
-except:
+except Exception:
     MAXFD = 256
 
 try:
@@ -992,7 +992,7 @@ class Popen(object):
                     os.close(i)
                 except KeyboardInterrupt:
                     raise       # SCons:  don't swallow keyboard interrupts
-                except:
+                except Exception:
                     pass
 
 

@@ -225,7 +225,7 @@ class BuildTask(SCons.Taskmaster.OutOfDateTask):
                     raise SCons.Errors.BuildError(t, errstr)
                 except KeyboardInterrupt:
                     raise
-                except:
+                except Exception:
                     self.exception_set()
                 self.do_failed()
             else:
