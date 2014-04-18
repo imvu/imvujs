@@ -13,3 +13,15 @@ env['TSC'] = '../node_modules/typescript/bin/tsc'
     ['$NODEJS $TSC --target ES5 --module commonjs --noImplicitAny --out $TARGET $SOURCE'])
 env.Depends(combine_js, '$TSC')
 
+# NOTE: Building combine.js implicitly builds combine_util.js, too.  The
+# following rule handles the case where combine_util.js is independently
+# deleted or combine_util.ts is independently modified, as happened once on
+# Jinsuck's machine.
+#
+# We probably should bundle these build steps up in a tool.
+[combine_util_js] = env.Command(
+    ['combine_util.js'],
+    ['combine_util.ts'],
+    ['$NODEJS $TSC --target ES5 --module commonjs --noImplicitAny --out $TARGET $SOURCE'])
+env.Depends(combine_util_js, '$TSC')
+
