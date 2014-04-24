@@ -144,6 +144,8 @@ V10DSPItemDefinition = """\
 \t\t<ClCompile>
 \t\t\t<AdditionalIncludeDirectories>%(includepath)s</AdditionalIncludeDirectories>
 \t\t<PreprocessorDefinitions>%(cppdefines)s</PreprocessorDefinitions>
+\t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebugDLL</RuntimeLibrary>
+\t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
 \t\t</ClCompile>
 \t</ItemDefinitionGroup>
 """
