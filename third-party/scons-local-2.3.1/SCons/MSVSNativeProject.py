@@ -128,8 +128,8 @@ V10DSPPropertyGroupCondition = """\
 \t\t<PlatformToolset>%(msvc_version)s</PlatformToolset>
 \t</PropertyGroup>
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'">
-\t\t<IntDir>%(build_dir)s/%(variant)s/</IntDir>
-\t\t<OutDir>%(build_dir)s/</OutDir>
+\t\t<IntDir>%(build_dir)s/%(variant)s/$(ProjectName)/</IntDir>
+\t\t<OutDir>%(build_dir)s/%(variant)s/</OutDir>
 \t</PropertyGroup>
 """
 
