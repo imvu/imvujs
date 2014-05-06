@@ -130,6 +130,7 @@ V10DSPPropertyGroupCondition = """\
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'">
 \t\t<IntDir>%(build_dir)s/%(variant)s/$(ProjectName)/</IntDir>
 \t\t<OutDir>%(build_dir)s/%(variant)s/</OutDir>
+\t\t<IncludePath>$(IncludePath)</IncludePath>
 \t</PropertyGroup>
 """
 
