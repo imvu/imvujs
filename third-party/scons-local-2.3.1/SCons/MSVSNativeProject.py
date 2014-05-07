@@ -148,6 +148,9 @@ V10DSPItemDefinition = """\
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebugDLL</RuntimeLibrary>
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
 \t\t</ClCompile>
+\t\t<Link>
+\t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInformation>
+\t\t</Link>
 \t</ItemDefinitionGroup>
 """
 
