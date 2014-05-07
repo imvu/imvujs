@@ -148,6 +148,9 @@ V10DSPItemDefinition = """\
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebugDLL</RuntimeLibrary>
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
 \t\t</ClCompile>
+\t\t<Link>
+\t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+\t\t</Link>
 \t</ItemDefinitionGroup>
 """
 
@@ -347,7 +350,20 @@ class _GenerateVCXProj(_ProjGenerator):
                         
             self.file.write('\t</ItemGroup>\n')
             self.filters_file.write('\t</ItemGroup>\n')
-                
+        
+        references = self.env.get('project_references', None)
+        if references is not None:
+            suffix = '.vcxproj'
+            if self.name[-1:].lower() == 'd':
+                suffix = 'D' + suffix
+            self.file.write('\t<ItemGroup>\n')
+            for ref in references:
+                projname = '%s%s' % (ref, suffix)
+                self.file.write('\t\t<ProjectReference Include="%s">\n' % (xmlify(projname),))
+                self.file.write('\t\t\t<Project>%s</Project>\n' % (_generateGUID(self.dspfile, ref), ))
+                self.file.write('\t\t</ProjectReference>\n')
+            self.file.write('\t</ItemGroup>\n')
+
         # add the SConscript file outside of the groups
         self.file.write('\t<ItemGroup>\n'
                         '\t\t<None Include="%s" />\n'
