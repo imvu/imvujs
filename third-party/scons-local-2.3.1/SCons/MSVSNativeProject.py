@@ -150,7 +150,9 @@ V10DSPItemDefinition = """\
 \t\t</ClCompile>
 \t\t<Link>
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+\t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 \t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInformation>
+\t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateDebugInformation>
 \t\t</Link>
 \t</ItemDefinitionGroup>
 """
@@ -356,7 +358,7 @@ class _GenerateVCXProj(_ProjGenerator):
         if references is not None:
             suffix = '.vcxproj'
             if self.name[-1:].lower() == 'd':
-                suffix = 'D' + suffix
+                suffix = "_d" + suffix
             self.file.write('\t<ItemGroup>\n')
             for ref in references:
                 projname = '%s%s' % (ref, suffix)
