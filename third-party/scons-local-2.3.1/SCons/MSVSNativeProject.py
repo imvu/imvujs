@@ -356,8 +356,8 @@ class _GenerateVCXProj(_ProjGenerator):
         references = self.env.get('project_references', None)
         if references is not None:
             suffix = '.vcxproj'
-            if self.name[-1:].lower() == 'd':
-                suffix = 'D' + suffix
+            if self.name[-2:].lower() == '_d':
+                suffix = '_d' + suffix
             self.file.write('\t<ItemGroup>\n')
             for ref in references:
                 projname = '%s%s' % (ref, suffix)
