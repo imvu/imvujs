@@ -152,6 +152,7 @@ V10DSPItemDefinition = """\
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 \t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInformation>
+\t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateDebugInformation>
 \t\t</Link>
 \t</ItemDefinitionGroup>
 """
