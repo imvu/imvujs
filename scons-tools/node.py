@@ -14,6 +14,6 @@ def generate(env):
     if sys.platform in ('win32', 'cygwin'):
         env['NODEJS'] = os.path.join(relativePathToHere, 'third-party', 'windows', 'nodejs-0.8.6', 'node.exe')
     elif sys.platform == 'darwin':
-        env['NODEJS'] = os.path.join(relativePathToHere, 'third-party', 'mac', 'node-v0.8.6-darwin-i386', 'bin', 'node')
+        env['NODEJS'] = os.path.join(relativePathToHere, 'third-party', 'mac', 'node-v0.10.28-darwin-x64', 'bin', 'node')
     elif sys.platform.startswith('linux'):
         env['NODEJS'] = os.path.join(relativePathToHere, 'third-party', 'linux', 'node-0.8.5', 'bin', 'node')
