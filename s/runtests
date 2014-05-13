@@ -22,7 +22,7 @@ function run_jshint() {
 }
 
 function run_node_tests() {
-    local TESTS=`find "$HERE/.." -type f -iname '*.test.js' $TESTMASK`
+    local TESTS=`find "$HERE/../fakes" "$HERE/../src" "$HERE/../tests" -type f -iname '*.test.js' $TESTMASK`
     if [ "${#TESTS}" != 0 ]; then
         echo "Running node tests..."
         "$HERE"/../bin/test --superfixture "$HERE/../tests/superfixture.js" $TESTS || fail
@@ -105,7 +105,7 @@ function run_browser_async_tests() {
 }
 
 function run_fail_tests() {
-    local EXPECTED_FAILS=`find "$HERE/.." -type f -iname '*.fail.js' $TESTMASK`
+    local EXPECTED_FAILS=`find "$HERE/../tests" -type f -iname '*.fail.js' $TESTMASK`
     if [ "${#EXPECTED_FAILS}" != 0 ]; then
         printf "\nRunning failure tests...\n\n"
         for expected in $EXPECTED_FAILS; do
