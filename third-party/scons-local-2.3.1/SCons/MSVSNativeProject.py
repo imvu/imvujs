@@ -85,6 +85,7 @@ def makeHierarchy(sources):
             dict[path[-1]] = file
         #else:
         #    print 'Warning: failed to decompose path for '+str(file)
+
     return hierarchy
 
 # NOLA return a file path relative to the project directory
@@ -106,6 +107,7 @@ V10DSPHeader = """\
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 """
 
+# Release|Win32 etc.
 V10DSPProjectConfiguration = """\
 \t\t<ProjectConfiguration Include="%(variant)s|%(platform)s">
 \t\t\t<Configuration>%(variant)s</Configuration>
@@ -121,6 +123,8 @@ V10DSPGlobals = """\
 \t</PropertyGroup>
 """
 
+# VCProjectConfigurationProperties Interface
+# http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.vcproject.vcprojectconfigurationproperties.aspx
 V10DSPPropertyGroupCondition = """\
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'" Label="Configuration">
 \t\t<ConfigurationType>%(config_type)s</ConfigurationType>
@@ -129,7 +133,7 @@ V10DSPPropertyGroupCondition = """\
 \t</PropertyGroup>
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'">
 \t\t<IntDir>%(build_dir)s/%(variant)s/$(ProjectName)/</IntDir>
-\t\t<OutDir>%(build_dir)s/%(variant)s/</OutDir>
+\t\t<OutDir>%(build_dir)s/%(output_dir)s/</OutDir>
 \t\t<IncludePath>$(IncludePath)</IncludePath>
 \t</PropertyGroup>
 """
@@ -147,6 +151,7 @@ V10DSPItemDefinition = """\
 \t\t<PreprocessorDefinitions>%(cppdefines)s</PreprocessorDefinitions>
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebugDLL</RuntimeLibrary>
 \t\t<RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreadedDLL</RuntimeLibrary>
+\t\t<Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
 \t\t</ClCompile>
 \t\t<Link>
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -224,6 +229,7 @@ class _GenerateVCXProj(_ProjGenerator):
             msvc_version = self.env['MSVC_PLATFORM_TOOLSET']
         except Exception:
             msvc_version = "v120"
+            
         for kind in confkeys:
             variant = self.configs[kind].variant
             platform = self.configs[kind].platform
@@ -235,6 +241,14 @@ class _GenerateVCXProj(_ProjGenerator):
                 config_type = "Application"
             elif buildext == ".dll":
                 config_type = "DynamicLibrary"
+
+            # route .exe's into the northstar/bin dir
+            output_dir = variant
+            buildtarget = self.env.get('buildtarget', None)
+            if buildtarget is not None:
+                if buildtarget[-4:].lower() == '.exe':
+                    output_dir = "../../bin"
+
             self.file.write(V10DSPPropertyGroupCondition % locals())
 
         self.file.write('\t<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />\n')
@@ -303,16 +317,21 @@ class _GenerateVCXProj(_ProjGenerator):
             if SCons.Util.is_Dict(value):
                 self.printSources(value, kind, commonprefix, filter_name + '\\' + key)
 
+        # redirect the include files to be listed under the source filters
+        redirect_filter_name = filter_name
+        if kind == 'Header Files' :
+            redirect_filter_name = "Source Files" + filter_name[filter_name.find('\\'):]
+
         for key, value in sorteditems:
             if SCons.Util.is_String(value):
                 fs = SCons.Node.FS.get_default_fs()
                 file = value
                 if commonprefix:
-                    file = os.path.join(commonprefix, value)                
+                    file = os.path.join(commonprefix, value)
                 self.file.write('\t\t<%s Include="%s" />\n' % (keywords[kind], file))
                 self.filters_file.write('\t\t<%s Include="%s">\n'
                                         '\t\t\t<Filter>%s</Filter>\n'
-                                        '\t\t</%s>\n' % (keywords[kind], file, filter_name, keywords[kind]))
+                                        '\t\t</%s>\n' % (keywords[kind], file, redirect_filter_name, keywords[kind]))
 
     def PrintSourceFiles(self):
         categories = {'Source Files': 'cpp;c;cxx;l;y;def;odl;idl;hpj;bat',
@@ -323,20 +342,44 @@ class _GenerateVCXProj(_ProjGenerator):
         
         cats = sorted([k for k in categories.keys() if self.sources[k]],
                     key = lambda a: a.lower())
-        
-        # print vcxproj.filters file first
-        self.filters_file.write('\t<ItemGroup>\n')
+
+        # generate sources lists
         for kind in cats:
-            self.filters_file.write('\t\t<Filter Include="%s">\n'
-                                    '\t\t\t<UniqueIdentifier>{7b42d31d-d53c-4868-8b92-ca2bc9fc052f}</UniqueIdentifier>\n'
-                                    '\t\t\t<Extensions>%s</Extensions>\n'
-                                    '\t\t</Filter>\n' % (kind, categories[kind]))
             sources = []
             for sfile in self.sources[kind]:
                 sfile = projectRelativePath(sfile, self.projectDir)
                 sources.append(sfile)
             self.sources[kind] = sources
-            hierarchy = makeHierarchy(sources)
+
+        # remove include files that do not live alongside source
+        local_incs = []
+        external_incs = []
+        for inc in self.sources['Header Files']:
+            incbase = os.path.dirname(inc)
+            for src in self.sources['Source Files']:
+                srcbase = os.path.dirname(src)
+                if incbase == srcbase :
+                    local_incs.append(inc)
+                    break
+            if local_incs and local_incs[-1] != inc:
+                # print "[REJECT] INC=["+inc+"]  base=["+incbase+"]"
+                external_incs.append(inc)
+            self.sources['Header Files'] = list(local_incs)
+            
+        # print vcxproj.filters file first
+        self.filters_file.write('\t<ItemGroup>\n')
+        for kind in cats:
+        
+            # no Header File specific filter catagories
+            if kind == 'Header Files' :
+                continue
+
+            self.filters_file.write('\t\t<Filter Include="%s">\n'
+                                    '\t\t\t<UniqueIdentifier>{7b42d31d-d53c-4868-8b92-ca2bc9fc052f}</UniqueIdentifier>\n'
+                                    '\t\t\t<Extensions>%s</Extensions>\n'
+                                    '\t\t</Filter>\n' % (kind, categories[kind]))
+
+            hierarchy = makeHierarchy(self.sources[kind])
             self.printFilters(hierarchy, kind)
             
         self.filters_file.write('\t</ItemGroup>\n')
@@ -349,16 +392,15 @@ class _GenerateVCXProj(_ProjGenerator):
             # First remove any common prefix
             sources = self.sources[kind]          
             hierarchy = makeHierarchy(sources)
+
             self.printSources(hierarchy, kind, '', kind)
-                        
             self.file.write('\t</ItemGroup>\n')
             self.filters_file.write('\t</ItemGroup>\n')
         
+        # establish dependencies to other projects - these show up in Properties/Common Properties/References
         references = self.env.get('project_references', None)
         if references is not None:
             suffix = '.vcxproj'
-            if self.name[-2:].lower() == '_d':
-                suffix = '_d' + suffix
             self.file.write('\t<ItemGroup>\n')
             for ref in references:
                 projname = '%s%s' % (ref, suffix)
@@ -370,7 +412,6 @@ class _GenerateVCXProj(_ProjGenerator):
         # add the SConscript file outside of the groups
         self.file.write('\t<ItemGroup>\n'
                         '\t\t<None Include="%s" />\n'
-                        #'\t\t<None Include="SConstruct" />\n'
                         '\t</ItemGroup>\n' % str(self.sconscript))
 
     def Parse(self):
