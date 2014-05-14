@@ -132,8 +132,8 @@ V10DSPPropertyGroupCondition = """\
 \t\t<PlatformToolset>%(msvc_version)s</PlatformToolset>
 \t</PropertyGroup>
 \t<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='%(variant)s|%(platform)s'">
-\t\t<IntDir>%(build_dir)s/%(variant)s/$(ProjectName)/</IntDir>
-\t\t<OutDir>%(build_dir)s/%(output_dir)s/</OutDir>
+\t\t<IntDir>%(build_dir)s/$(Configuration)/$(ProjectName)/</IntDir>
+\t\t<OutDir>%(build_dir)s/$(Configuration)/</OutDir>
 \t\t<IncludePath>$(IncludePath)</IncludePath>
 \t</PropertyGroup>
 """
@@ -157,7 +157,6 @@ V10DSPItemDefinition = """\
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 \t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 \t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInformation>
-\t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateDebugInformation>
 \t\t</Link>
 \t</ItemDefinitionGroup>
 """

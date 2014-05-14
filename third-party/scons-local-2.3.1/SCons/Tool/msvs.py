@@ -1205,9 +1205,7 @@ class _GenerateV7DSW(_DSWGenerator):
         self.version = self.env['MSVS_VERSION']
         self.version_num, self.suite = msvs_parse_version(self.version)
         self.versionstr = '7.00'
-        if self.version_num >= 12.0:
-            self.versionstr = '13.0'
-        elif self.version_num >= 11.0:
+        if self.version_num >= 11.0:
             self.versionstr = '12.00'
         elif self.version_num >= 10.0:
             self.versionstr = '11.00'
@@ -1394,16 +1392,15 @@ class _GenerateV7DSW(_DSWGenerator):
         else:
             self.file.write('\tGlobalSection(ProjectConfiguration) = postSolution\n')
 
-        for name in confkeys:
-            variant = self.configs[name].variant
-            platform = self.configs[name].platform
-            if self.version_num >= 8.0:
-                for dspinfo in self.dspfiles_info:
+        for dspinfo in self.dspfiles_info:
+            for name in confkeys:
+                variant = self.configs[name].variant
+                platform = self.configs[name].platform
+                if self.version_num >= 8.0:
                     guid = dspinfo['GUID']
                     self.file.write('\t\t%s.%s|%s.ActiveCfg = %s|%s\n'
                                     '\t\t%s.%s|%s.Build.0 = %s|%s\n'  % (guid,variant,platform,variant,platform,guid,variant,platform,variant,platform))
-            else:
-                for dspinfo in self.dspfiles_info:
+                else:
                     guid = dspinfo['GUID']
                     self.file.write('\t\t%s.%s.ActiveCfg = %s|%s\n'
                                     '\t\t%s.%s.Build.0 = %s|%s\n'  %(guid,variant,variant,platform,guid,variant,variant,platform))
