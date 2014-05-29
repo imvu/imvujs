@@ -124,6 +124,7 @@
               'isSubClass',
               'moduleCommon',
               'new',
+              'optionalProperty',
               'pmxdr',
               'repr',
               'requireProperty'
