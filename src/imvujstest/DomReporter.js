@@ -33,7 +33,11 @@ module({}, function (imports) {
             $('.test-output .status').text(prettyText);
         },
 
-        startTest: function (name) {},
+        startTest: function (name) {
+            if (window.console && window.console.groupCollapsed) {
+                window.console.groupCollapsed('Test: "' + name + '"');
+            }
+        },
 
         endTest: function (name, passed, stack, exception) {
             var $logItem;
@@ -41,6 +45,9 @@ module({}, function (imports) {
             $logItem = this._log(verdict + ': ' + name).addClass(verdict);
             if (stack) {
                 $logItem.append($('<pre>').addClass('stack').text(stack));
+            }
+            if (window.console && window.console.groupEnd) {
+                window.console.groupEnd();
             }
         }
     });
