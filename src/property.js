@@ -8,4 +8,8 @@ var IMVU = IMVU || {};
         messagePrefix = messagePrefix ? messagePrefix + ': ' : '';
         throw new ReferenceError(messagePrefix + 'object has no property ' + propertyName);
     };
+
+    IMVU.optionalProperty = function(obj, propertyName, defaultValue) {
+        return propertyName in obj ? obj[propertyName] : defaultValue;
+    };
 })();
