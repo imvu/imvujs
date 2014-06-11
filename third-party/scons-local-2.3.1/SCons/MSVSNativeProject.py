@@ -158,8 +158,9 @@ V10DSPItemDefinition = """\
 \t\t<WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Level3</WarningLevel>
 \t\t</ClCompile>
 \t\t<Link>
-\t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-\t\t\t<AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\\..\\third-party\\lib;%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+\t\t\t<AdditionalLibraryDirectories>$(SolutionDir)%(lib_paths)s%%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+\t\t\t<AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(libs_dbg)s%%(AdditionalDependencies)</AdditionalDependencies>
+\t\t\t<AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(libs_rel)s%%(AdditionalDependencies)</AdditionalDependencies>
 \t\t\t<GenerateDebugInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateDebugInformation>
 \t\t</Link>
 \t</ItemDefinitionGroup>
@@ -264,6 +265,13 @@ class _GenerateVCXProj(_ProjGenerator):
             self.file.write(V10DSPImportGroupCondition % locals())
         
         self.file.write('\t<PropertyGroup Label="UserMacros" />\n')
+        
+        # V10DSPItemDefinition takes the following arguments...
+        #      includepath : <AdditionalIncludeDirectories>            : built from CPPPATH
+        #      cppdefines  : <PreprocessorDefinitions>                 : built from CPPDEFINES
+        #      lib_paths   : <AdditionalLibraryDirectories>            : built from LIB_PATHS
+        #      libs_dbg    : <AdditionalDependencies 'Debug|Win32'>    : built from LIBS_REL
+        #      libs_rel    : <AdditionalDependencies 'Release|Win32'>  : built from LIBS_DBG
         includepath = ''
         for file in self.env.get('CPPPATH', []):
             fname = projectRelativePath(file, self.projectDir)
@@ -271,7 +279,19 @@ class _GenerateVCXProj(_ProjGenerator):
         includepath = xmlify(includepath)
         cppdefines = ''
         for d in self.env.get('CPPDEFINES', []):
-            cppdefines += d + ';'
+            cppdefines += d + ';'        
+        lib_paths = ''
+        for file in self.env.get('LIB_PATHS', []):
+            fname = projectRelativePath(file, self.projectDir)
+            lib_paths += fname + ';'
+        lib_paths = xmlify(lib_paths)
+        libs_rel = ''
+        for l in self.env.get('LIBS_REL', []):
+            libs_rel += l + '.lib;'
+        libs_dbg = ''
+        for l in self.env.get('LIBS_DBG', []):
+            libs_dbg += l + '.lib;'
+
         self.file.write(V10DSPItemDefinition % locals())
         
         #filter settings in MSVS 2010 are stored in separate file
