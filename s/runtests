@@ -132,5 +132,6 @@ launch_server
 run_browser_tests
 run_browser_async_tests
 run_fail_tests
+run_command_tests
 
 succeed

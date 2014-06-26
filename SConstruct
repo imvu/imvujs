@@ -126,3 +126,4 @@ def scons_tool_tests(env=env):
     env.Append(MODULE_ALIASES={
         'short': 'tests/includes/include.js'})
     env.CombinedModule('out/tests/uses_alias.js', 'tests/includes/alias.js')
+    env.CombinedModule('out/tests/uses_asmjs.js', 'tests/includes/uses_asmjs.js')
