@@ -72,7 +72,10 @@ class SDKDefinition(object):
         Return None if failed or the directory does not exist.
         """
         # NOLA Explicitly check environment variable to avoid having to read registry
-        sdk_dir = os.environ['VSSDK120Install']
+        try:
+            sdk_dir = os.environ['VSSDK120Install']
+        except KeyError:
+            return None
         if os.path.exists(sdk_dir):
             return sdk_dir
         if not SCons.Util.can_read_reg:
