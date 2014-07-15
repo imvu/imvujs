@@ -58,6 +58,9 @@ module({
         },
         extend: function(fixtureName, definition) {
             return new Fixture(this, fixtureName, definition, false, this.runner);
+        },
+        abstractExtend: function(fixtureName, definition) {
+            return new Fixture(this, fixtureName, definition, true, this.runner);
         }
     });
     return Fixture;
