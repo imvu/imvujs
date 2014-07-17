@@ -17,6 +17,7 @@ module({
             // function runTest(test, continuation);
             //     pass false (success) or {stack: e.stack, e: e} (failure) into onComplete
             this.runTest = runTest;
+            this.__runOnly = {};
         },
 
         runTest: function () {
@@ -28,7 +29,7 @@ module({
 
         test: function test(name, fn) {
             if (arguments.length !== 2) {
-                throw new TypeError("test requires 2 arguments");
+                throw new TypeError("test() requires 2 arguments");
             }
 
             if (undefined !== this.activeFixture && this.activeFixture.abstract) {
@@ -36,12 +37,15 @@ module({
                     name: name,
                     body: fn });
             } else {
-                var fixtureName = (this.activeFixture !== undefined) ? this.activeFixture.name + ': ' : '';
                 this.allTests.push({
-                    name: fixtureName + name,
+                    name: name,
                     body: fn,
                     fixture: this.activeFixture });
             }
+        },
+
+        setRunOnly: function(runOnly){
+            this.__runOnly = runOnly;
         },
 
         run_all: function run_all(testUrl, reporter, onComplete) {
@@ -49,17 +53,26 @@ module({
             reporter.startSuite(testUrl);
             var steps = _(this.allTests).map(function (test) {
                 return function (nextTest) {
-                    reporter.startTest(test.name);
-                    self.runTest(self.superFixtures, test, function (failed) {
-                        if (failed) {
-                            reporter.endTest(test.name, false, failed.stack, failed.e);
-                            reporter.endSuite(false);
-                            onComplete(false);
-                        } else {
-                            reporter.endTest(test.name, true, undefined, undefined);
-                            nextTest();
-                        }
-                    });
+                    reporter.startTest(test);
+
+                    if (self.__runOnly.fixture && !(test.fixture && self.__runOnly.fixture === test.fixture.name)){
+                        reporter.skipTest();
+                        nextTest();
+                    } else if (self.__runOnly.test && self.__runOnly.test !== test.name){
+                        reporter.skipTest();
+                        nextTest();
+                    } else {
+                        self.runTest(self.superFixtures, test, function (failed) {
+                            if (failed) {
+                                reporter.endTest(test, false, failed.stack, failed.e);
+                                reporter.endSuite(false);
+                                onComplete(false);
+                            } else {
+                                reporter.endTest(test, true, undefined, undefined);
+                                nextTest();
+                            }
+                        });
+                    }
                 };
             });
             imports.cps.sequence_(steps, function (results) {

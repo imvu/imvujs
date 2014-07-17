@@ -34,15 +34,18 @@ function runInDirectory(dir, action) {
     }
 }
 
-var run_all;
+var syncRunner;
 
 runInDirectory(__dirname, function () {
      // node-module.js loads js relative to process.cwd(), we can't rely on
      // this, so we change to __dirname to import relative to *here*
     global.module({
-        synctest: '../src/imvujstest/synctest.js'
+        SyncRunner: '../src/imvujstest/SyncRunner.js',
+        testglobals: '../src/imvujstest/testglobals.js'
     }, function(imports) {
-        run_all = imports.synctest.run_all;
+        syncRunner = new imports.SyncRunner();
+        imports.testglobals.injectTestGlobals(syncRunner);
+        imports.testglobals.replaceIntermittentGlobals();
     });
 });
 
@@ -120,7 +123,7 @@ function runTest(testPath, continuation) {
     });
     var reporter = new ConsoleReporter();
 
-    return run_all(testPath, reporter);
+    return syncRunner.run_all(testPath, reporter);
 }
 
 function main() {

@@ -50,7 +50,7 @@ module({
             fixtureOrdering.push('parent tearDown');
             done();
         });
-    }); 
+    });
 
     abstractFixture.extend('child', function () {
         this.setUp(function (done) {

@@ -23,6 +23,9 @@ module({
         },
         endTest: function () {
             this._wrap('endTest', arguments);
+        },
+        skipTest: function(){
+            this._wrap('skipTest', arguments);
         }
-    }); 
+    });
 });

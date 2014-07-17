@@ -1,10 +1,16 @@
 module({
-    asynctest: 'asynctest.js',
-    BrowserDispatcher: 'BrowserDispatcher.js'
+    BrowserDispatcher: 'BrowserDispatcher.js',
+    AsyncRunner: 'AsyncRunner.js',
+    testglobals: 'testglobals.js'
 }, function (imports) {
+    var asyncRunner = new imports.AsyncRunner();
+    imports.testglobals.injectTestGlobals(asyncRunner);
+    // XXXnrd: looks like we rely on stuff like setTimeout to test our async tests.
+    // imports.testglobals.replaceIntermittentGlobals();
+
     return {
         start: function (superfixtureUrl) {
-            imports.BrowserDispatcher.dispatch(imports.asynctest.run_all, superfixtureUrl);
+            imports.BrowserDispatcher.dispatch(asyncRunner, superfixtureUrl);
         }
     };
 });

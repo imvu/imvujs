@@ -52,12 +52,19 @@ module({
         initialize: function () {
             this.runner = new imports.Runner(runTest);
         },
+
         registerSuperFixture: function (superFixture) {
             this.runner.registerSuperFixture(superFixture);
         },
+
         test: function (name, body) {
             this.runner.test(name, body);
         },
+
+        setRunOnly: function(runOnly){
+            this.runner.setRunOnly(runOnly);
+        },
+
         run_all: function (testUrl, reporter, onComplete) {
             this.runner.run_all(testUrl, reporter, onComplete);
         }

@@ -21,24 +21,26 @@ module({
             });
         },
 
-        startTest: function (name) {},
+        startTest: function (test) {},
 
-        endTest: function (name, passed, stack, exception) {
+        endTest: function (test, passed, stack, exception) {
             if (!passed) {
-                console.log(name + ' has FAILED');
+                console.log(test.name + ' has FAILED');
                 console.log(stack);
                 console.log(exception);
             }
             this._report({
                 type: 'test-complete',
                 success: passed,
-                name: name,
+                name: test.name,
                 stack: stack
             });
         },
 
         _report: function (msg) {
             window.postMessage(JSON.stringify(msg), "*");
-        }
+        },
+
+        skipTest: function(){}
     });
 });

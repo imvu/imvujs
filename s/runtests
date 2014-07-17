@@ -17,7 +17,7 @@ function succeed() {
 
 function run_jshint() {
     echo "Running jshint..."
-    
+
     "$NODEJS" "$JSHINT" "$HERE/../src" "$HERE/../fakes" "$HERE/../bin" || fail
 }
 
@@ -41,7 +41,7 @@ function launch_server() {
         echo "If using Cygwin, please install the nc package."
         fail
     }
-        
+
     while true; do
         nc -n 127.0.0.1 8001 < /dev/null
         if [ $? -eq 0 ]; then
@@ -66,7 +66,7 @@ function run_browser_tests() {
 
     run_leprechaun "http://127.0.0.1:8001/bin/test-trampoline.html" "$TESTS"
 
-    if [ "$?" != 0 ]; then 
+    if [ "$?" != 0 ]; then
         fail
     fi
 }
