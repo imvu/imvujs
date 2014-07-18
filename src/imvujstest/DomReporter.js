@@ -60,7 +60,10 @@ module({
 
             if (stack) {
                 this.$logItem.append($('<pre>').addClass('stack').text(stack));
+            } else if (exception){
+                this.$logItem.append($('<div>').text(exception));
             }
+
             if (window.console && window.console.groupEnd) {
                 window.console.groupEnd();
             }
