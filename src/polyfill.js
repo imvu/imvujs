@@ -40,14 +40,16 @@
             };
 
         window.requestAnimationFrame = function(callback) {
-            requestAnimationFrame(function(time) {
-                if (typeof time === "number") {
-                    window.requestAnimationFrame = requestAnimationFrame;
-                    callback(time);
-                } else {
-                    callback(Date.now());
-                }
-            });
+            if (callback) {
+                requestAnimationFrame(function(time) {
+                    if (typeof time === "number") {
+                        window.requestAnimationFrame = requestAnimationFrame;
+                        callback(time);
+                    } else {
+                        callback(Date.now());
+                    }
+                });
+            }
         };
     }
 })();
