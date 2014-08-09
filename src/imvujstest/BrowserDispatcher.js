@@ -1,6 +1,7 @@
 module({
     css: 'css.js',
     DomReporter: 'DomReporter.js',
+    PhantomReporter: 'PhantomReporter.js',
     LeprechaunReporter: 'LeprechaunReporter.js',
     CompositeReporter: 'CompositeReporter.js'
 }, function (imports) {
@@ -12,6 +13,7 @@ module({
 
             var reporter = new imports.CompositeReporter([
                 new imports.DomReporter({ el: output }),
+                new imports.PhantomReporter(),
                 new imports.LeprechaunReporter()
             ]);
 
