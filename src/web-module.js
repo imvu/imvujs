@@ -41,6 +41,18 @@ var MODULE_DEBUG = true;
         return old;
     }
 
+    var LoadEventListener = {
+        evalStart: nop,
+        evalEnd: nop,
+        callEnd: nop
+    };
+
+    function setLoadEventListener(l) {
+        var old = LoadEventListener;
+        LoadEventListener = l;
+        return old;
+    }
+
     var promiseOptions = {
         immediateCallbacks: true,
         exposeErrors: true
@@ -106,6 +118,7 @@ var MODULE_DEBUG = true;
                 throw new ModuleError("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
 
+            LoadEventListener.evalStart(url);
             var evaluated;
             try {
                 evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//# sourceURL=" + url);
@@ -117,6 +130,7 @@ var MODULE_DEBUG = true;
 
                 throw e;
             }
+            LoadEventListener.evalEnd(url);
 
             return new Promise(function(resolver) {
                 var saveUrl = currentModuleURL;
@@ -125,6 +139,7 @@ var MODULE_DEBUG = true;
 
                 try {
                     evaluated.call(window);
+                    LoadEventListener.callEnd(url);
                     if (currentModuleResolver) {
                         // then no module() or define() was called
                         resolver.accept(undefined);
@@ -303,6 +318,7 @@ var MODULE_DEBUG = true;
         setPromiseFactory: setPromiseFactory,
         setLogger: setLogger,
         setPlugin: setPlugin,
+        setLoadEventListener: setLoadEventListener,
         caching: true,
 
         // I wish this weren't a public symbol.

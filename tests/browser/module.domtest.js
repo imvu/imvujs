@@ -123,5 +123,37 @@ module({
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null" ],
                 this.logs);
         });
+
+        test("can trigger load event", function() {
+            module._test_loadEvents = [];   // used by loggingModule
+            var loggingModule = 'module({}, function() { module._test_loadEvents.push("module loaded"); });';
+            var loadEventListener = {
+                evalStart: function(url) {
+                    module._test_loadEvents.push({evalStart: url});
+                },
+                evalEnd: function(url) {
+                    module._test_loadEvents.push({evalEnd: url});
+                },
+                callEnd: function(url) {
+                    module._test_loadEvents.push({callEnd: url});
+                }
+            };
+            module.setLoadEventListener(loadEventListener);
+            module.run({
+                a: "a_module.js"
+            }, function(imports) {
+                module._test_loadEvents.push('imports ready');
+            });
+
+            this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/a_module.js', 200, [], loggingModule);
+            assert.deepEqual(
+                [{evalStart: 'http://127.0.0.1:8001/bin/a_module.js'},
+                 {evalEnd: 'http://127.0.0.1:8001/bin/a_module.js'},
+                 'module loaded',
+                 {callEnd: 'http://127.0.0.1:8001/bin/a_module.js'},
+                 'imports ready'],
+                module._test_loadEvents);
+        });
+
     });
 });
