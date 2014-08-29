@@ -236,7 +236,7 @@ var MODULE_DEBUG = true;
             setTimeout;
         st(function() { throw e; }, 0);
         */
-        if(window.console !== undefined) { 
+        if(window.console !== undefined) {
             window.console.error(e);
         }
 
@@ -248,10 +248,10 @@ var MODULE_DEBUG = true;
 
     function module(dependencies, body) {
         if ("object" !== typeof dependencies) {
-            throw new TypeError("Dependencies must be object");
+            throw new TypeError("module's dependencies must be object; ("+ currentModuleURL +") actual=" + dependencies);
         }
         if ("function" !== typeof body) {
-            throw new TypeError("Body must be a function");
+            throw new TypeError("module's body must be a function; ("+ currentModuleURL +") actual=" + body);
         }
 
         if (!module.inModuleDependency()) {
