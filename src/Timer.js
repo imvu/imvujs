@@ -1,6 +1,16 @@
-/*global IMVU:true*/
+/*global IMVU:true, performance*/
 var IMVU = IMVU || {};
 (function() {
+    var getPerformanceTimer = (typeof performance === 'object' && typeof performance.now === 'function') ?
+        function() {
+            return performance.now();
+        } :
+        function() {
+            // warning: Not monotonic. We could detect that and return
+            // an arbitrarily-small interval.
+            return Date.now();
+        };
+
     IMVU.Timer = {
         getTime: Date.now.bind(Date),
 
@@ -9,6 +19,15 @@ var IMVU = IMVU || {};
                 return new Date();
             }
             return new Date(t);
+        },
+
+        beginPerformanceTimer: function beginPerformanceTimer() {
+            var start = getPerformanceTimer();
+            return {
+                getElapsed: function() {
+                    return getPerformanceTimer() - start;
+                }
+            };
         },
 
         // using bind on setTimeout causes trouble in IE8

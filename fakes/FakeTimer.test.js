@@ -138,4 +138,14 @@ module({
             this.timer.clearInterval(handle);
         });
     });
+
+    base.extend("performance", function() {
+        this.timer = new imports.FakeTimer;
+        var e = this.timer.beginPerformanceTimer();
+        assert.equal(0, e.getElapsed());
+        this.timer._advance(1000);
+        assert.equal(1000, e.getElapsed());
+        this.timer._advance(500);
+        assert.equal(1500, e.getElapsed());
+    });
 });

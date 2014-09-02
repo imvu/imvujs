@@ -31,6 +31,16 @@ module({
             return this._currentTimeMsec;
         },
 
+        beginPerformanceTimer: function() {
+            var self = this;
+            var start = self._currentTimeMsec;
+            return {
+                getElapsed: function() {
+                    return self._currentTimeMsec - start;
+                }
+            };
+        },
+
         _setTime: function (msSinceEpoch) {
             this._currentTimeMsec = msSinceEpoch;
         },
