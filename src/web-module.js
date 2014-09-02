@@ -42,6 +42,8 @@ var MODULE_DEBUG = true;
     }
 
     var LoadEventListener = {
+        downloadStart: nop,
+        downloadEnd: nop,
         evalStart: nop,
         evalEnd: nop,
         callEnd: nop
@@ -61,6 +63,7 @@ var MODULE_DEBUG = true;
     // fetch(url) -> Promise<xhr>
     function fetch(url) {
         return new Promise(function(resolver) {
+            LoadEventListener.downloadStart(url);
             var xhr = new XHRFactory();
             xhr.open('GET', url);
             xhr.withCredentials = false; // allows Access-Control-Allow-Origin: *
@@ -69,6 +72,7 @@ var MODULE_DEBUG = true;
             }
             xhr.onreadystatechange = function () {
                 if (this.readyState === this.DONE) {
+                    LoadEventListener.downloadEnd(url);
                     resolver.accept(this);
                 }
             };

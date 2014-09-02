@@ -128,6 +128,12 @@ module({
             module._test_loadEvents = [];   // used by loggingModule
             var loggingModule = 'module({}, function() { module._test_loadEvents.push("module loaded"); });';
             var loadEventListener = {
+                downloadStart: function(url) {
+                    module._test_loadEvents.push({downloadStart: url});
+                },
+                downloadEnd: function(url) {
+                    module._test_loadEvents.push({downloadEnd: url});
+                },
                 evalStart: function(url) {
                     module._test_loadEvents.push({evalStart: url});
                 },
@@ -145,12 +151,15 @@ module({
                 module._test_loadEvents.push('imports ready');
             });
 
-            this.xhrFactory._respond('GET', 'http://127.0.0.1:8001/bin/a_module.js', 200, [], loggingModule);
+            var url = 'http://127.0.0.1:8001/bin/a_module.js';
+            this.xhrFactory._respond('GET', url, 200, [], loggingModule);
             assert.deepEqual(
-                [{evalStart: 'http://127.0.0.1:8001/bin/a_module.js'},
-                 {evalEnd: 'http://127.0.0.1:8001/bin/a_module.js'},
+                [{downloadStart: url},
+                 {downloadEnd: url},
+                 {evalStart: url},
+                 {evalEnd: url},
                  'module loaded',
-                 {callEnd: 'http://127.0.0.1:8001/bin/a_module.js'},
+                 {callEnd: url},
                  'imports ready'],
                 module._test_loadEvents);
         });
