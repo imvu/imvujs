@@ -22,7 +22,7 @@ module({
         },
 
         startTest: function (test) {
-            console.log('Test: ' + test.name + ' ...');
+            console.log('Test: ' + test.displayName + ' ...');
         },
 
         endTest: function (test, passed, stack, exception) {

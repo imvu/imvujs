@@ -103,10 +103,10 @@ function runTest(testPath, continuation) {
         },
         endSuite: function (passed) {},
         error: function (errorMsg, url, lineNumber) {},
-        startTest: function (name) {
-            syncWrite('* ' + name + '... ');
+        startTest: function (test) {
+            syncWrite('* ' + test.displayName + '... ');
         },
-        endTest: function (name, passed, stack, exception) {
+        endTest: function (test, passed, stack, exception) {
             var verdict = passed ? 'PASS' : 'FAIL';
             if (passed) {
                 syncWrite(green + verdict + normal + '\n');

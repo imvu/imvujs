@@ -42,7 +42,6 @@ module({
         },
 
         startTest: function (test) {
-            test.displayName = (test.fixture ? '[' + test.fixture.name + '] ' : '') + test.name;
             if (window.console && window.console.groupCollapsed) {
                 window.console.groupCollapsed('Test: "' + test.displayName + '"');
             }

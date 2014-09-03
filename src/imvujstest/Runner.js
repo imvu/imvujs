@@ -52,6 +52,8 @@ module({
             var self = this;
             reporter.startSuite(testUrl);
             var steps = _(this.allTests).map(function (test) {
+                test.displayName = (test.fixture ? '[' + test.fixture.name + '] ' : '') + test.name;
+
                 return function (nextTest) {
                     reporter.startTest(test);
 
