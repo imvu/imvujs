@@ -13,6 +13,45 @@ module({
             });
         });
 
+        test('requireProperty handles passed-through values as expected', function() {
+            var valueReadFromArgs = null;
+
+            // A typical use-case:
+            var mainFunc = function(args) {
+                args = args || {};
+                delegateFunc({
+                    a_key: args.a_key
+                });
+            };
+            var delegateFunc = function(args) {
+                args = args || {};
+                valueReadFromArgs = IMVU.requireProperty(args, 'a_key');
+            };
+
+            mainFunc({
+                'some_other_stuff': 'just_for_main_func',
+                'a_key': 'passed-through'
+            });
+            assert.equal('passed-through', valueReadFromArgs);
+
+            // TODO: Evaluate whether it actually makes more sense to throw a
+            // "missing property" exception for explicitly undefined values.
+            // E.g.:
+            //
+            //assert.throws(ReferenceError, function() {
+            //    mainFunc({
+            //        'some_other_stuff': 'just_for_main_func'
+            //    });
+            //});
+            //
+            // Current behavior, but may not actually be desired:
+            //
+            //mainFunc({
+            //    'some_other_stuff': 'just_for_main_func'
+            //});
+            //assert.equal(undefined, valueReadFromArgs);
+        });
+
         test('optionalProperty returns key if present and truthy', function() {
             var args = {'a_key': 'a_value'};
             assert.equal('a_value', IMVU.optionalProperty(args, 'a_key', 'a_default'));
