@@ -10,6 +10,12 @@ var IMVU = IMVU || {};
     };
 
     IMVU.optionalProperty = function(obj, propertyName, defaultValue) {
-        return propertyName in obj ? obj[propertyName] : defaultValue;
+        if (propertyName in obj) {
+            var value = obj[propertyName];
+            if (value !== undefined) {
+                return value;
+            }
+        }
+        return defaultValue;
     };
 })();
