@@ -84,10 +84,10 @@ var MODULE_DEBUG = true;
                 }
             };
             xhr.onabort = function() {
-                addLoadEvent(url, 'abort');
+                addLoadEvent(url, 'network_abort');
             };
             xhr.onerror = function() {
-                addLoadEvent(url, 'error');
+                addLoadEvent(url, 'network_error');
             };
             xhr.send();
         }, promiseOptions);
