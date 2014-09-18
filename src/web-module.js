@@ -41,18 +41,23 @@ var MODULE_DEBUG = true;
         return old;
     }
 
-    var LoadEventListener = {
-        downloadStart: nop,
-        downloadEnd: nop,
-        evalStart: nop,
-        evalEnd: nop,
-        callEnd: nop
-    };
+    // url -> [{event_name: ..., timestamp: ...}, ...]
+    var loadEventLog = { };
+    var loadEventStart = IMVU.Timer.beginPerformanceTimer();
+    function getLoadEventLog() {
+        return loadEventLog;
+    }
 
-    function setLoadEventListener(l) {
-        var old = LoadEventListener;
-        LoadEventListener = l;
-        return old;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    function addLoadEvent(url, event_name) {
+        var log;
+        if (hasOwnProperty.call(loadEventLog, url)) {
+            log = loadEventLog[url];
+        } else {
+            log = loadEventLog[url] = [];
+        }
+
+        log.push({event_name: event_name, timestamp: loadEventStart.getElapsed()});
     }
 
     var promiseOptions = {
@@ -62,8 +67,8 @@ var MODULE_DEBUG = true;
 
     // fetch(url) -> Promise<xhr>
     function fetch(url) {
+        addLoadEvent(url, 'requested');
         return new Promise(function(resolver) {
-            LoadEventListener.downloadStart(url);
             var xhr = new XHRFactory();
             xhr.open('GET', url);
             xhr.withCredentials = false; // allows Access-Control-Allow-Origin: *
@@ -71,10 +76,18 @@ var MODULE_DEBUG = true;
                 xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
             }
             xhr.onreadystatechange = function () {
-                if (this.readyState === this.DONE) {
-                    LoadEventListener.downloadEnd(url);
+                if (this.readyState === this.HEADERS_RECEIVED) {
+                    addLoadEvent(url, 'headers_received');
+                } else if (this.readyState === this.DONE) {
+                    addLoadEvent(url, 'body_received');
                     resolver.accept(this);
                 }
+            };
+            xhr.onabort = function() {
+                addLoadEvent(url, 'abort');
+            };
+            xhr.onerror = function() {
+                addLoadEvent(url, 'error');
             };
             xhr.send();
         }, promiseOptions);
@@ -118,15 +131,18 @@ var MODULE_DEBUG = true;
         C.log("fetch", url);
         return fetch(url).then(function fetched(xhr) {
             if (xhr.status !== 200) {
+                addLoadEvent(url, 'error_non_200');
                 C.error("Failed to fetch " + url);
                 throw new ModuleError("Failed to fetch " + url + ".  Status code " + xhr.status);
             }
 
-            LoadEventListener.evalStart(url);
+            addLoadEvent(url, 'begin_parse');
+
             var evaluated;
             try {
                 evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//# sourceURL=" + url);
             } catch (e) {
+                addLoadEvent('failed_parse');
                 C.error("Failed to parse", url);
                 C.log(xhr.responseText);
 
@@ -134,24 +150,29 @@ var MODULE_DEBUG = true;
 
                 throw e;
             }
-            LoadEventListener.evalEnd(url);
+            addLoadEvent(url, 'end_parse');
 
             return new Promise(function(resolver) {
                 var saveUrl = currentModuleURL;
                 currentModuleURL = url;
                 currentModuleResolver = resolver;
 
+                addLoadEvent(url, 'begin_parse');
                 try {
-                    evaluated.call(window);
-                    LoadEventListener.callEnd(url);
+                    try {
+                        evaluated.call(window);
+                    } catch (e) {
+                        addLoadEvent(url, 'failed_parse');
+                        C.error('failed to evaluate script:', e);
+                        resolver.reject(e);
+                        throw e;
+                    }
+
+                    addLoadEvent(url, 'end_parse');
                     if (currentModuleResolver) {
                         // then no module() or define() was called
                         resolver.accept(undefined);
                     }
-                } catch (e) {
-                    C.error('failed to evaluate script:', e);
-                    resolver.reject(e);
-                    throw e;
                 } finally {
                     currentModuleURL = saveUrl;
                     currentModuleResolver = undefined;
@@ -322,7 +343,7 @@ var MODULE_DEBUG = true;
         setPromiseFactory: setPromiseFactory,
         setLogger: setLogger,
         setPlugin: setPlugin,
-        setLoadEventListener: setLoadEventListener,
+        getLoadEventLog: getLoadEventLog,
         caching: true,
 
         // I wish this weren't a public symbol.

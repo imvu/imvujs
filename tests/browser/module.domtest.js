@@ -125,43 +125,18 @@ module({
         });
 
         test("can trigger load event", function() {
-            module._test_loadEvents = [];   // used by loggingModule
-            var loggingModule = 'module({}, function() { module._test_loadEvents.push("module loaded"); });';
-            var loadEventListener = {
-                downloadStart: function(url) {
-                    module._test_loadEvents.push({downloadStart: url});
-                },
-                downloadEnd: function(url) {
-                    module._test_loadEvents.push({downloadEnd: url});
-                },
-                evalStart: function(url) {
-                    module._test_loadEvents.push({evalStart: url});
-                },
-                evalEnd: function(url) {
-                    module._test_loadEvents.push({evalEnd: url});
-                },
-                callEnd: function(url) {
-                    module._test_loadEvents.push({callEnd: url});
-                }
-            };
-            module.setLoadEventListener(loadEventListener);
+            var loggingModule = 'module({}, function() { });';
             module.run({
-                a: "a_module.js"
+                a: "my_unique_module.js"
             }, function(imports) {
-                module._test_loadEvents.push('imports ready');
             });
 
-            var url = 'http://127.0.0.1:8001/bin/a_module.js';
+            var url = 'http://127.0.0.1:8001/bin/my_unique_module.js';
             this.xhrFactory._respond('GET', url, 200, [], loggingModule);
             assert.deepEqual(
-                [{downloadStart: url},
-                 {downloadEnd: url},
-                 {evalStart: url},
-                 {evalEnd: url},
-                 'module loaded',
-                 {callEnd: url},
-                 'imports ready'],
-                module._test_loadEvents);
+                [ 'requested', 'headers_received', 'body_received',
+                 'begin_parse', 'end_parse', 'begin_parse', 'end_parse' ],
+                module.getLoadEventLog()[url].map(function(k) { return k.event_name; }));
         });
 
     });
