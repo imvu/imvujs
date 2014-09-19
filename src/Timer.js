@@ -1,6 +1,7 @@
 /*global IMVU:true, performance*/
 var IMVU = IMVU || {};
 (function() {
+    var performanceBaseDate = Date.now();
     var getPerformanceTimer = (typeof performance === 'object' && typeof performance.now === 'function') ?
         function() {
             return performance.now();
@@ -8,7 +9,7 @@ var IMVU = IMVU || {};
         function() {
             // warning: Not monotonic. We could detect that and return
             // an arbitrarily-small interval.
-            return Date.now();
+            return Date.now() - performanceBaseDate;
         };
 
     IMVU.Timer = {
