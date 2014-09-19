@@ -135,7 +135,8 @@ module({
             this.xhrFactory._respond('GET', url, 200, [], loggingModule);
             assert.deepEqual(
                 [ 'requested', 'headers_received', 'body_received',
-                 'begin_parse', 'end_parse', 'begin_parse', 'end_parse' ],
+                  'begin_parse', 'end_parse',
+                  'begin_execute', 'end_execute' ],
                 module.getLoadEventLog()[url].map(function(k) { return k.event_name; }));
         });
 

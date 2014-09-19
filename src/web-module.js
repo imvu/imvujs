@@ -44,6 +44,9 @@ var MODULE_DEBUG = true;
     // url -> [{event_name: ..., timestamp: ...}, ...]
     var loadEventLog = { };
     var loadEventStart = IMVU.Timer.beginPerformanceTimer();
+    function getLoadEventTimestampBase() {
+        return loadEventStart.getStartTime();
+    }
     function getLoadEventLog() {
         return loadEventLog;
     }
@@ -157,18 +160,18 @@ var MODULE_DEBUG = true;
                 currentModuleURL = url;
                 currentModuleResolver = resolver;
 
-                addLoadEvent(url, 'begin_parse');
+                addLoadEvent(url, 'begin_execute');
                 try {
                     try {
                         evaluated.call(window);
                     } catch (e) {
-                        addLoadEvent(url, 'failed_parse');
+                        addLoadEvent(url, 'failed_execute');
                         C.error('failed to evaluate script:', e);
                         resolver.reject(e);
                         throw e;
                     }
 
-                    addLoadEvent(url, 'end_parse');
+                    addLoadEvent(url, 'end_execute');
                     if (currentModuleResolver) {
                         // then no module() or define() was called
                         resolver.accept(undefined);
@@ -343,6 +346,7 @@ var MODULE_DEBUG = true;
         setPromiseFactory: setPromiseFactory,
         setLogger: setLogger,
         setPlugin: setPlugin,
+        getLoadEventTimestampBase: getLoadEventTimestampBase,
         getLoadEventLog: getLoadEventLog,
         caching: true,
 

@@ -35,6 +35,9 @@ module({
             var self = this;
             var start = self._currentTimeMsec;
             return {
+                getStartTime: function() {
+                    return start;
+                },
                 getElapsed: function() {
                     return self._currentTimeMsec - start;
                 }

@@ -24,6 +24,9 @@ var IMVU = IMVU || {};
         beginPerformanceTimer: function beginPerformanceTimer() {
             var start = getPerformanceTimer();
             return {
+                getStartTime: function() {
+                    return start;
+                },
                 getElapsed: function() {
                     return getPerformanceTimer() - start;
                 }
