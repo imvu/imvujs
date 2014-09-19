@@ -18,7 +18,10 @@ module({
                 .text(test.displayName);
             $logItem.append($a);
             this.$el.find('ul').append($logItem);
-            $logItem[0].scrollIntoViewIfNeeded();
+            var item = $logItem[0];
+            if ('function' === typeof item.scrollIntoViewIfNeeded) {
+                item.scrollIntoViewIfNeeded();
+            }
             return $logItem;
         },
 
