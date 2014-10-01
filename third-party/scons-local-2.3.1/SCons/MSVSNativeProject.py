@@ -351,7 +351,14 @@ class _GenerateVCXProj(_ProjGenerator):
                 file = value
                 if commonprefix:
                     file = os.path.join(commonprefix, value)
-                self.file.write('\t\t<%s Include="%s" />\n' % (keywords[kind], file))
+
+                if file.find('\\platform\\web\\') != -1:
+                    self.file.write('\t\t<%s Include="%s">\n'
+                    '\t\t\t<ExcludedFromBuild Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|Win32\'\">true</ExcludedFromBuild>\n'
+                    '\t\t</ClCompile>\n' % (keywords[kind], file))
+                else:
+                    self.file.write('\t\t<%s Include="%s" />\n' % (keywords[kind], file))
+
                 self.filters_file.write('\t\t<%s Include="%s">\n'
                                         '\t\t\t<Filter>%s</Filter>\n'
                                         '\t\t</%s>\n' % (keywords[kind], file, redirect_filter_name, keywords[kind]))
