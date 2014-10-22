@@ -12,7 +12,7 @@
     url = git@github.com:imvu/UglifyJS2.git
 [submodule "third-party/DefinitelyTyped"]
     path = third-party/DefinitelyTyped
-    url = git@github.com:srhazi-imvu/DefinitelyTyped.git
+    url = git@github.com:imvu/DefinitelyTyped.git
 [submodule "third-party/libxdr"]
     path = third-party/libxdr
     url = git@github.com:imvu/libxdr.git
