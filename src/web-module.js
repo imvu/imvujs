@@ -367,9 +367,12 @@ var MODULE_DEBUG = true;
             callback = arguments[1];
         }
         if (1 === arguments.length) {
-            module({}, function() { return callback(); });
+            module.run({}, function() { return callback(); });
+        } else if (3 === arguments.length) {
+            var cb = arguments[2];
+            module.run({}, cb);
         } else {
-            module({}, callback);
+            module.run({}, callback);
         }
     }
     define.amd = {};
