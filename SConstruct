@@ -5,6 +5,7 @@ SetOption('num_jobs', multiprocessing.cpu_count())
 print "running with -j", GetOption('num_jobs')
 
 FIRST_SOURCES = [
+    'src/includeguard.js',
     'src/polyfill.js',
     'third-party/es5-shim/es5-shim.js',
     'third-party/es5-shim/es5-sham.js',

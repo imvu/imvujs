@@ -30,6 +30,8 @@
         '__filename',
         '__dirname',
 
+        '__included_imvujs__',
+
         // browser-ish symbols prevented in tests
         'requestAnimationFrame',
 
