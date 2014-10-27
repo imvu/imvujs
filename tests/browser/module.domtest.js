@@ -140,5 +140,18 @@ module({
                 module.getLoadEventLog()[url].map(function(k) { return k.event_name; }));
         });
 
+        test("XML responseType handles XMLDocument in _dataReceived", function() {
+            var xmlText = "<books/>";
+            var domParser = new DOMParser();
+            var xmlData = domParser.parseFromString(xmlText,"text/xml");
+            var xhr = new this.xhrFactory;
+
+            xhr.open('GET', 'http://url');
+            xhr._headersReceived(200, '', {});
+            xhr._dataReceived(xmlData);
+            xhr._done();
+            assert.equal(xmlText, xhr.response);
+            assert.equal(xmlData, xhr.responseXML);
+        });
     });
 });

@@ -1,4 +1,5 @@
 /*jslint browser: true */
+/*global XMLDocument:true*/
 
 module({
 }, function (imports) {
@@ -239,6 +240,10 @@ module({
                         }
                         this.response = view.buffer;
                     }
+                } else if(typeof XMLDocument !== 'undefined' && //node does not have XMLDocument so this will allow node tests to run
+                          data instanceof XMLDocument) {
+                    this.response = (new XMLSerializer()).serializeToString(data);
+                    this.responseXML = data;
                 } else {
                     this.response = data;
                     if (!definePropertyWorks) {
