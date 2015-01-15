@@ -6,7 +6,7 @@ module({
             this.register('random', new IMVU.Random());
             this.register('timer', IMVU.Timer);
             this.register('Promise', new IMVU.PromiseFactory(IMVU.EventLoop, {
-                immediateCallbacks: true,
+                immediateCallbacks: false,
                 exposeErrors: true
             }));
             this.register('XMLHttpRequest', IMVU.XMLHttpRequest);
