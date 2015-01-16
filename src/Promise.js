@@ -28,12 +28,7 @@ var IMVU = IMVU || {};
         var then = null;
         var promise = this.promise;
         if (typeof value === "object") {
-            try {
-                then = value.then;
-            } catch (e) {
-                this.reject(e);
-                return;
-            }
+            then = value.then;
         }
         if (typeof then === "function") {
             var accept = this.resolve.bind(this);
