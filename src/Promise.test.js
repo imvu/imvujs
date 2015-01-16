@@ -362,10 +362,20 @@ module({
                 exposeErrors: false
             });
 
-            p.then(function(x) {
-                throw new SyntaxError('boom');
-            });
+            var caught = false;
+            p
+                .then(function(x) {
+                     throw new SyntaxError('boom');
+                })
+                .then(function(){
+                    assert.fail('should not happen');
+                })
+                ['catch'](function(){
+                    caught = true;
+                });
             r.accept(10);
+            this.eventLoop._flushTasks();
+            assert['true'](caught);
         });
 
         test('set immediateCallbacks', function() {

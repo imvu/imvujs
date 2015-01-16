@@ -24,6 +24,14 @@ var IMVU = IMVU || {};
         promise._scheduleCallbacks();
     };
 
+    PromiseResolver.prototype.__thenWithCatch = function(then, value, accept, reject){
+        try {
+            then.call(value, accept, reject);
+        } catch (e) {
+            this.reject(e);
+        }
+    };
+
     PromiseResolver.prototype.resolve = function(value) {
         var then = null;
         var promise = this.promise;
@@ -36,11 +44,7 @@ var IMVU = IMVU || {};
             if (promise.exposeErrors) {
                 then.call(value, accept, reject);
             } else {
-                try {
-                    then.call(value, accept, reject);
-                } catch (e) {
-                    this.reject(e);
-                }
+                this.__thenWithCatch(then, value, accept, reject);
             }
             return;
         }
