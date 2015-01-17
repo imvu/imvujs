@@ -195,6 +195,14 @@ var IMVU = IMVU || {};
             this.state = state;
         };
 
+        function tryToCall(callback, promise, argument){
+            try {
+                return [true, callback.call(promise, argument)];
+            } catch (e) {
+                return [false, e];
+            }
+        }
+
         Promise.prototype.then = function(acceptCallback, rejectCallback) {
             var resolver;
             var promise = new Promise(function(r) {
@@ -204,18 +212,17 @@ var IMVU = IMVU || {};
                 exposeErrors: this.exposeErrors
             });
 
-            var exposeErrors = this.exposeErrors;
-
             function promiseWrapperCallback(callback) {
                 return function(argument) {
                     var value;
-                    if (exposeErrors) {
+                    if (promise.exposeErrors) {
                         value = callback.call(promise, argument);
                     } else {
-                        try {
-                            value = callback.call(promise, argument);
-                        } catch (e) {
-                            resolver.reject(e); // per spec: synchronous=true
+                        var rs = tryToCall(callback, promise, argument);
+                        if (rs[0]) {
+                            value = rs[1];
+                        } else {
+                            resolver.reject(rs[1]);  // per spec: synchronous=true
                             return;
                         }
                     }
