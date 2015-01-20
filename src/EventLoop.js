@@ -19,15 +19,10 @@ var IMVU = IMVU || {};
 
     function flushTaskQueue() {
         // todo: O(N^2)
-        while (queue.length) {
-            var fn = queue.shift();
-            try {
-                fn();
-            }
-            catch (e) {
-                impl(flushTaskQueue);
-                // shows error in console log, presumably
-                throw e;
+        if (queue.length){
+            impl(flushTaskQueue);
+            while (queue.length){
+                queue.shift()();
             }
         }
     }
