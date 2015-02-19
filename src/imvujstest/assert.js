@@ -356,6 +356,10 @@ module({
                 assert.equal(value, $(selector).attr(attributeName));
             },
 
+            prop: function(value, propName, selector){
+                assert.equal(value, $(selector).prop(propName));
+            },
+
             attributeValues: function (values, selector) {
                 var $el = $(selector);
                 _(values).each(function (val, key) {
