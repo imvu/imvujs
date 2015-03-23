@@ -442,7 +442,16 @@ module({
                 if ($(el).is(':empty')) {
                     fail(new imports.AssertionError(decipherDomElement(el) + ' expected NOT to be empty'));
                 }
+            },
+
+            pseudoClassContent: function(expected, selectorOrJQueryObject, pseudoClass) {
+                var el = $(selectorOrJQueryObject);
+                assert.dom.present(el);
+                //xxxMCR convert the string definition of the string to the actual string
+                //       for comparison.
+                assert.equal(expected, eval(window.getComputedStyle(el[0], pseudoClass).content));
             }
+
         }
     };
 
