@@ -444,12 +444,19 @@ module({
                 }
             },
 
-            pseudoClassContent: function(expected, selectorOrJQueryObject, pseudoClass) {
+            pseudoElementCss: function(expected, propertyName, selectorOrJQueryObject, pseudoElement) {
                 var el = $(selectorOrJQueryObject);
                 assert.dom.present(el);
-                //xxxMCR convert the string definition of the string to the actual string
-                //       for comparison.
-                assert.equal(expected, eval(window.getComputedStyle(el[0], pseudoClass).content));
+                var value = window.getComputedStyle(el[0], pseudoElement)[propertyName];
+                var realValue;
+                try {
+                    //xxxMCR convert the string definition of the string to the actual string
+                    //       for comparison.
+                    realValue = eval(value);
+                } catch(e) {
+                    realValue = value;
+                }
+                assert.equal(expected, realValue);
             }
 
         }
