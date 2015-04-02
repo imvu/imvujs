@@ -240,7 +240,7 @@ var MODULE_DEBUG = true;
                 var params = splitUnescapedBangs(dependency);
                 var name = params[0];
                 var args = params.slice(1);
-                args[0] = IMVU.moduleCommon.toAbsoluteUrl(args[0], thisURL);
+                args[0] = IMVU.moduleCommon.toAbsoluteUrl(IMVU.moduleCommon._resolveDependency(args[0]), thisURL);
                 if (plugins[name] === undefined) {
                     resolver.reject('Module referenced unregistered "' + name + '" plugin');
                 } else {
