@@ -10,7 +10,7 @@ FIRST_SOURCES = [
     'third-party/es5-shim/es5-shim.js',
     'third-party/es5-shim/es5-sham.js',
     'src/es6-collections.js',
-    'ext/underscore-1.7.0.js',
+    'ext/underscore-1.8.3.js',
 ]
 
 BASE_SOURCES = [
