@@ -1,8 +1,6 @@
 /*global console*/
 var net = require('net');
  
-// Keep track of the chat clients
-// Start a TCP Server
 var server = net.createServer(function (socket) {
  
   // Handle incoming messages from clients.
