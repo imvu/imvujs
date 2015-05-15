@@ -6,14 +6,14 @@ var server = net.createServer(function (socket) {
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
     var command = data.toString();
-    if(command.match(/scan /)) {
+    if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
         }
         catch(e) {
         }
     }
-    else if(command.match(/fix /)) {
+    else if(command.match(/^fix /)) {
         try {
           var params = JSON.parse(command.substr(4));
           replace_imports(params.i, params.o, params.p);
@@ -23,7 +23,7 @@ var server = net.createServer(function (socket) {
           socket.write('failed');
         }
     }
-    else if(command.match(/shutdown/)) {
+    else if(command.match(/^shutdown/)) {
        server.close();
        console.log('Server closed by client');
     }
