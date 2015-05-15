@@ -3,7 +3,7 @@ var IMVU = IMVU || {};
 (function() {
     IMVU.ServiceProvider = IMVU.BaseClass.extend('ServiceProvider', {
         initialize: function(services) {
-            this.services = Object.create(services || null);
+            this.services = Object.create(services || {});
         },
 
         get: function(name) {

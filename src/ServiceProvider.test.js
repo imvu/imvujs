@@ -249,4 +249,9 @@ fixture("ServiceProvider", function() {
         assert.equal(timer2, instance.timer);
         assert.equal("hi", instance.filler);
     });
+
+    test('nested providers services has a proper prototype relationship with parents services', function(){
+        var nested = this.sp.nestedProvider();
+        assert['true'](this.sp.services.isPrototypeOf(nested.services));
+    });
 });
