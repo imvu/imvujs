@@ -14,7 +14,7 @@ FIRST_SOURCES = [
 ]
 
 BASE_SOURCES = [
-    'ext/backbone-0.9.10.js',
+    'ext/backbone-1.2.1.js',
     'ext/URI.js',
     'src/repr.js',
     'src/property.js',
