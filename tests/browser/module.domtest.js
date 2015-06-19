@@ -79,7 +79,7 @@ module({
                 [ 'log: fetch http://127.0.0.1:8001/bin/a_module.js',
                   'log: fetch http://127.0.0.1:8001/bin/another_module.js',
                   'error: Failed to fetch http://127.0.0.1:8001/bin/another_module.js' ],
-                this.logs);
+                this.logs.slice(0, 3));
         });
 
         test("if evaluating script raises error then run logs", function() {
@@ -100,7 +100,7 @@ module({
             assert.deepEqual(
                 [ 'log: fetch http://127.0.0.1:8001/bin/broken.js',
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null"],
-                this.logs);
+                _.filter(this.logs, function(entry) { return ((entry.indexOf('all dependencies') === -1) && (entry.indexOf('caught an exception while calling module') === -1)); }));
         });
 
         test("if evaluating module raises error then run logs", function() {
@@ -121,7 +121,7 @@ module({
             assert.deepEqual(
                 [ 'log: fetch http://127.0.0.1:8001/bin/broken.js',
                   "error: failed to evaluate script: TypeError: Cannot read property 'x' of null" ],
-                this.logs);
+                _.filter(this.logs, function(entry) { return ((entry.indexOf('all dependencies') === -1) && (entry.indexOf('caught an exception while calling module') === -1)); }));
         });
 
         test("can trigger load event", function() {
