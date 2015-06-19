@@ -10,7 +10,7 @@ function Runner(trampoline, tests) {
 }
 Runner.prototype = {
     runTest: function (url) {
-        leprechaun.log('Running test: ' + url);
+        leprechaun.echo('Running test: ' + url);
 
         if (this.testframe) {
             document.body.removeChild(this.testframe);
@@ -35,7 +35,7 @@ Runner.prototype = {
 
     start: function () {
         this.startTime = new Date();
-        leprechaun.log('Running '+ this.tests.length + ' tests.');
+        leprechaun.echo('Running '+ this.tests.length + ' tests.');
         this.nextTest();
     },
 
@@ -46,8 +46,8 @@ Runner.prototype = {
     stop: function (success, reason) {
         this.done = true;
         var endTime = new Date();
-        leprechaun.log('Stopping tests: ' + reason);
-        leprechaun.log('Total time: ' + this.timeDelta(endTime, this.startTime) + 's');
+        leprechaun.echo('Stopping tests: ' + reason);
+        leprechaun.echo('Total time: ' + this.timeDelta(endTime, this.startTime) + 's');
         leprechaun.exit(success ? 0 : 1);
     },
 
@@ -65,14 +65,23 @@ Runner.prototype = {
         if (this.done) {
             return;
         }
-        var msg = JSON.parse(evt.data);
+        var msg = null;
+        try {
+            msg = JSON.parse(evt.data);
+        } catch (e) {
+            leprechaun.echo('failed to parse evt.data as JSON');
+            return;
+        }
+        if (typeof(msg) !== "object") {
+            return;
+        }
 
         if (msg.type === 'all-tests-complete') {
             this.nextTest();
         }
         if (msg.type === 'test-complete') {
             if (!msg.success) {
-                leprechaun.log(msg.stack);
+                leprechaun.echo(msg.stack);
                 this.stop(false, 'Test failure');
             }
         }

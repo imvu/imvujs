@@ -1,9 +1,10 @@
+/*global console*/
 module({
     Reporter: 'Reporter.js'
 }, function (imports) {
-    return imports.Reporter.extend('LeprechaunReporter', {
+    return imports.Reporter.extend('ConsoleReporter', {
         _report: function (msg) {
-            window.postMessage(JSON.stringify(msg), "*");
+            console.log(msg);
         }
     });
 });
