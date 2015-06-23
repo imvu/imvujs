@@ -133,11 +133,11 @@ module({
 
             var url = 'http://127.0.0.1:8001/bin/my_unique_module.js';
             this.xhrFactory._respond('GET', url, 200, [], loggingModule);
-            var expected = [ 'requested', 'headers_received', 'body_received',
-                'begin_parse', 'end_parse',
-                'begin_execute', 'end_execute' ];
-            assert.deepEqual(expected,
-                module.getLoadEventLog()[url].map(function(k) { return k.event_name; }).filter(function(name) { return expected.indexOf(name) !== -1 }));
+            assert.deepEqual(
+                [ 'requested', 'headers_received', 'body_received',
+                  'begin_parse', 'end_parse',
+                  'begin_execute', 'end_execute' ],
+                module.getLoadEventLog()[url].map(function(k) { return k.event_name; }));
         });
 
         test("XML responseType handles XMLDocument in _dataReceived", function() {

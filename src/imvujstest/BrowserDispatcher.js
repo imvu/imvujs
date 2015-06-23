@@ -3,7 +3,6 @@ module({
     DomReporter: 'DomReporter.js',
     PhantomReporter: 'PhantomReporter.js',
     LeprechaunReporter: 'LeprechaunReporter.js',
-    ConsoleReporter: 'ConsoleReporter.js',
     CompositeReporter: 'CompositeReporter.js'
 }, function (imports) {
     return {
@@ -15,8 +14,7 @@ module({
             var reporter = new imports.CompositeReporter([
                 new imports.DomReporter({ el: output }),
                 new imports.PhantomReporter(),
-                new imports.LeprechaunReporter(),
-                new imports.ConsoleReporter()
+                new imports.LeprechaunReporter()
             ]);
 
             window.onerror = reporter.error.bind(reporter);

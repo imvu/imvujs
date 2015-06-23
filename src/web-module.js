@@ -79,17 +79,11 @@ var MODULE_DEBUG = true;
                 xhr.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
             }
             xhr.onreadystatechange = function () {
-                if (this.readyState === this.OPENED) {
-                    addLoadEvent(url, 'opened');
-                } else if (this.readyState === this.HEADERS_RECEIVED) {
+                if (this.readyState === this.HEADERS_RECEIVED) {
                     addLoadEvent(url, 'headers_received');
-                } else if (this.readyState === this.LOADING) {
-                    addLoadEvent(url, 'loading');
                 } else if (this.readyState === this.DONE) {
                     addLoadEvent(url, 'body_received');
                     resolver.accept(this);
-                } else {
-                    addLoadEvent(url, 'unexpected_state');
                 }
             };
             xhr.onabort = function() {
@@ -97,21 +91,6 @@ var MODULE_DEBUG = true;
             };
             xhr.onerror = function() {
                 addLoadEvent(url, 'network_error');
-            };
-            xhr.onload = function() {
-                addLoadEvent(url, 'loaded');
-            };
-            xhr.onloadend = function() {
-                addLoadEvent(url, 'load_end');
-            };
-            xhr.onloadstart = function() {
-                addLoadEvent(url, 'load_start');
-            };
-            xhr.onprogress = function() {
-                addLoadEvent(url, 'progress');
-            };
-            xhr.ontimeout = function() {
-                addLoadEvent(url, 'timeout');
             };
             xhr.send();
         }, promiseOptions);
@@ -152,7 +131,7 @@ var MODULE_DEBUG = true;
     var ModuleError = module.ModuleError = IMVU.extendError(Error, 'ModuleError');
 
     function actualLoadModule(url) {
-        C.log("fetch " + url);
+        C.log("fetch", url);
         return fetch(url).then(function fetched(xhr) {
             if (xhr.status !== 200) {
                 addLoadEvent(url, 'error_non_200');
@@ -167,7 +146,7 @@ var MODULE_DEBUG = true;
                 evaluated = new Function("'use strict';" + xhr.responseText + "\n\n//# sourceURL=" + url);
             } catch (e) {
                 addLoadEvent('failed_parse');
-                C.error("Failed to parse " + url);
+                C.error("Failed to parse", url);
                 C.log(xhr.responseText);
 
                 reportSyntaxError(url, xhr.responseText);
@@ -187,7 +166,7 @@ var MODULE_DEBUG = true;
                         evaluated.call(window);
                     } catch (e) {
                         addLoadEvent(url, 'failed_execute');
-                        C.error('failed to evaluate script: ' + e);
+                        C.error('failed to evaluate script:', e);
                         resolver.reject(e);
                         throw e;
                     }
@@ -195,7 +174,6 @@ var MODULE_DEBUG = true;
                     addLoadEvent(url, 'end_execute');
                     if (currentModuleResolver) {
                         // then no module() or define() was called
-                        addLoadEvent(url, 'resolved');
                         resolver.accept(undefined);
                     }
                 } finally {
@@ -210,9 +188,9 @@ var MODULE_DEBUG = true;
         if (MODULE_DEBUG) {
             try {
                 var result = esprima.parse(code);
-                C.log(result);
+                Console.log(result);
             } catch (e) {
-                C.error("Parse error in " + url + ':' + e.message);
+                Console.error("Parse error in", url + ':', e.message);
             }
         }
     }
@@ -286,7 +264,10 @@ var MODULE_DEBUG = true;
             setTimeout;
         st(function() { throw e; }, 0);
         */
-        C.error(e);
+        if(window.console !== undefined) {
+            window.console.error(e);
+        }
+
     }
 
     module.inModuleDependency = function() {
