@@ -307,18 +307,10 @@ var MODULE_DEBUG = true;
 
         // TODO: assert there's a module resolver
         var thisModuleResolver = currentModuleResolver;
-        var thisModuleURL = currentModuleURL;
         currentModuleResolver = undefined;
 
         var imports = {};
         var remainingDependencies = 1;
-
-        for (var name in dependencies) {
-            if (!hasOwnProperty.call(dependencies, name)) {
-                continue;
-            }
-            imports[name] = null;
-        }
 
         for (var name in dependencies) {
             if (!hasOwnProperty.call(dependencies, name)) {
@@ -329,21 +321,9 @@ var MODULE_DEBUG = true;
 
             var dependency = dependencies[name];
             loadDependency(currentModuleURL, dependency).then(function(name, exports) {
-                if (MODULE_DEBUG) {
-                    C.log('dependency ' + name + ' of ' + thisModuleURL + ' has been satisfied');
-                }
                 imports[name] = exports;
                 if (--remainingDependencies === 0) {
                     complete();
-                } else if (MODULE_DEBUG) {
-                    C.log('remaining dependencies of ' + thisModuleURL + ': ' + JSON.stringify( 
-                        _.reduce(imports, function(remaining, dependencyExports, dependencyName) {
-                            if (dependencyExports === null) {
-                                remaining.push(dependencyName);
-                            }
-                            return remaining;
-                        }, []))
-                    );
                 }
             }.bind(undefined, name))['catch'](function(error) {
                 bubbleErrorToBrowser(error);
@@ -355,19 +335,9 @@ var MODULE_DEBUG = true;
         }
 
         function complete() {
-            if (MODULE_DEBUG) {
-                C.log('all dependencies of ' + thisModuleURL + ' are satisfied');
-            }
-            try {
-                var exports = body.call(undefined, imports);
-                if (thisModuleResolver) {
-                    thisModuleResolver.accept(exports);
-                } else if (MODULE_DEBUG) {
-                    C.log('no module resolver for ' + thisModuleURL);
-                }
-            } catch (e) {
-                C.log('caught an exception while calling module ' + thisModuleURL  + ': ' + e);
-                throw e;
+            var exports = body.call(undefined, imports);
+            if (thisModuleResolver) {
+                thisModuleResolver.accept(exports);
             }
         }
     }
