@@ -16,7 +16,12 @@ var IMVU = IMVU || {};
         var cookies = document.cookie.split(';');
 
         return makeObject(_.map(cookies, function (c) {
-            return r.exec(c).splice(1);
+            var parsed = r.exec(c);
+            if (parsed) {
+                return parsed.splice(1);
+            } else {
+                return [c,null];
+            }
         }));
     };
 })();
