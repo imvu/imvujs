@@ -78,18 +78,19 @@ function run_leprechaun() {
         printf "\nRunning browser tests...\n\n"
 
         OS=`python -c "import sys; print sys.platform"`
-        RUNNER="$HERE/../bin/leprechaun-runner.js"
+        RUNNER="http://127.0.0.1:8001/bin/leprechaun-runner.js"
+        OPTIONS=""
         if [ $OS = 'darwin' ]; then
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/leprechaun.app/Contents/MacOS/leprechaun"
         elif [ $OS = 'linux2' ]; then
             export LD_LIBRARY_PATH="$HERE/../third-party/leprechaun-binaries/linux"
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/linux/leprechaun"
+            LEPRECHAUN_OPTIONS="--disable-gpu --disable-setuid-sandbox"
         elif [ $OS = 'cygwin' ]; then
             LEPRECHAUN="$HERE/../third-party/leprechaun-binaries/windows/leprechaun.exe"
-            RUNNER="$HERE\..\bin\leprechaun-runner.js"
         fi
 
-        DISPLAY=:9.0 "$LEPRECHAUN" $RUNNER $TRAMPOLINE $TESTS
+        DISPLAY=:9.0 "$LEPRECHAUN" $LEPRECHAUN_OPTIONS $RUNNER $TRAMPOLINE $TESTS
         return "$?"
     fi
 }
