@@ -35,7 +35,7 @@ var IMVU = IMVU || {};
     PromiseResolver.prototype.resolve = function(value) {
         var then = null;
         var promise = this.promise;
-        if (typeof value === "object") {
+        if (value !== null && typeof value === "object") {
             then = value.then;
         }
         if (typeof then === "function") {

@@ -113,6 +113,21 @@ module({
             assert.deepEqual(['hey'], this.accepts);
         });
 
+        test('null is not then-able', function () {
+            var r;
+            var f = new this.Promise(function(resolver) {
+                r = resolver;
+            }).then(function () {
+                return null;
+            }).then(this.acceptCallback, this.rejectCallback);
+
+            r.accept(1);
+            this.eventLoop._flushTasks();
+
+            assert.deepEqual([], this.rejects);
+            assert.deepEqual([null], this.accepts);
+        });
+
         test("static accept returns accepted Promise", function() {
             var f = this.Promise.accept("hello");
             f.then(this.acceptCallback);
