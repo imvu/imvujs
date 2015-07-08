@@ -1,21 +1,21 @@
 [submodule "third-party/node-jshint"]
     path = third-party/node-jshint
-    url = git@github.com:imvu/node-jshint.git
+    url = https://github.com/imvu/node-jshint.git
 [submodule "third-party/es5-shim"]
     path = third-party/es5-shim
-    url = git@github.com:imvu/es5-shim.git
+    url = https://github.com/imvu/es5-shim.git
 [submodule "third-party/leprechaun-binaries"]
     path = third-party/leprechaun-binaries
-    url = git@github.com:imvu/leprechaun-binaries.git
+    url = https://github.com/imvu/leprechaun-binaries.git
 [submodule "third-party/UglifyJS2"]
     path = third-party/UglifyJS2
-    url = git@github.com:imvu/UglifyJS2.git
+    url = https://github.com/imvu/UglifyJS2.git
 [submodule "third-party/DefinitelyTyped"]
     path = third-party/DefinitelyTyped
-    url = git@github.com:imvu/DefinitelyTyped.git
+    url = https://github.com/imvu/DefinitelyTyped.git
 [submodule "third-party/libxdr"]
     path = third-party/libxdr
-    url = git@github.com:imvu/libxdr.git
+    url = https://github.com/imvu/libxdr.git
 [submodule "third-party/pmxdr"]
     path = third-party/pmxdr
-    url = git@github.com:imvu/pmxdr.git
+    url = https://github.com/imvu/pmxdr.git
