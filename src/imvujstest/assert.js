@@ -56,6 +56,10 @@ module({
             fail(new imports.AssertionError(info));
         },
 
+        inTest: function(){
+            // the fact that you can call this function means that you are in a test.
+        },
+
         ////////////////////////////////////////////////////////////////////////////////
         // BOOLEAN TESTS
 
