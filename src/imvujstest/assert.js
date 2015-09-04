@@ -161,6 +161,25 @@ module({
         // FLOATING POINT
 
         nearEqual: function(expected, actual, tolerance) {
+            requireArgumentRange(2, 3, arguments.length, "nearEqual");
+            if (tolerance === undefined) {
+                tolerance = 0;
+            }
+            if (expected instanceof Array && actual instanceof Array) {
+                assert.equal(expected.length, actual.length);
+                for (var i = 0; i < expected.length; ++i) {
+                    assert.nearEqual(expected[i], actual[i], tolerance);
+                }
+                return;
+            }
+            if ((Math.abs(expected - actual) <= tolerance) === false) {
+                fail(new imports.AssertionError("expected: " + formatTestValue(expected) + ", actual: " + formatTestValue(actual) + ", tolerance: " + formatTestValue(tolerance) + ", diff: " + formatTestValue(actual - expected)), {
+                    Expected: expected,
+                    Actual: actual,
+                    Tolerance: tolerance});
+            }
+        },
+        deprecatedNearEqual: function(expected, actual, tolerance) {
             requireArgumentRange(2, 3, arguments.length, 'nearEqual');
 
             if (tolerance === undefined) {
