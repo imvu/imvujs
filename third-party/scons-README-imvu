@@ -1,0 +1,11 @@
+IMVU-specific SCons notes:
+
+This directory contains a local installation of SCons, a utility for building
+software (like make, ant, CMake, etc.).
+
+This installation of SCons is used to build IMVUJS, as well as some other
+projects that consume IMVUJS, like the website and Northstar projects.  (The
+IMVU client also uses SCons, but it has its own installation in /Stable/Ext .)
+
+We have made local changes to this SCons installation to allow us to generate
+Visual Studio projects for Northstar.
