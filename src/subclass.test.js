@@ -15,7 +15,7 @@ module({}, function() {
     }
 
     function throws_(cls, parent) {
-        assert['throws'](TypeError, function() {
+        assert.throws(TypeError, function() {
             IMVU.isSubClass(cls, parent);
         });
     }

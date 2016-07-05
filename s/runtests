@@ -3,7 +3,7 @@
 HERE=`dirname "$0"`
 
 NODEJS="$HERE/node"
-JSHINT="$HERE/../third-party/node-jshint/bin/jshint"
+JSHINT="$HERE/../third-party/jshint/bin/jshint"
 
 function fail() {
     printf "\nFailed\n"
