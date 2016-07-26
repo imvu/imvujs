@@ -18,7 +18,7 @@ var IMVU = IMVU || {};
         NewClass.prototype = Object.create(this.prototype, {
             constructor: { value: NewClass } });
         _.extend(NewClass.prototype, def);
-
+        NewClass.__super__ = this.prototype;
         Object.freeze(NewClass);
         //Object.freeze(NewClass.prototype);
 
