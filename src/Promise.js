@@ -192,6 +192,7 @@ var IMVU = IMVU || {};
                     this.rejectCallbacks,
                 this.result,
                 this.immediateCallbacks);
+            this[state === 'accepted' ? 'rejectCallbacks' : 'acceptCallbacks'].length = 0;
             this.state = state;
         };
 
