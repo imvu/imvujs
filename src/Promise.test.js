@@ -150,6 +150,14 @@ module({
             assert.equal(e, caught);
         });
 
+        test("Promises do not leak callbacks after being resolved", function() {
+            var p = this.Promise.accept();
+            var wasCalled = false;
+            p['catch'](function(){ wasCalled = true;});
+            assert.equal(0, p.rejectCallbacks.length);
+            assert.false(wasCalled);
+        });
+
         test("Promise.any empty", function() {
             this.Promise.any([]).then(this.acceptCallback);
             this.eventLoop._flushTasks();
