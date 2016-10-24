@@ -32,6 +32,8 @@ BASE_SOURCES = [
     'src/NamedBackbone.js',
     'third-party/pmxdr/pmxdr-client.js',
     'third-party/libxdr/libxdr.js',
+    'third-party/requirejs/require.js',
+    'src/twig_template_plugin.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [

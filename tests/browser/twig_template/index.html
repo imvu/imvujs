@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<script src="../../../out/imvu.js"></script>
+<script>
+
+    module.run({
+      _: 'handlebars-2.0.0-alpha.4.js'
+    }, function () {
+        module.run({
+            a: 'twig_template!/includes/peacock/header.tml!{}',
+            b: 'text!/README.md',
+            c: 'css!test.css',
+            d: 'hb!test.hb'
+        }, function(imports) {
+            console.log(imports.a);
+            console.log(imports.b);
+            console.log(imports.d({hooty:'hoob'}));
+
+            document.body.appendChild(document.createTextNode("Ok!"));
+        });
+    });
+</script>
+</html>
