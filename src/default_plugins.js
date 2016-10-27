@@ -41,9 +41,9 @@
     define('json', [], function () {
         return {
             load: function (name, parentRequire, onload, config) {
-                function innerload(text) {
+                loadText(name, function innerload(text) {
                     onload(JSON.parse(text));
-                }
+                });
             }
         };
     });
