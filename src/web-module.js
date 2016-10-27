@@ -41,7 +41,6 @@
         }
 
         define(depList, function () {
-
             var args = Array.prototype.slice.call(arguments, 0);
             var depMap = {}; // name : dependency
             for (var i = 0; i < depNames.length; ++i) {
@@ -53,22 +52,23 @@
     }
 
     module.run = function (dependencies, body) {
-        inModuleDependency = true;
         var a = objectToList(dependencies);
         var depNames = a[0];
         var depList = a[1];
 
-        requirejs(depList, function () {
-            var args = Array.prototype.slice.call(arguments, 0);
+        requirejs(depList, function (main) {
+            var oldInModuleDependency = inModuleDependency;
+            var args = [main];
             var depMap = {}; // name : dependency
             for (var i = 0; i < depNames.length; ++i) {
                 depMap[depNames[i]] = args[i];
             }
 
             try {
+                inModuleDependency = true;
                 return body(depMap);
             } finally {
-                inModuleDependency = false;
+                inModuleDependency = oldInModuleDependency;
             }
         });
     };
