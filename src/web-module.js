@@ -95,6 +95,8 @@
         return inModuleDependency;
     };
 
+    module.allowModuleState = function () {};
+
     if (window.module === undefined) {
         window.module = module;
     }
