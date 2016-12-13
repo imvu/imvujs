@@ -19,7 +19,7 @@ module({
         if (typeof selectorOrJQueryObject === 'string') {
             return 'Selector ' + formatTestValue(selectorOrJQueryObject);
         } else if (typeof selectorOrJQueryObject === 'object') {
-            return "'" + selectorOrJQueryObject[0] + "'";
+            return "'" + $(selectorOrJQueryObject)[0] + "'";
         }
         return undefined;
     }
