@@ -84,27 +84,27 @@ var IMVU = IMVU || {};
             init(new PromiseResolver(this));
         }
 
-        Promise.accept = function(value) {
+        Promise.accept = function(value, settings) {
             return new Promise(function(resolver) {
                 resolver.accept(value);
-            });
+            }, settings);
         };
 
-        function resolveWrap(value) {
+        function resolveWrap(value, settings) {
             return new Promise(function(resolver) {
                 resolver.resolve(value);
-            });
+            }, settings);
         }
 
         Promise.resolve = resolveWrap;
 
-        Promise.reject = function(value) {
+        Promise.reject = function(value, settings) {
             return new Promise(function(resolver) {
                 resolver.reject(value);
-            });
+            }, settings);
         };
 
-        Promise.any = function(values) {
+        Promise.any = function(values, settings) {
             return new Promise(function(resolver) {
                 var length = values.length;
                 if (length === 0) {
@@ -115,12 +115,12 @@ var IMVU = IMVU || {};
                 var acceptCallback = resolver.resolve.bind(resolver);
                 var rejectCallback = resolver.reject.bind(resolver);
                 for (var i = 0; i < length; ++i) {
-                    resolveWrap(values[i]).then(acceptCallback, rejectCallback);
+                    resolveWrap(values[i], settings).then(acceptCallback, rejectCallback);
                 }
-            });
+            }, settings);
         };
 
-        Promise.every = function(values) {
+        Promise.every = function(values, settings) {
             return new Promise(function(resolver) {
                 var length = values.length;
                 if (0 === length) {
@@ -137,12 +137,12 @@ var IMVU = IMVU || {};
                             resolver.resolve(args); // per spec: synchronous=true
                         }
                     }.bind(undefined, i);
-                    resolveWrap(values[i]).then(acceptCallback, rejectCallback);
+                    resolveWrap(values[i], settings).then(acceptCallback, rejectCallback);
                 }
-            });
+            }, settings);
         };
 
-        Promise.some = function(values) {
+        Promise.some = function(values, settings) {
             return new Promise(function(resolver) {
                 var length = values.length;
                 if (0 === length) {
@@ -159,9 +159,9 @@ var IMVU = IMVU || {};
                             resolver.reject(args); // per spec: synchronous=true
                         }
                     }.bind(undefined, i);
-                    resolveWrap(values[i]).then(acceptCallback, rejectCallback);
+                    resolveWrap(values[i], settings).then(acceptCallback, rejectCallback);
                 }
-            });
+            }, settings);
         };
 
         function processCallbacks(callbacks, result, immediateCallbacks) {
