@@ -113,7 +113,7 @@ module({
             assert.deepEqual(['hey'], this.accepts);
         });
 
-        test('null is not then-able', function () {
+        test('null is then-able', function () {
             var r;
             var f = new this.Promise(function(resolver) {
                 r = resolver;
@@ -164,7 +164,7 @@ module({
             assert.deepEqual([undefined], this.accepts);
         });
 
-        test("Promise.any: one reject, one accept", function() {
+        test("Promise.any: first reject, second accept", function() {
             var r1, r2;
             var p1 = new this.Promise(function(resolver) { r1 = resolver; });
             var p2 = new this.Promise(function(resolver) { r2 = resolver; });
@@ -175,6 +175,19 @@ module({
             this.eventLoop._flushTasks();
             assert.deepEqual([], this.accepts);
             assert.deepEqual([1], this.rejects);
+        });
+
+        test("Promise.any: first accept, second reject", function() {
+            var r1, r2;
+            var p1 = new this.Promise(function(resolver) { r1 = resolver; });
+            var p2 = new this.Promise(function(resolver) { r2 = resolver; });
+            this.Promise.any([p1, p2]).then(this.acceptCallback, this.rejectCallback);
+            r1.accept(1);
+            r2.reject(2);
+
+            this.eventLoop._flushTasks();
+            assert.deepEqual([1], this.accepts);
+            assert.deepEqual([], this.rejects);
         });
 
         test("Promise.every: rejection passes through", function() {
@@ -266,7 +279,7 @@ module({
             });
         });
 
-        test("", function() {
+        test("handlers run immediately and errors bubble even if chained with custom returned promise", function() {
             var r;
             var p = new this.Promise(function(resolver) {
                 r = resolver;
@@ -358,7 +371,7 @@ module({
 
         });
 
-        test('set exposeErrors', function() {
+        test('set exposeErrors, but not immediateCallbacks', function() {
             this.Promise = new IMVU.PromiseFactory(this.eventLoop, {exposeErrors: true});
 
             var r;
@@ -366,13 +379,53 @@ module({
                 r = resolver;
             });
 
+            var caught = false;
             p.then(function(x) {
+                this.acceptCallback(x);
                 throw new SyntaxError('boom');
+            }.bind(this))
+            ['catch'](function(error) {
+                caught = true;
             });
-            r.accept(10);
+            r.resolve(10);
             assert.throws(SyntaxError, function() {
                 this.eventLoop._flushTasks();
             }.bind(this));
+            assert.deepEqual([10], this.accepts);
+
+            // flush again to run handlers that may have been queued by errors
+            // in the previous eventLoop tick's callbacks.
+            this.eventLoop._flushTasks();
+
+            // Even if exposeErrors is true, catch handlers should still have
+            // fired.
+            assert['true'](caught);
+        });
+
+        test('set both exposeErrors and immediateCallbacks', function() {
+            this.Promise = new IMVU.PromiseFactory(this.eventLoop, {exposeErrors: true, immediateCallbacks: true});
+
+            var r;
+            var p = new this.Promise(function(resolver) {
+                r = resolver;
+            });
+
+            var caught = false;
+            p.then(function(x) {
+                this.acceptCallback(x);
+                throw new SyntaxError('boom');
+            }.bind(this))
+            ['catch'](function(error) {
+                caught = true;
+            });
+            assert.throws(SyntaxError, function() {
+                r.resolve(10);
+            }.bind(this));
+            assert.deepEqual([10], this.accepts);
+
+            // Even if exposeErrors is true, catch handlers should still have
+            // fired.
+            assert['true'](caught);
         });
 
         test('override exposeErrors', function() {
@@ -401,17 +454,27 @@ module({
             assert['true'](caught);
         });
 
-        test('set immediateCallbacks', function() {
+        test('set immediateCallbacks, but not exposeErrors', function() {
             this.Promise = new IMVU.PromiseFactory(this.eventLoop, {immediateCallbacks: true});
 
             var r;
             var p = new this.Promise(function(resolver) {
                 r = resolver;
             });
-            p.then(this.acceptCallback, this.rejectCallback);
-
-            r.accept(10);
+            var caught = false;
+            p.then(function(value) {
+                this.acceptCallback(value);
+                throw new Error('Thunder struck house.');
+            }.bind(this))
+            ['catch'](function() {
+                caught = true;
+            });
+            r.resolve(10);
             assert.deepEqual([10], this.accepts);
+
+            // Even if immediateCallbacks is true, catch handlers should still
+            // have fired.
+            assert['true'](caught);
         });
 
         test('override immediateCallbacks', function() {

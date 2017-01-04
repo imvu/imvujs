@@ -24,11 +24,15 @@ var IMVU = IMVU || {};
         promise._scheduleCallbacks();
     };
 
-    PromiseResolver.prototype.__thenWithCatch = function(then, value, accept, reject){
+    PromiseResolver.prototype.__thenWithCatch = function(promise, then, value, accept, reject){
         try {
             then.call(value, accept, reject);
         } catch (e) {
             this.reject(e);
+
+            if (promise.exposeErrors) {
+                throw e;
+            }
         }
     };
 
@@ -41,11 +45,9 @@ var IMVU = IMVU || {};
         if (typeof then === "function") {
             var accept = this.resolve.bind(this);
             var reject = this.reject.bind(this);
-            if (promise.exposeErrors) {
-                then.call(value, accept, reject);
-            } else {
-                this.__thenWithCatch(then, value, accept, reject);
-            }
+
+            this.__thenWithCatch(promise, then, value, accept, reject);
+
             return;
         }
         this.accept(value);
@@ -196,11 +198,19 @@ var IMVU = IMVU || {};
             this.state = state;
         };
 
-        function tryToCall(callback, promise, argument){
+        function tryToCall(callback, promise, argument, resolver){
+            var result;
+
             try {
-                return [true, callback.call(promise, argument)];
+                result = callback.call(promise, argument);
+                resolver.resolve(result); // per spec: synchronous=true
             } catch (e) {
-                return [false, e];
+                result = e;
+                resolver.reject(result);  // per spec: synchronous=true
+
+                if (promise.exposeErrors) {
+                    throw result;
+                }
             }
         }
 
@@ -215,19 +225,7 @@ var IMVU = IMVU || {};
 
             function promiseWrapperCallback(callback) {
                 return function(argument) {
-                    var value;
-                    if (promise.exposeErrors) {
-                        value = callback.call(promise, argument);
-                    } else {
-                        var rs = tryToCall(callback, promise, argument);
-                        if (rs[0]) {
-                            value = rs[1];
-                        } else {
-                            resolver.reject(rs[1]);  // per spec: synchronous=true
-                            return;
-                        }
-                    }
-                    resolver.resolve(value); // per spec: synchronous=true
+                    tryToCall(callback, promise, argument, resolver);
                 };
             }
 
