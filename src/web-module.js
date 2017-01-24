@@ -56,21 +56,23 @@
         var depList = a[1];
 
         for (var i = 0; i < depList.length; ++i) {
-            if (depList[i][0] === '@') {
-                var alias = depList[i].substr(1);
+            var matches = /([a-z0-9]+!)?@(.+)/i.exec(depList[i]);
+            if (matches !== null) {
+                var plugin = matches[1] || '';
+                var alias = matches[2];
                 var aliasTarget = aliases[alias];
                 if (typeof aliasTarget !== 'string') {
                     throw "Unknown alias " + depList;
                 } else if (/^https?:\/\//.test(aliasTarget)) {
-                    depList[i] = aliasTarget;
+                    depList[i] = plugin + aliasTarget;
                 } else {
-                    depList[i] = require.toUrl(aliasTarget);
+                    depList[i] = plugin + require.toUrl(aliasTarget);
                 }
             }
             depList[i] = makeRelative(depList[i]);
         }
 
-        console.log('depList', depList);
+        //console.log('depList', depList);
 
         return [depNames, depList];
     }
@@ -138,9 +140,11 @@
             }
         }
 
-        console.log('requireConfig', requireConfig);
+        //console.log('requireConfig', requireConfig);
         require.config(requireConfig);
     };
+
+    module.setPlugin = function (name, fn) {};
 
     module.setLogger = function () {};
 
