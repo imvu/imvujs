@@ -1,5 +1,5 @@
 declare class BaseClass {
-    initialize(args: Object)
+    initialize(args: Object): void
     static extend(name:string, def?:Object, classDef?:Object): Function
 }
 
