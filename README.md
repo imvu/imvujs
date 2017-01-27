@@ -1,3 +1,14 @@
+# Special Note
+
+This is a particular old version that we've pinned so we know that it can be regenerated later on.
+
+The JS industry has largely standardized on RequireJS, so we are going to rework imvujs's module system
+to work atop that.
+
+This is all ok for almost everything, but requires that we delete the `module.inModuleDepenedncy` function call,
+as it cannot be effected in RequireJS.  We preserve this old version of imvujs so that some of our older products
+continue to work until we can get around to updating them.
+
 imvujs
 ======
 
@@ -53,4 +64,3 @@ The JSHint options live in `.jshintrc` at the root of this tree.
 *Setup*: The `s/pull` script just copies `s/.githooks/pre-commit` to your `.git/hooks/` directory and assures it's executable.
 
 If it's _absolutely urgent_ for you to bypass this hook, there are a couple of options: `git add --no-verify` is one, and `git commit -n` is the other. 
-
