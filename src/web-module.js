@@ -72,8 +72,6 @@
             depList[i] = makeRelative(depList[i]);
         }
 
-        //console.log('depList', depList);
-
         return [depNames, depList];
     }
 
