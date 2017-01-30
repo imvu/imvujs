@@ -98,20 +98,14 @@
         var depNames = a[0];
         var depList = a[1];
 
-        requirejs(depList, function () {
-            var oldInModuleDependency = inModuleDependency;
+        require(depList, function () {
             var args = Array.prototype.slice.call(arguments, 0);
             var depMap = {}; // name : dependency
             for (var i = 0; i < depNames.length; ++i) {
                 depMap[depNames[i]] = args[i];
             }
 
-            try {
-                inModuleDependency = true;
-                return body(depMap);
-            } finally {
-                inModuleDependency = oldInModuleDependency;
-            }
+            return body(depMap);
         });
     };
 
@@ -133,14 +127,24 @@
     module.setAlias = function (alias, path) {
         aliases[alias] = path;
 
-        requireConfig.paths = {};
         for (var key in aliases) {
             if (aliases.hasOwnProperty(key)) {
                 requireConfig.paths['@' + key] = aliases[key];
             }
         }
 
-        //console.log('requireConfig', requireConfig);
+        require.config(requireConfig);
+    };
+
+    module.config = function (config) {
+        if ('undefined' !== typeof config.paths) {
+            for (var prop in config.paths) {
+                if (config.paths.hasOwnProperty(prop)) {
+                    requireConfig.paths[prop] = config.paths[prop];
+                }
+            }
+        }
+
         require.config(requireConfig);
     };
 

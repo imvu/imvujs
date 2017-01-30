@@ -5,9 +5,9 @@ define('twig_template', ['module'], function (module) {
 
     // FIXME: What does failure mean?
     function load(name, parentRequire, onload, config) {
-        var a = name.split('!');
-        var filename = a[0];
-        var data = a[1];
+        var r = /([^!]*)(!(.*))?/.exec(name);
+        var filename = r[1];
+        var data = r[3];
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
