@@ -3,8 +3,6 @@
 (function() {
     "use strict";
 
-    var inModuleDependency = false;
-
     var aliases = {};
 
     function objectToList(o) {
@@ -153,7 +151,7 @@
     module.caching = true;
 
     module.inModuleDependency = function () {
-        return inModuleDependency;
+        return false;
     };
 
     module.allowModuleState = function () {};
