@@ -34,7 +34,6 @@ BASE_SOURCES = [
     'third-party/libxdr/libxdr.js',
     'third-party/requirejs/require.js',
     'src/twig_template_plugin.js',
-    'src/default_plugins.js',
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [

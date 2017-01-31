@@ -145,7 +145,15 @@
         require.config(requireConfig);
     };
 
-    module.setPlugin = function (name, fn) {};
+    module.setPlugin = function (name, fn) {
+        define(name, [], function() {
+            return {
+                load: function (name, parentRequire, onload, config) {
+                    return fn([name], onload);
+                }
+            };
+        });
+    };
 
     module.setLogger = function () {};
 
