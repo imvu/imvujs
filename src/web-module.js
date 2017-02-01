@@ -120,8 +120,8 @@
         require.config(requireConfig);
     };
 
-    module.setAlias = function (alias, path) {
-        aliases[alias] = path;
+    module.setAlias = function (alias, path) 
+{        aliases[alias] = path;
 
 
         for (var key in aliases) {
@@ -140,6 +140,10 @@
                     requireConfig.paths[prop] = config.paths[prop];
                 }
             }
+        }
+
+        if ('undefined' !== typeof config.baseUrl) {
+            requireConfig.baseUrl = config.baseUrl;
         }
 
         require.config(requireConfig);
