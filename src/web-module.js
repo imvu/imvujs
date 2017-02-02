@@ -66,7 +66,7 @@
                 } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
                 } else if (/^[\.\/]/.test(name)) {
                 } else if (/^\/asset/.test(name)) {
-                    depList[i] = plugin + '://webasset-akm.imvu.com/asset';
+                    depList[i] = plugin + '://webasset-akm.imvu.com' + name;
                 } else {
                     depList[i] = plugin + './' + name;
                 }
