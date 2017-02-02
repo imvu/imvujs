@@ -63,10 +63,10 @@
 
                 if ('string' === typeof aliases[name]) {
                     depList[i] = plugin + aliases[name];
-                } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
-                } else if (/^[\.\/]/.test(name)) {
                 } else if (/^\/asset/.test(name)) {
                     depList[i] = plugin + '://webasset-akm.imvu.com' + name;
+                } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
+                } else if (/^[\.\/]/.test(name)) {
                 } else {
                     depList[i] = plugin + './' + name;
                 }
