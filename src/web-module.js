@@ -48,7 +48,7 @@
         }
     }
 
-    function preprocessDeps(dependencies) {
+    function preprocessDeps(dependencies, innerRequire) {
         var a = objectToList(dependencies);
         var depNames = a[0];
         var depList = a[1];
@@ -64,7 +64,7 @@
                 } else if (/^https?:\/\//.test(aliasTarget)) {
                     depList[i] = plugin + aliasTarget;
                 } else {
-                    depList[i] = plugin + require.toUrl(aliasTarget);
+                    depList[i] = plugin + innerRequire.toUrl(aliasTarget);
                 }
             }
             depList[i] = makeRelative(depList[i]);
@@ -73,19 +73,29 @@
         return [depNames, depList];
     }
 
+    var currentRequire = require;
     function module(dependencies, body) {
-        var a = preprocessDeps(dependencies);
+        var a = preprocessDeps(dependencies, currentRequire);
         var depNames = a[0];
         var depList = a[1];
 
-        define(depList, function () {
-            var args = Array.prototype.slice.call(arguments, 0);
+        depList.unshift('require');
+
+        define(depList, function (innerRequire) {
+            var saveCurrentRequire = currentRequire;
+            currentRequire = innerRequire;
+
+            var args = Array.prototype.slice.call(arguments, 1);
             var depMap = {}; // name : dependency
             for (var i = 0; i < depNames.length; ++i) {
                 depMap[depNames[i]] = args[i];
             }
 
-            return body(depMap);
+            try {
+                return body(depMap);
+            } finally {
+                currentRequire = saveCurrentRequire;
+            }
         });
     }
 
