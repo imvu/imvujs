@@ -56,7 +56,7 @@
         for (var i = 0; i < depList.length; ++i) {
             var old = depList[i];
 
-            var matches = /([a-z0-9]*!)?(.*)/i.exec(depList[i]);
+            var matches = /([a-z0-9_]*!)?(.*)/i.exec(depList[i]);
             if (matches !== null) {
                 var plugin = matches[1] || '';
                 var name = matches[2];
