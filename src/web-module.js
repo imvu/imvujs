@@ -65,6 +65,8 @@
                     depList[i] = plugin + aliases[name];
                 } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
                 } else if (/^[\.\/]/.test(name)) {
+                } else if (/^\/asset/.test(name)) {
+                    depList[i] = plugin + '://webasset-akm.imvu.com/asset';
                 } else {
                     depList[i] = plugin + './' + name;
                 }
