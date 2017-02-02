@@ -48,54 +48,45 @@
         }
     }
 
-    function preprocessDeps(dependencies, innerRequire) {
+    function preprocessDeps(dependencies) {
         var a = objectToList(dependencies);
         var depNames = a[0];
         var depList = a[1];
 
         for (var i = 0; i < depList.length; ++i) {
-            var matches = /([a-z0-9]+!)?@(.+)/i.exec(depList[i]);
+            var old = depList[i];
+
+            var matches = /([a-z0-9]*!)?(.*)/i.exec(depList[i]);
             if (matches !== null) {
                 var plugin = matches[1] || '';
-                var alias = matches[2];
-                var aliasTarget = aliases[alias];
-                if (typeof aliasTarget !== 'string') {
-                    throw "Unknown alias " + depList;
-                } else if (/^https?:\/\//.test(aliasTarget)) {
-                    depList[i] = plugin + aliasTarget;
+                var name = matches[2];
+
+                if ('string' === typeof aliases[name]) {
+                    depList[i] = plugin + aliases[name];
+                } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
+                } else if (/^[\.\/]/.test(name)) {
                 } else {
-                    depList[i] = plugin + innerRequire.toUrl(aliasTarget);
+                    depList[i] = plugin + './' + name;
                 }
             }
-            depList[i] = makeRelative(depList[i]);
         }
 
         return [depNames, depList];
     }
 
-    var currentRequire = require;
     function module(dependencies, body) {
-        var a = preprocessDeps(dependencies, currentRequire);
+        var a = preprocessDeps(dependencies);
         var depNames = a[0];
         var depList = a[1];
 
-        depList.unshift('require');
-
         define(depList, function (innerRequire) {
-            var saveCurrentRequire = currentRequire;
-            currentRequire = innerRequire;
-
-            var args = Array.prototype.slice.call(arguments, 1);
+            var args = Array.prototype.slice.call(arguments, 0);
             var depMap = {}; // name : dependency
             for (var i = 0; i < depNames.length; ++i) {
                 depMap[depNames[i]] = args[i];
             }
 
-            try {
-                return body(depMap);
-            } finally {
-                currentRequire = saveCurrentRequire;
-            }
+            return body(depMap);
         });
     }
 
@@ -131,7 +122,7 @@
     };
 
     module.setAlias = function (alias, path) 
-{        aliases[alias] = path;
+{        aliases['@' + alias] = path;
 
 
         for (var key in aliases) {
