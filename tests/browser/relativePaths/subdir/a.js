@@ -1,5 +1,5 @@
 module({
-    b: 'another/b.js',
+    b:'another/b.js',
     c: 'c.js'
 }, function(imports) {
     return {

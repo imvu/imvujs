@@ -1,6 +1,6 @@
 
 module({
-    c: 'c.js'
+    c: '../c.js'
 }, function(imports) {
     return {
         invoke: function() {
