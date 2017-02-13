@@ -17,7 +17,8 @@ module({
                 type: 'test-complete',
                 success: false,
                 stack: 'No stack available',
-                name: window.location.hash.substr(1)
+                name: window.location.hash.substr(1),
+                message: url + '(' + lineNumber + '): ' + errorMsg
             });
         },
 
