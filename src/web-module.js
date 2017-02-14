@@ -123,13 +123,12 @@
         require.config(requireConfig);
     };
 
-    module.setAlias = function (alias, path) 
-{        aliases['@' + alias] = path;
-
+    module.setAlias = function (alias, path) {
+        aliases['@' + alias] = path;
 
         for (var key in aliases) {
             if (aliases.hasOwnProperty(key)) {
-                requireConfig.paths['@' + key] = aliases[key].replace(/\.js$/, '');
+                requireConfig.paths[key] = aliases[key].replace(/\.js$/, '');
             }
         }
 
