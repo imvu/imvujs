@@ -62,7 +62,7 @@
                 var name = matches[2];
 
                 if ('string' === typeof aliases[name]) {
-                    depList[i] = plugin + aliases[name];
+                    // Pass the string on to require verbatim.  Do not treat it like a relative path.
                 } else if (/^\/asset/.test(name)) {
                     depList[i] = plugin + '//webasset-akm.imvu.com' + name;
                 } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
@@ -109,6 +109,7 @@
     };
 
     var requireConfig = {
+        map: {'*': {}},
         paths: {}
     };
 
@@ -128,7 +129,7 @@
 
         for (var key in aliases) {
             if (aliases.hasOwnProperty(key)) {
-                requireConfig.paths[key] = aliases[key].replace(/\.js$/, '');
+                requireConfig.map['*'][key] = aliases[key];
             }
         }
 
