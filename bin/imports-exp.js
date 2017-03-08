@@ -1,6 +1,36 @@
 /*global console*/
 var net = require('net');
- 
+var fs = require('fs');
+
+var postcss = require('postcss');
+var url = require('postcss-url');
+var trim = require("lodash.trim");
+
+function cleanupRemoteFile(value) {
+    if (value.substr(0, 3) === "url") {
+        value = value.substr(3);
+    }
+    value = trim(value, "'\"()");
+    return value;
+}
+
+var space = postcss.list.space;
+
+var atimporturl = postcss.plugin('myplugin', function (options) {
+
+    return function (css) {
+        options = options || {};
+        var registry = options.registry;
+        css.walkAtRules('import', function (rule) {
+            var params = space(rule.params);
+            var p = cleanupRemoteFile(params[0]);
+            if(!registry[p])
+                registry[p] = '___$$$_URL_$$$___' + (++options.index);
+            rule.params = 'url(' + registry[p] + ')';
+        });
+    };
+});
+
 var server = net.createServer(function (socket) {
  
   // Handle incoming messages from clients.
@@ -9,6 +39,7 @@ var server = net.createServer(function (socket) {
     if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
+          socket.end();
         }
         catch(e) {
         }
@@ -22,12 +53,45 @@ var server = net.createServer(function (socket) {
         catch(e) {
           socket.write('failed');
         }
+        socket.end();
+    }
+    else if(command.match(/^parse /)) {
+        try {
+            var fname = command.substr(6);
+            console.log(command);
+            fs.readFile(fname, 'utf8', function(e, d) {
+            if(d) {
+                var options = {index:1, registry: {}};
+                var output = postcss()
+                  .use(atimporturl(options))
+                  .use(url({url : function(URL, decl, from, dirname, to, opts) {
+                    if(!options.registry[URL])
+                        options.registry[URL] = '___$$$_URL_$$$___' + (++options.index);
+                        return options.registry[URL];
+                    }})
+                  )
+                  .process(d, {});
+                socket.write(JSON.stringify({urls: options.registry, 
+                    css: output.css}));
+                socket.end();
+            }
+            else {
+                socket.write(JSON.stringify({}));
+                socket.end();
+            }
+            });
+        }
+        catch(e) {
+          socket.write(JSON.stringify({}));
+          socket.end();
+        }
+
     }
     else if(command.match(/^shutdown/)) {
+       socket.end();
        server.close();
        console.log('Server closed by client');
     }
-    socket.end();
   });
   
 });
