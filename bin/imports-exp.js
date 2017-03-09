@@ -10,7 +10,7 @@ function cleanupRemoteFile(value) {
     if (value.substr(0, 3) === "url") {
         value = value.substr(3);
     }
-    value = trim(value, "'\"()");
+    value = trim(value, "'\"() ");
     return value;
 }
 
