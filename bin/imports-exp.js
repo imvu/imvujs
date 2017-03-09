@@ -65,8 +65,9 @@ var server = net.createServer(function (socket) {
                 var output = postcss()
                   .use(atimporturl(options))
                   .use(url({url : function(URL, decl, from, dirname, to, opts) {
+                    console.log(decl.value);
                     var params = space(decl.value);
-                    var p = cleanupRemoteFile(params[0]);
+                    var p = cleanupRemoteFile(params.find(function(s) { return s.startsWith('url(');}));
                     if(!options.registry[p])
                         options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
                     return options.registry[p];
