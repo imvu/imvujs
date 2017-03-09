@@ -66,11 +66,21 @@ var server = net.createServer(function (socket) {
                 var options = {index:1, registry: {}};
                 var output = postcss()
                   .use(atimporturl(options))
-                  .use(url({url : function(URL, decl, from, dirname, to, opts, result) {
+                  .use(url({url : function(purl, decl, from, dirname, to, opts, result) {
                     var params = space(decl.value);
-                    var p = cleanupRemoteFile(params.find(function(s) { return s.startsWith('url(');}));
-                    if(!p)
-                        return decl.value;
+                    var nested = !params.some(function(pp) {
+                        if(pp.startsWith("url")) {
+                            var px = cleanupRemoteFile(pp);
+                            if(px.indexOf(purl) === 0)
+                                return true;
+                        }           
+                        return false;
+                    }
+                    );
+                    if(nested)
+                        return purl;
+
+                    var p = purl;
                     if(!options.registry[p])
                         options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
                     return options.registry[p];
