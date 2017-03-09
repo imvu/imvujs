@@ -10,13 +10,13 @@ function cleanupRemoteFile(value) {
     if (value.substr(0, 3) === "url") {
         value = value.substr(3);
     }
-    value = trim(value, "'\"() ");
+    value = trim(value, "'\"(), ");
     return value;
 }
 
 var space = postcss.list.space;
 
-var atimporturl = postcss.plugin('myplugin', function (options) {
+var atimporturl = postcss.plugin('atimplg', function (options) {
 
     return function (css) {
         options = options || {};
@@ -65,9 +65,11 @@ var server = net.createServer(function (socket) {
                 var output = postcss()
                   .use(atimporturl(options))
                   .use(url({url : function(URL, decl, from, dirname, to, opts) {
-                    if(!options.registry[URL])
-                        options.registry[URL] = '___$$$_URL_$$$___' + (++options.index);
-                        return options.registry[URL];
+                    var params = space(decl.value);
+                    var p = cleanupRemoteFile(params[0]);
+                    if(!options.registry[p])
+                        options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
+                    return options.registry[p];
                     }})
                   )
                   .process(d, {});
