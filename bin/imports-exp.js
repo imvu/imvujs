@@ -7,6 +7,8 @@ var url = require('postcss-url');
 var trim = require("lodash.trim");
 
 function cleanupRemoteFile(value) {
+    if(!value)
+        return value;
     if (value.substr(0, 3) === "url") {
         value = value.substr(3);
     }
@@ -64,10 +66,11 @@ var server = net.createServer(function (socket) {
                 var options = {index:1, registry: {}};
                 var output = postcss()
                   .use(atimporturl(options))
-                  .use(url({url : function(URL, decl, from, dirname, to, opts) {
-                    console.log(decl.value);
+                  .use(url({url : function(URL, decl, from, dirname, to, opts, result) {
                     var params = space(decl.value);
                     var p = cleanupRemoteFile(params.find(function(s) { return s.startsWith('url(');}));
+                    if(!p)
+                        return decl.value;
                     if(!options.registry[p])
                         options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
                     return options.registry[p];
