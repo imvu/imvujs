@@ -18,25 +18,41 @@ function cleanupRemoteFile(value) {
 
 var space = postcss.list.space;
 
-var atimporturl = postcss.plugin('atimplg', function (options) {
+var atimporturl = postcss.plugin('atimplg', function(options) {
 
-    return function (css) {
+    return function(css) {
         options = options || {};
         var registry = options.registry;
-        css.walkAtRules('import', function (rule) {
+        css.walkAtRules('import', function(rule) {
             var params = space(rule.params);
             var p = cleanupRemoteFile(params[0]);
-            if(!registry[p])
-                registry[p] = '___$$$_URL_$$$___' + (++options.index);
+            if(!registry.hasOwnProperty(p))
+                registry[p] = '___$$$_URL_$$$___' + (options.index++);
             rule.params = 'url(' + registry[p] + ')';
         });
+/*
+        css.walkDecls(/^(src|background|filter|list-style|behavior|cursor)/, decl => {
+            var val = decl.value;
+            if(val.indexOf('url(') >= 0) {
+                var ps = space(val);
+                ps.forEach( (p, indx, arr) => {
+                    if(p.indexOf('url(') == 0) {
+                        var purl = cleanupRemoteFile(p);
+                        if(!options.registry.hasOwnProperty(purl))
+                            options.registry[purl] = '___$$$_URL_$$$___' + (options.index++);
+                        arr[indx] = options.registry[purl];
+                    }
+                });
+                decl.value = ps.join(' ');
+            }
+        });
+        */
     };
 });
 
-var server = net.createServer(function (socket) {
- 
+var server = net.createServer(function(socket) {
   // Handle incoming messages from clients.
-  socket.on('data', function (data) {
+  socket.on('data', function(data) {
     var command = data.toString();
     if(command.match(/^scan /)) {
         try {
@@ -85,7 +101,7 @@ var server = net.createServer(function (socket) {
                         options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
                     return options.registry[p];
                     }})
-                  )
+                  )  
                   .process(d, {});
                 socket.write(JSON.stringify({urls: options.registry, 
                     css: output.css}));
@@ -115,19 +131,19 @@ var server = net.createServer(function (socket) {
 var port = process.argv.length > 2? process.argv[2]:'/tmp/bb-imports.sock';
 server.listen(port);
 
-process.on('SIGTERM', function () {
+process.on('SIGTERM', function() {
   console.log('Server closed');
-  server.close(function () {
-  });
+  server.close(function() {});
 }); 
 
 console.log("import server running at " + port + "\n");
 
 var fs     = require('fs');
 var combine = require('./combine.js');
+var lastModule = { name: "", module: null};
 
 function replace_imports(input, output, replacements) {
-    var module = combine.loadModule(input);
+    var module = input.equals(lastModule.name)? lastModule.module : combine.loadModule(input);
     var deps = module.deps;
     var new_deps = {};
     for (var m in deps) {
@@ -155,6 +171,8 @@ function scan_dependencies(rootPath) {
     var depstr = '';
     try {
         module = combine.loadModule(rootPath);
+        lastModule.name = rootPath;
+        lastModule.module = module;
     }
     catch (e) {
         if (e instanceof combine.ScriptError) {
