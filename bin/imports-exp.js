@@ -7,6 +7,14 @@ var url = require('postcss-url');
 var trim = require("lodash.trim");
 var combine = require('./combine.js');
 
+var LRU = require("lru-cache"),
+   options = { max: 50,
+               length: function (n, key) { return 1 << 22; },
+               dispose: function (key, n) { },
+               maxAge: 1000 * 60 },
+   cache = LRU(options),
+   otherCache = LRU(50) ; // sets just the max size
+
 function cleanupRemoteFile(value) {
     if(!value)
         return value;
@@ -142,11 +150,16 @@ process.on('SIGTERM', function() {
 console.log("import server running at " + port + "\n");
 
 var fs  = require('fs');
-var lastModule = { name: "", module: null};
 
 function replace_imports(input, output, replacements) {
-    var module = input === lastModule.name ?  lastModule.module : 
-         combine.loadModule(input);
+    var module;
+
+    if(cache.has(input))
+        module = cache.get(input);
+    else {
+        module = combine.loadModule(input);
+        cache.set(input, module, 1000 * 60);
+    }
     var deps = module.deps;
     var new_deps = {};
     for (var m in deps) {
@@ -169,13 +182,16 @@ function replace_imports(input, output, replacements) {
     fs.writeFileSync(output, combine.gen_code(new_ast, {beautify: /\.min\.js$/.exec(input) === null}));
 }
 
-function scan_dependencies(rootPath) {
+function scan_dependencies(input) {
     var module;
     var depstr = '';
     try {
-        module = combine.loadModule(rootPath);
-        lastModule.name = rootPath;
-        lastModule.module = module;
+        if(cache.has(input))
+            module = cache.get(input);
+        else {
+            module = combine.loadModule(input);
+            cache.set(input, module, 1000 * 60);
+        }
     }
     catch (e) {
         if (e instanceof combine.ScriptError) {
