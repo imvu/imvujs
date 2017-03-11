@@ -5,6 +5,7 @@ var fs = require('fs');
 var postcss = require('postcss');
 var url = require('postcss-url');
 var trim = require("lodash.trim");
+var combine = require('./combine.js');
 
 function cleanupRemoteFile(value) {
     if(!value)
@@ -54,12 +55,15 @@ var server = net.createServer(function(socket) {
   // Handle incoming messages from clients.
   socket.on('data', function(data) {
     var command = data.toString();
+    console.log(command);
     if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
           socket.end();
         }
         catch(e) {
+          socket.write(JSON.stringify({'error' : e.message}));
+          socket.end();
         }
     }
     else if(command.match(/^fix /)) {
@@ -76,7 +80,6 @@ var server = net.createServer(function(socket) {
     else if(command.match(/^parse /)) {
         try {
             var fname = command.substr(6);
-            console.log(command);
             fs.readFile(fname, 'utf8', function(e, d) {
             if(d) {
                 var options = {index:1, registry: {}};
@@ -133,17 +136,17 @@ server.listen(port);
 
 process.on('SIGTERM', function() {
   console.log('Server closed');
-  server.close(function() {});
+  server.close(function() { fs.unlinkSync(process.arv[2]); });
 }); 
 
 console.log("import server running at " + port + "\n");
 
-var fs     = require('fs');
-var combine = require('./combine.js');
+var fs  = require('fs');
 var lastModule = { name: "", module: null};
 
 function replace_imports(input, output, replacements) {
-    var module = input.equals(lastModule.name)? lastModule.module : combine.loadModule(input);
+    var module = input === lastModule.name ?  lastModule.module : 
+         combine.loadModule(input);
     var deps = module.deps;
     var new_deps = {};
     for (var m in deps) {
@@ -188,7 +191,6 @@ function scan_dependencies(rootPath) {
             depstr += deps[m] + '\n';
         }
     }
-    console.log(depstr);
     return depstr;
 }
 
