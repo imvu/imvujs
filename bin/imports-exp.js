@@ -15,6 +15,26 @@ var LRU = require("lru-cache"),
    cache = LRU(options),
    otherCache = LRU(50) ; // sets just the max size
 
+var fs = require('fs');
+var acorn = require('acorn/dist/acorn_loose');
+var walk = require('acorn/dist/walk');
+
+function loadModule(filename) {
+    var code = fs.readFileSync(filename, 'utf8');
+    var ast;
+    var ast = acorn.parse_dammit(code, { sourceType : 'module'});
+    var node = walk.findNodeAt(ast, null, null, function(type, node) {
+        return type === 'CallExpression' &&
+            node.callee.type === 'Identifier' &&
+            node.callee.name === 'module' &&
+            node.arguments.length === 2 &&
+            node.arguments[0].type === 'ObjectExpression' &&
+            node.arguments[1].type === 'FunctionExpression';
+    });
+    return node? { deps: node.node.arguments[0].properties, body: node.node.arguments[1]} : null;
+}
+
+
 function cleanupRemoteFile(value) {
     if(!value)
         return value;
@@ -67,6 +87,16 @@ var server = net.createServer(function(socket) {
     if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
+          socket.end();
+        }
+        catch(e) {
+          socket.write(JSON.stringify({'error' : e.message}));
+          socket.end();
+        }
+    }
+    else if(command.match(/^scan2 /)) {
+        try {
+          socket.write(scan_dependencies2(command.substr(6)));
           socket.end();
         }
         catch(e) {
@@ -179,10 +209,17 @@ function replace_imports(input, output, replacements) {
     var new_ast = combine.saveModule(new_module);
 
     // TODO: this could be a commandline arg, but then we'd have to have sane argument parsing below.
-    fs.writeFileSync(output, combine.gen_code(new_ast, {beautify: /\.min\.js$/.exec(input) === null}));
+    fs.writeFile(output, combine.gen_code(new_ast, {beautify: /\.min\.js$/.exec(input) === null}), function(err) {});
 }
 
 function scan_dependencies(input) {
+    var module;
+    module = loadModule(input);
+
+    return module ? module.deps.map(function(e) { return e.value.value; }).join('\n') : '';
+}
+
+function scan_dependencies2(input) {
     var module;
     var depstr = '';
     try {
