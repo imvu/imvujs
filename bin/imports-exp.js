@@ -209,7 +209,7 @@ function replace_imports(input, output, replacements) {
     var new_ast = combine.saveModule(new_module);
 
     // TODO: this could be a commandline arg, but then we'd have to have sane argument parsing below.
-    fs.writeFile(output, combine.gen_code(new_ast, {beautify: /\.min\.js$/.exec(input) === null}), function(err) {});
+    fs.writeFileSync(output, combine.gen_code(new_ast, {beautify: /\.min\.js$/.exec(input) === null}));
 }
 
 function scan_dependencies(input) {
