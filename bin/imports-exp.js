@@ -16,13 +16,21 @@ var LRU = require("lru-cache"),
    otherCache = LRU(50) ; // sets just the max size
 
 var fs = require('fs');
-var acorn = require('acorn/dist/acorn_loose');
+var acorn = require('acorn');
+var acorn_loose = require('acorn/dist/acorn_loose');
 var walk = require('acorn/dist/walk');
 
 function loadModule(filename) {
     var code = fs.readFileSync(filename, 'utf8');
     var ast;
-    var ast = acorn.parse_dammit(code, { sourceType : 'module'});
+    var ast = null;
+    try {
+        ast = acorn.parse(code, { sourceType : 'module'});
+    }
+    catch(e) {
+        //ast = acorn_loose.parse_dammit(code, { sourceType : 'module'});
+        return null;
+    }
     var node = walk.findNodeAt(ast, null, null, function(type, node) {
         return type === 'CallExpression' &&
             node.callee.type === 'Identifier' &&
@@ -216,7 +224,7 @@ function scan_dependencies(input) {
     var module;
     module = loadModule(input);
 
-    return module ? module.deps.map(function(e) { return e.value.value; }).join('\n') : '';
+    return module ? module.deps.map(function(e) { return e.value.value; }).join('\n') : scan_dependencies2(input);
 }
 
 function scan_dependencies2(input) {
