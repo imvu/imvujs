@@ -22,15 +22,7 @@ var walk = require('acorn/dist/walk');
 
 function loadModule(filename) {
     var code = fs.readFileSync(filename, 'utf8');
-    var ast;
-    var ast = null;
-    try {
-        ast = acorn.parse(code, { sourceType : 'module'});
-    }
-    catch(e) {
-        //ast = acorn_loose.parse_dammit(code, { sourceType : 'module'});
-        return null;
-    }
+    var ast = acorn.parse(code, { sourceType : 'module'});
     var node = walk.findNodeAt(ast, null, null, function(type, node) {
         return type === 'CallExpression' &&
             node.callee.type === 'Identifier' &&
@@ -91,7 +83,7 @@ var server = net.createServer(function(socket) {
   // Handle incoming messages from clients.
   socket.on('data', function(data) {
     var command = data.toString();
-    console.log(command);
+    //console.log(command);
     if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
@@ -222,9 +214,14 @@ function replace_imports(input, output, replacements) {
 
 function scan_dependencies(input) {
     var module;
-    module = loadModule(input);
-
-    return module ? module.deps.map(function(e) { return e.value.value; }).join('\n') : scan_dependencies2(input);
+    try {
+        module = loadModule(input);
+        return module? module.deps.map(function(e) { return e.value.value; }).join('\n') : '';
+    }
+    catch(e) {
+        console.log(input + ":" + e.message);
+        return scan_dependencies2(input);
+    }
 }
 
 function scan_dependencies2(input) {
