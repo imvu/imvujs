@@ -228,6 +228,24 @@ var IMVU = IMVU || {};
         return URIQuery.fromString(this.getQuery(), this.querySeparator);
     };
 
+    URI.buildQuery = function(params, options) {
+        var query = new IMVU.URIQuery();
+        var keys = Object.keys(params).sort();
+        var prune = options && options.prune;
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = params[key];
+            if (params[key] === '' && prune) {
+                continue;
+            }
+            if (!query.params.hasOwnProperty(key)) {
+                query.params[key] = [];
+            }
+            query.params[key].push(encodeURIComponent(value + ''));
+        }
+        return query.toString();
+    };
+
     //// URIQuery CLASS /////
 
     var URIQuery = function () {

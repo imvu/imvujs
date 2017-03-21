@@ -59,3 +59,29 @@ test('setFragment', function() {
     uri.setFragment('foobar');
     assert.equal('http://username:password@localhost.imvu.com:80/next/home/?key=value#foobar', uri.toString());
 });
+
+test('buildQuery stringifies keys, sorts keys, and URI encodes values', function() {
+    assert.equal('a=1&b=two&c=3.1415&d=9%2C2&e=6%2C5', IMVU.URI.buildQuery({
+        d: [9, 2],
+        a: 1,
+        c: 3.1415,
+        b: 'two',
+        e: '6,5'
+    }));
+})
+
+test('buildQuery keeps keys with empty string values by default', function() {
+    assert.equal('a=1&b=&c=3', IMVU.URI.buildQuery({
+        a: 1,
+        b: '',
+        c: 3,
+    }));
+});
+
+test('buildQuery can prune keys with empty string values', function() {
+    assert.equal('a=1&c=3', IMVU.URI.buildQuery({
+        a: 1,
+        b: '',
+        c: 3,
+    }, {prune: true}));
+});
