@@ -230,7 +230,7 @@ var IMVU = IMVU || {};
 
     URI.buildQuery = function(params, options) {
         var query = new IMVU.URIQuery();
-        var keys = Object.keys(params).sort();
+        var keys = Object.keys(params);
         var prune = options && options.prune;
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -244,6 +244,33 @@ var IMVU = IMVU || {};
             query.params[key].push(encodeURIComponent(value + ''));
         }
         return query.toString();
+    };
+
+    URI.build = function(uri, newQueryParams) {
+        var uri = new IMVU.URI(uri);
+        var existingQueryParams = {};
+        var mergedQueryParams = {};
+
+        // parseQuery() explodes if there's no query.
+        if (uri.getQuery()) {
+            existingQueryParams = uri.parseQuery().params;
+        }
+
+
+        // fromString()'s values are arrays, so stringify before merging.
+        // In practice, we don't use array/keyed query params. Instead,
+        // we comma-delimit.
+        Object.keys(existingQueryParams).forEach(function (key) {
+            mergedQueryParams[key] = existingQueryParams[key] + '';
+        });
+
+        Object.keys(newQueryParams).forEach(function (key) {
+            mergedQueryParams[key] = newQueryParams[key];
+        });
+
+        uri.setQuery(IMVU.URI.buildQuery(mergedQueryParams));
+
+        return uri.toString();
     };
 
     //// URIQuery CLASS /////

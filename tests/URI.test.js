@@ -1,4 +1,5 @@
 var URL = 'http://username:password@localhost.imvu.com:80/next/home/?key=value#fragment';
+var URL_NO_QUERY = 'http://username:password@localhost.imvu.com:80/next/home/#fragment';
 
 test('toString', function() {
     var uri = new IMVU.URI(URL);
@@ -84,4 +85,20 @@ test('buildQuery can prune keys with empty string values', function() {
         b: '',
         c: 3,
     }, {prune: true}));
+});
+
+test('build can construct full URL and add query params', function() {
+    assert.equal(
+        'http://username:password@localhost.imvu.com:80/next/home/' +
+            '?height=768&width=1024#fragment',
+        IMVU.URI.build(URL_NO_QUERY, {width: 1024, height: 768})
+    );
+});
+
+test('build can construct full URL and merge query params', function() {
+    assert.equal(
+        'http://username:password@localhost.imvu.com:80/next/home/' +
+            '?height=768&key=value&width=1024#fragment',
+        IMVU.URI.build(URL, {width: 1024, height: 768})
+    );
 });
