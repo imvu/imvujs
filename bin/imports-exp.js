@@ -56,7 +56,7 @@ var atimporturl = postcss.plugin('atimplg', function(options) {
             var params = space(rule.params);
             var p = cleanupRemoteFile(params[0]);
             if(!registry.hasOwnProperty(p))
-                registry[p] = '___$$$_URL_$$$___' + (options.index++);
+                registry[p] = '___$$$_URL_$$$___' + (options.index++) + '__';
             rule.params = 'url(' + registry[p] + ')';
         });
 /*
@@ -68,7 +68,7 @@ var atimporturl = postcss.plugin('atimplg', function(options) {
                     if(p.indexOf('url(') == 0) {
                         var purl = cleanupRemoteFile(p);
                         if(!options.registry.hasOwnProperty(purl))
-                            options.registry[purl] = '___$$$_URL_$$$___' + (options.index++);
+                            options.registry[purl] = '___$$$_URL_$$$___' + (options.index++) + '__';
                         arr[indx] = options.registry[purl];
                     }
                 });
@@ -139,7 +139,7 @@ var server = net.createServer(function(socket) {
 
                     var p = purl;
                     if(!options.registry[p])
-                        options.registry[p] = '___$$$_URL_$$$___' + (++options.index);
+                        options.registry[p] = '___$$$_URL_$$$___' + (++options.index) + '__';
                     return options.registry[p];
                     }})
                   )  
