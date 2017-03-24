@@ -102,3 +102,11 @@ test('build can construct full URL and merge query params', function() {
         IMVU.URI.build(URL, {width: 1024, height: 768})
     );
 });
+
+test('build can prune keys with empty string values too', function() {
+    assert.equal(
+        'http://username:password@localhost.imvu.com:80/next/home/' +
+            '?key=value&width=1024#fragment',
+        IMVU.URI.build(URL, {width: 1024, height: ''}, {prune: true})
+    );
+});

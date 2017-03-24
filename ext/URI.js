@@ -246,7 +246,7 @@ var IMVU = IMVU || {};
         return query.toString();
     };
 
-    URI.build = function(uri, newQueryParams) {
+    URI.build = function(uri, newQueryParams, options) {
         var uri = new IMVU.URI(uri);
         var existingQueryParams = {};
         var mergedQueryParams = {};
@@ -268,7 +268,7 @@ var IMVU = IMVU || {};
             mergedQueryParams[key] = newQueryParams[key];
         });
 
-        uri.setQuery(IMVU.URI.buildQuery(mergedQueryParams));
+        uri.setQuery(IMVU.URI.buildQuery(mergedQueryParams, options));
 
         return uri.toString();
     };
