@@ -5,7 +5,7 @@ var fs = require('fs');
 var postcss = require('postcss');
 var url = require('postcss-url');
 var trim = require("lodash.trim");
-var combine = require('./combine.js');
+var combine = require('./fix-imports.js');
 
 var LRU = require("lru-cache"),
    options = { max: 50,
@@ -19,6 +19,8 @@ var fs = require('fs');
 var acorn = require('acorn');
 var acorn_loose = require('acorn/dist/acorn_loose');
 var walk = require('acorn/dist/walk');
+
+var times = {scan:0, fix:0, parse:0};
 
 function loadModule(filename) {
     var code = fs.readFileSync(filename, 'utf8');
@@ -83,26 +85,26 @@ var server = net.createServer(function(socket) {
   // Handle incoming messages from clients.
   socket.on('data', function(data) {
     var command = data.toString();
+    var t1 = Date.now();
     //console.log(command);
     if(command.match(/^scan /)) {
         try {
           socket.write(scan_dependencies(command.substr(5)));
-          socket.end();
         }
         catch(e) {
           socket.write(JSON.stringify({'error' : e.message}));
-          socket.end();
         }
+        socket.end();
+        times.scan += Date.now() - t1;
     }
     else if(command.match(/^scan2 /)) {
         try {
           socket.write(scan_dependencies2(command.substr(6)));
-          socket.end();
         }
         catch(e) {
           socket.write(JSON.stringify({'error' : e.message}));
-          socket.end();
         }
+        socket.end();
     }
     else if(command.match(/^fix /)) {
         try {
@@ -114,6 +116,7 @@ var server = net.createServer(function(socket) {
           socket.write('failed');
         }
         socket.end();
+        times.fix += Date.now() - t1;
     }
     else if(command.match(/^parse /)) {
         try {
@@ -146,12 +149,12 @@ var server = net.createServer(function(socket) {
                   .process(d, {});
                 socket.write(JSON.stringify({urls: options.registry, 
                     css: output.css}));
-                socket.end();
             }
             else {
                 socket.write(JSON.stringify({}));
-                socket.end();
             }
+            socket.end();
+            times.parse += Date.now() - t1;
             });
         }
         catch(e) {
@@ -163,6 +166,7 @@ var server = net.createServer(function(socket) {
     else if(command.match(/^shutdown/)) {
        socket.end();
        server.close();
+       console.log(times);
        console.log('Server closed by client');
     }
   });

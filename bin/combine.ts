@@ -8,7 +8,7 @@
 ///<reference path="combine_util.ts"/>
 
 import combine_util = require('combine_util');
-import uglify       = require('uglify-js');
+import uglify = require('uglify-js');
 import _            = require('underscore');
 import fs           = require('fs');
 import path         = require('path');
