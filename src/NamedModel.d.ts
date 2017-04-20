@@ -3,7 +3,8 @@ import BaseClass from 'imvu/BaseClass'
 // This class is created in ./NamedBackbone.js
 declare class NamedModel extends BaseClass /*TODO: extends Backbone.Model*/ {
     attributes: any
-    readonly id:any
+    readonly id?:number|string
+    readonly cid:string
     constructor(opts:any)
 
     get(prop:string): any
