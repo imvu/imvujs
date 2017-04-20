@@ -11,10 +11,16 @@ declare class NamedCollection<T> extends BaseClass /*TODO: extends Backbone.Coll
     add(models:T | T[], options?:any): T[]
     remove(models:T | T[], options?:any): T[]
     reset(models?:T | T[] | null, options?:any): void
+
     map(
         iteratee:(item:T, index?:number, collection?:NamedCollection<T>) => any,
         context?:any
     ): any[]
+
+    filter(
+        predicate:(item:T) => boolean,
+        context?:any
+    ): T[]
 
     // ... add props/methods as needed ...
 
