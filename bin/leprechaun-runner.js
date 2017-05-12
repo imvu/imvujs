@@ -35,6 +35,7 @@ Runner.prototype = {
 
     start: function () {
         this.startTime = new Date();
+        leprechaun.log('Leprechaun user agent: ' + navigator.userAgent);
         leprechaun.log('Running '+ this.tests.length + ' tests.');
         this.nextTest();
     },
