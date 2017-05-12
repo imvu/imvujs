@@ -1,6 +1,9 @@
 declare class BaseClass {
-    initialize(args: Object): void
-    static extend(name:string, def?:Object, classDef?:Object): Function
+    dependencies?:string[]
+    initialize(any): void
+
+    // TODO: type parameter: static extend<T>(...
+    static extend(name:string, def?:Object, classDef?:Object): any
 }
 
 export default BaseClass
