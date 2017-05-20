@@ -56,7 +56,8 @@ var IMVU = IMVU || {};
 
             var missing = _.reject(
                 dependencies,
-                _.has.bind(undefined, options));
+                function (dep) {return _.has(options, dep);}
+            );
             if (missing.length) {
                 throw new ReferenceError('Unsatisfied dependencies "' + missing.join(', ') + '" when constructing ' + type.name);
             }

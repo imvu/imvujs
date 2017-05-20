@@ -4,7 +4,9 @@ var IMVU = IMVU || {};
     function BaseClass() {
     }
 
-    BaseClass.extend = function (name, def, classDef) {
+    BaseClass.extend = function (name, def, statics) {
+        statics = statics || {};
+
         if (typeof name !== "string" || null === name.match(/[a-z_][0-9a-z_]*/i)) {
             var msg = "First argument to BaseClass.extend must be the class name.  Actual: " + IMVU.repr(name);
             throw new TypeError(msg);
@@ -13,33 +15,49 @@ var IMVU = IMVU || {};
         var NewClass = IMVU.createNamedFunction(name, function() {
             this.initialize.apply(this, arguments);
         });
-        _.extend(NewClass, this, classDef);
+
+        // f.e. {"static foo": function() {}}
+        _.mapObject(def, function(value, key) {
+
+            var parts = key.trim().split(/\s+/);
+            var isStatic = parts[0] === 'static';
+
+            if (parts.length > 2 || (parts.length === 2 && !isStatic)) {
+                throw new Error('Invalid spacing in property: "' + key + '"');
+            }
+
+            if (isStatic) {
+                key = parts[1];
+                statics[key] = value;
+            }
+        });
+
+        _.extend(NewClass, this, statics);
 
         // ES6 Module compatibility. This allows any class extending from
         // BaseClass and returned as the export of an IMVU module()-style or
-        // AMD define()-style module to be imported as the default value in an
-        // ES6 Module. f.e.
+        // AMD define()-style module to be imported as the default value in a
+        // transpiled ES6 Babel or TypeScript Module. f.e.
         //
         //   // ClassThatExtendsBaseClass.js:
         //   module({}, function() {
         //     return IMVU.BaseClass.extend('ClassThatExtendsBaseClass', { ... })
         //   })
         //
-        //   // main.js
+        //   // main.ts
         //   import ClassThatExtendsBaseClass from './ClassThatExtendsBaseClass'
         //
-        // This must be defined here because it cannot be defined inside a
-        // module due to the Object.freeze call that follows.
-        //
-        // Most imvu-style module()s export a single class, so this will
-        // automatically handle the default export for most modules. In other
-        // cases, a `default` property on the exported object would need to be
-        // specified.
         NewClass['default'] = NewClass;
 
         NewClass.prototype = Object.create(this.prototype, {
             constructor: { value: NewClass, writable: true } });
-        _.extend(NewClass.prototype, def);
+
+        // f.e. {"bar": function() {}} without the "static" keyword
+        var instanceProperties = _.omit(def, function(value, key) {
+            return key.trim().split(/\s+/)[0] === 'static';
+        });
+
+        _.extend(NewClass.prototype, instanceProperties);
 
         Object.freeze(NewClass);
 

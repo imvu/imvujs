@@ -3,14 +3,14 @@ var IMVU = IMVU || {};
 (function (root) {
     function MakeNamedBackboneConstructor(Constructor) {
         return IMVU.BaseClass.extend.call(Constructor, 'Named' + Constructor.name, {
+            'static extend': IMVU.BaseClass.extend,
+
             initialize: function () {
                 var oldInitialize = this.initialize;
                 this.initialize = function () {};
                 Constructor.apply(this, arguments);
                 this.initialize = oldInitialize;
             }
-        }, {
-            extend: IMVU.BaseClass.extend
         });
     }
 
