@@ -20,6 +20,13 @@ fixture("ServiceProvider", function() {
         assert.equal(timer, instance.timer);
     });
 
+    test('test for the existence of a registered service using "has"', function() {
+        var testKey = 'ligatureDearly';
+        assert.false(this.sp.has(testKey));
+        this.sp.register(testKey, 'crete-energetically');
+        assert.true(this.sp.has(testKey));
+    });
+
     test("dependencies can be specified on prototypes too", function() {
         var service = {};
         this.sp.register('service', service);

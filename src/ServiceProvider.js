@@ -13,6 +13,10 @@ var IMVU = IMVU || {};
             return this.services[name];
         },
 
+        has: function(serviceName) {
+            return this.services.hasOwnProperty(serviceName);
+        },
+
         register: function(name, instance) {
             this.services[name] = instance;
         },
