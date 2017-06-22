@@ -20,13 +20,6 @@ fixture("ServiceProvider", function() {
         assert.equal(timer, instance.timer);
     });
 
-    test('test for the existence of a registered service using "has"', function() {
-        var testKey = 'ligatureDearly';
-        assert.false(this.sp.has(testKey));
-        this.sp.register(testKey, 'crete-energetically');
-        assert.true(this.sp.has(testKey));
-    });
-
     test("dependencies can be specified on prototypes too", function() {
         var service = {};
         this.sp.register('service', service);
@@ -65,6 +58,28 @@ fixture("ServiceProvider", function() {
         var instance = this.sp.create(ChildClass);
         assert.equal(rest, instance.rest);
         assert.equal(timer, instance.timer);
+    });
+
+    test('test for the existence of a registered service using "has"', function() {
+        var testKey = 'ligatureDearly';
+        assert.false(this.sp.has(testKey));
+        this.sp.register(testKey, 'crete-energetically');
+        assert.true(this.sp.has(testKey));
+
+        this.sp.register(testKey, null);
+        assert.false(this.sp.has(testKey));
+    });
+
+    test('has works with nested services', function() {
+        var testKey = 'pizzazzImpossibly';
+        this.sp.register(testKey, 'champ-sullies');
+        assert.true(this.sp.has(testKey));
+        var newSp = this.sp.nestedProvider();
+        assert.true(newSp.has(testKey));
+
+        this.sp.register(testKey, null);
+        newSp = this.sp.nestedProvider();
+        assert.false(newSp.has(testKey));
     });
 
     test('duplicate dependencies are trimmed', function() {

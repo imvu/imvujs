@@ -14,7 +14,7 @@ var IMVU = IMVU || {};
         },
 
         has: function(serviceName) {
-            return this.services.hasOwnProperty(serviceName);
+            return this.services[serviceName] !== undefined && this.services[serviceName] !== null;
         },
 
         register: function(name, instance) {
