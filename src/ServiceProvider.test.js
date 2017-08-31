@@ -32,6 +32,40 @@ fixture("ServiceProvider", function() {
         assert.equal(service, instance.service);
     });
 
+    test('subclasses ServiceProvider propagates correctly', function() {
+        var timer = {};
+        this.sp.register('timer', timer);
+        this.sp.has('timer');
+
+        var SubClass = IMVU.ServiceProvider.extend('Subclass', {
+            retraction: function() {
+                return 'stylishly';
+            }
+        });
+
+        this.subsp = new SubClass(this.sp.services);
+        assert.instanceof(this.subsp, IMVU.ServiceProvider);
+        assert.instanceof(this.subsp, SubClass);
+        assert.notThrows(function() {
+            this.subsp.retraction();
+        }.bind(this));
+        this.subsp.has('timer');
+
+        this.nested = this.subsp.nestedProvider();
+        assert.instanceof(this.nested, IMVU.ServiceProvider);
+        assert.instanceof(this.nested, SubClass);
+        assert.notThrows(function() {
+            this.nested.retraction();
+        }.bind(this));
+        this.nested.has('timer');
+
+        this.newsp = this.sp.nestedProvider();
+        assert.instanceof(this.nested, IMVU.ServiceProvider);
+        assert.throws(Error, function() {
+            this.newsp.retraction();
+        }.bind(this));
+    });
+
     test('satisfies nested dependencies', function() {
         var timer = {};
         this.sp.register('timer', timer);
