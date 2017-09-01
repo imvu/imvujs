@@ -33,37 +33,57 @@ fixture("ServiceProvider", function() {
     });
 
     test('subclasses ServiceProvider propagates correctly', function() {
+        var subclassInit = 0;
         var timer = {};
         this.sp.register('timer', timer);
         this.sp.has('timer');
 
         var SubClass = IMVU.ServiceProvider.extend('Subclass', {
+            // This initialize should not be called when nestedProvider is used.
+            initialize: function(args) {
+                subclassInit++;
+                this.services = {
+                    'timer': timer,
+                    'disunite': { shank: 'woof-benelux' },
+                };
+            },
+
             retraction: function() {
                 return 'stylishly';
             }
         });
 
-        this.subsp = new SubClass(this.sp.services);
+        this.subsp = new SubClass();
+        assert.equal(1, subclassInit);
         assert.instanceof(this.subsp, IMVU.ServiceProvider);
         assert.instanceof(this.subsp, SubClass);
         assert.notThrows(function() {
             this.subsp.retraction();
         }.bind(this));
-        this.subsp.has('timer');
+        assert.true(this.subsp.has('timer'));
+        assert.true(this.subsp.has('disunite'));
 
         this.nested = this.subsp.nestedProvider();
+        assert.equal(1, subclassInit);
         assert.instanceof(this.nested, IMVU.ServiceProvider);
         assert.instanceof(this.nested, SubClass);
         assert.notThrows(function() {
             this.nested.retraction();
         }.bind(this));
-        this.nested.has('timer');
+        assert.true(this.nested.has('timer'));
+        assert.true(Object.is(this.subsp.get('timer'), this.nested.get('timer')));
+        assert.true(this.nested.has('disunite'));
+        assert.true(Object.is(this.subsp.get('disunite'), this.nested.get('disunite')));
 
         this.newsp = this.sp.nestedProvider();
+        assert.equal(1, subclassInit);
         assert.instanceof(this.nested, IMVU.ServiceProvider);
         assert.throws(Error, function() {
             this.newsp.retraction();
         }.bind(this));
+        assert.true(this.newsp.has('timer'));
+        assert.true(Object.is(this.subsp.get('timer'), this.newsp.get('timer')));
+        assert.false(this.newsp.has('disunite'));
     });
 
     test('satisfies nested dependencies', function() {

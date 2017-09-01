@@ -26,7 +26,9 @@ var IMVU = IMVU || {};
         },
 
         nestedProvider: function() {
-            return new this.constructor(this.services);
+            var newServiceProvider = Object.create(this.constructor.prototype);
+            newServiceProvider.services = Object.create(this.services);
+            return newServiceProvider;
         },
 
         create: function(type/*, ..., options*/) {
