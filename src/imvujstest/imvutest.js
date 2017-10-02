@@ -8,8 +8,8 @@ module({
     imports.testglobals.replaceIntermittentGlobals();
 
     return {
-        start: function (superfixtureUrl) {
-            imports.BrowserDispatcher.dispatch(syncRunner, superfixtureUrl);
+        start: function (superfixtureUrl, options) {
+            imports.BrowserDispatcher.dispatch(syncRunner, superfixtureUrl, options);
         }
     };
 });

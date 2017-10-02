@@ -6,7 +6,11 @@ module({
     CompositeReporter: 'CompositeReporter.js'
 }, function (imports) {
     return {
-        dispatch: function (testRunner, superfixtureUrl) {
+        dispatch: function (testRunner, superfixtureUrl, options) {
+            options = options || {};
+            var theModule = options.module || module;
+            var onComplete = options.onComplete || function() {};
+
             imports.css.install();
             $('<div class="test-sandbox"></div>').appendTo(document.body);
             var output = $('<div class="test-output"></div>').appendTo(document.body);
@@ -22,7 +26,7 @@ module({
             var runTest = function () {
                 var hashParts = window.location.hash.substr(1).split(':');
                 var testUrl = hashParts[0];
-                module.run({
+                theModule.run({
                     test: testUrl,
                     superfixtures: superfixtureUrl
                 }, function (imports) {
@@ -31,9 +35,10 @@ module({
                         test: hashParts[2] ? decodeURIComponent(hashParts[2]) : null
                     });
 
-                    testRunner.run_all(testUrl, reporter, function onComplete(success) {
-                        // What do I do here?
-                    });
+                    var result = testRunner.run_all(testUrl, reporter, onComplete);
+                    if (result !== undefined) { // synchronous runners
+                        onComplete(result);
+                    }
                 });
             };
 
