@@ -9,7 +9,6 @@ module({
         dispatch: function (testRunner, superfixtureUrl, options) {
             options = options || {};
             var theModule = options.module || module;
-            var onComplete = options.onComplete || function() {};
 
             imports.css.install();
             $('<div class="test-sandbox"></div>').appendTo(document.body);
@@ -21,7 +20,21 @@ module({
                 new imports.LeprechaunReporter()
             ]);
 
-            window.onerror = reporter.error.bind(reporter);
+            var onComplete = function() {};
+            var onCompleteCalled = false;
+            if (options.onComplete) {
+                onComplete = function(result) {
+                    if (!onCompleteCalled) {
+                        options.onComplete(result);
+                        onCompleteCalled = true;
+                    }
+                };
+            }
+
+            window.onerror = function(errorMsg, url, lineNumber) {
+                reporter.error(errorMsg, url, lineNumber);
+                onComplete(false);
+            };
 
             var runTest = function () {
                 var hashParts = window.location.hash.substr(1).split(':');
