@@ -9,6 +9,7 @@ module({
         dispatch: function (testRunner, superfixtureUrl, options) {
             options = options || {};
             var theModule = options.module || module;
+            var onComplete = options.onComplete || function () {};
 
             imports.css.install();
             $('<div class="test-sandbox"></div>').appendTo(document.body);
@@ -20,25 +21,15 @@ module({
                 new imports.LeprechaunReporter()
             ]);
 
-            var onComplete = function() {};
-            var onCompleteCalled = false;
-            if (options.onComplete) {
-                onComplete = function(result) {
-                    if (!onCompleteCalled) {
-                        options.onComplete(result);
-                        onCompleteCalled = true;
-                    }
-                };
-            }
+            var hashParts = window.location.hash.substr(1).split(':');
+            var testUrl = hashParts[0];
 
             window.onerror = function(errorMsg, url, lineNumber) {
                 reporter.error(errorMsg, url, lineNumber);
-                onComplete(false);
+                onComplete(false, testUrl);
             };
 
             var runTest = function () {
-                var hashParts = window.location.hash.substr(1).split(':');
-                var testUrl = hashParts[0];
                 theModule.run({
                     test: testUrl,
                     superfixtures: superfixtureUrl
@@ -50,7 +41,7 @@ module({
 
                     var result = testRunner.run_all(testUrl, reporter, onComplete);
                     if (result !== undefined) { // synchronous runners
-                        onComplete(result);
+                        onComplete(result, testUrl);
                     }
                 });
             };
