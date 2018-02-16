@@ -38,7 +38,7 @@ BASE_SOURCES = [
 ]
 
 WEB_SOURCES = FIRST_SOURCES + [
-    'ext/jquery-1.8.3.js',
+    'ext/jquery-1.12.4.js',
     'src/Timer.js',
 ] + BASE_SOURCES + [
     'src/web-module.js',
@@ -58,7 +58,7 @@ env = Environment(
     tools=['node', 'closure', 'uglify', 'gzip', 'module_combine'])
 
 BASE_CLOSURE_FLAGS = [
-    '--language_in', 'ECMASCRIPT3',
+    '--language_in', 'ECMASCRIPT5',
     '--jscomp_error', 'ambiguousFunctionDecl',
     '--jscomp_error', 'checkDebuggerStatement',
     '--jscomp_error', 'checkRegExp',
