@@ -124,7 +124,7 @@ module({
                             return '';
                         }
                         // error flag? per 4.7.9, item 3
-                        return this.response;
+                        return typeof this.response === 'string' ? this.response : JSON.stringify(this.response);
                     }
                 },
                 'withCredentials': {
@@ -247,7 +247,7 @@ module({
                 } else {
                     this.response = data;
                     if (!definePropertyWorks) {
-                        this.responseText = data;
+                        this.responseText = typeof data === 'string' ? data : JSON.stringify(data);
                     }
                 }
                 this.__changeReadyState(this.LOADING);
