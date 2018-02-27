@@ -33,6 +33,7 @@ module({
             }
 
             replace(g, 'setTimeout', function(fn, time) {
+                if (time === undefined) return fn(); // jquery deferreds use setTimeout with an undefined time internally
                 throw new imports.AssertionError("Don't call setTimeout in tests.  Use fakes.");
             });
 
