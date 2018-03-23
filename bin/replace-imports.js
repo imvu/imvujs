@@ -2,7 +2,7 @@
 
 var fs     = require('fs');
 var path   = require('path');
-var uglify = require('uglify-js');
+var uglify = require('uglify-es');
 var combine = require('./combine.js');
 
 function replace_imports(input, output, replacements) {
