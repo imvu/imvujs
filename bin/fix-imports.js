@@ -1,5 +1,5 @@
 /*global console*/
-var uglify = require('uglify-js2');
+var uglify = require('uglify-es');
 var _u = require('underscore');
 var fs = require('fs');
 var path = require('path');
@@ -237,8 +237,6 @@ function saveModule(module) {
 exports.saveModule = saveModule;
 
 function gen_code(ast, options) {
-    var output = uglify.OutputStream(options);
-    ast.print(output);
-    return output.toString();
+    return uglify.minify(ast, options).code;
 }
 exports.gen_code = gen_code;
