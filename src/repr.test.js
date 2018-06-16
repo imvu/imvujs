@@ -21,8 +21,8 @@ module({}, function() {
     });
 
     test("functions", function() {
-        assert.equal("function (){}", IMVU.repr(function(){}));
-        assert.equal("function (x){return x;}", IMVU.repr(function(x){return x;}));
+        assert.equal("function(){}", IMVU.repr(function(){}));
+        assert.equal("function(x){return x;}", IMVU.repr(function(x){return x;}));
     });
 
     test("arrays", function() {

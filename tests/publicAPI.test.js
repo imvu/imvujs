@@ -52,9 +52,6 @@
         'Backbone',
         '_',
 
-        // polyfill
-        'Set',
-
         // AMD compatibility
         'define',
     ];

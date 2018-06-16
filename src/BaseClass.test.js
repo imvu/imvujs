@@ -14,11 +14,11 @@ module({}, function() {
         var f = new foo();
 
         var e = assert.throws(TypeError, function() { f.foojin(); });
-        assert.equal("Object #<foo> has no method 'foojin'", e.message);
+        assert.equal("f.foojin is not a function", e.message);
 
         f.foojin = undefined;
         e = assert.throws(TypeError, function() { f.foojin(); });
-        assert.equal("Property 'foojin' of object #<foo> is not a function", e.message);
+        assert.equal("f.foojin is not a function", e.message);
     });
 
     test("Can create a BaseClass without a def", function() {
@@ -91,11 +91,11 @@ module({}, function() {
         var f = new Foo();
 
         var e = assert.throws(TypeError, function() { f.foojin(); });
-        assert.equal("Object #<Foo> has no method 'foojin'", e.message);
+        assert.equal("f.foojin is not a function", e.message);
 
         f.foojin = undefined;
         e = assert.throws(TypeError, function() { f.foojin(); });
-        assert.equal("Property 'foojin' of object #<Foo> is not a function", e.message);
+        assert.equal("f.foojin is not a function", e.message);
     });
 
     function allKeys(o) {

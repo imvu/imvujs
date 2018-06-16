@@ -3,7 +3,6 @@ module({
     Runner: 'Runner.js',
     assert: 'assert.js'
 }, function (imports) {
-
     // XXXnrd: SyncRunner seems like it should actually extend Runner rather than have and delegate to a Runner.
     return IMVU.BaseClass.extend('SyncRunner', {
         initialize: function () {

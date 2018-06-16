@@ -30,8 +30,15 @@ function sysinclude(currentPath, includePath, settings) {
 
 var currentFilePath;
 
+function getCurrentFilePath() {
+    // path.dirname(undefined) explodes in node v10.4.1. Make sure this is set.
+    // Primse with a dummy file so that path resolution ala path.dirname()
+    // works out during the first/top-level module entry.
+    return currentFilePath || path.join(process.cwd(), path.sep, 'doesnotexist.txt');
+}
+
 function includeModule(modulePath, sysinclude) {
-    var cfp = currentFilePath;
+    var cfp = getCurrentFilePath();
     currentFilePath = modulePath;
 
     try {
@@ -66,7 +73,7 @@ function module(dependencies, body, settings) {
     var criticalErrorHandler = settings.criticalErrorHandler;
     var sysinclude = settings.sysinclude;
 
-    var cfp = currentFilePath;
+    var cfp = getCurrentFilePath();
     var importList = {};
 
     for (var k in dependencies) {
@@ -112,5 +119,5 @@ define.amd = true;
 global.define = define;
 
 module.canonicalize = function canonicalize(fp) {
-    return path.resolve(path.dirname(currentFilePath), fp);
+    return path.resolve(path.dirname(getCurrentFilePath()), fp);
 };

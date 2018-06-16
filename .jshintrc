@@ -1,5 +1,6 @@
 // for options, consult http://www.jshint.com/options/
 {
+    "esnext": true,
     "predef" : [
         // browser environment
         "global",
