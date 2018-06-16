@@ -1,49 +1,22 @@
 (function(root_this){
     var NODE_SYMBOLS = [
-        'ArrayBuffer',
-        'Int8Array',
-        'Uint8Array',
-        'Uint8ClampedArray',
-        'Int16Array',
-        'Uint16Array',
-        'Int32Array',
-        'Uint32Array',
-        'Float32Array',
-        'Float64Array',
-        'DataView',
         'global',
         'process',
-        'GLOBAL',
-        'root',
         'Buffer',
-        'setTimeout',
-        'setInterval',
-        'setImmediate',
-        'clearTimeout',
-        'clearInterval',
         'clearImmediate',
-        'console',
-        'module',
-        'require',
-
-        'exports',
+        'clearInterval',
+        'clearTimeout',
+        'setImmediate',
+        'setInterval',
+        'setTimeout',
         '__filename',
         '__dirname',
+        'require',
 
         '__included_imvujs__',
 
         // browser-ish symbols prevented in tests
         'requestAnimationFrame',
-
-        // only on windows?
-        'DTRACE_NET_SERVER_CONNECTION',
-        'DTRACE_NET_STREAM_END',
-        'DTRACE_NET_SOCKET_READ',
-        'DTRACE_NET_SOCKET_WRITE',
-        'DTRACE_HTTP_SERVER_REQUEST',
-        'DTRACE_HTTP_SERVER_RESPONSE',
-        'DTRACE_HTTP_CLIENT_REQUEST',
-        'DTRACE_HTTP_CLIENT_RESPONSE'
     ];
 
     var IMVUJS_SYMBOLS = [
@@ -51,6 +24,7 @@
         'IMVU',
         'Backbone',
         '_',
+        '$',
 
         // AMD compatibility
         'define',
@@ -62,11 +36,16 @@
         'assert',
         'AssertionError',
         'registerSuperFixture',
+        'window',
+        'document',
+
     ];
 
     test("this is limited to the following symbols", function() {
         var actual_symbols = Object.keys(root_this);
-
+        console.log('IMVUJS_SYMBOLS', IMVUJS_SYMBOLS);
+        console.log('actual_symbols', actual_symbols);
+        console.log('_.intersection', _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
 

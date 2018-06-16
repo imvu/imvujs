@@ -1,3 +1,5 @@
+(() => {
+
 test("asserts limit length of values in error", function() {
     var savedOutputSize = assert.MAX_OUTPUT_SIZE;
     assert.MAX_OUTPUT_SIZE = 8;
@@ -13,3 +15,4 @@ test("asserts limit length of values in error", function() {
     assert.MAX_OUTPUT_SIZE = savedOutputSize;
 });
 
+})();

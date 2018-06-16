@@ -1,3 +1,5 @@
+(() => {
+
 var URL = 'http://username:password@localhost.imvu.com:80/next/home/?key=value#fragment';
 var URL_NO_QUERY = 'http://username:password@localhost.imvu.com:80/next/home/#fragment';
 
@@ -110,3 +112,5 @@ test('build can prune keys with empty string values too', function() {
         IMVU.URI.build(URL, {width: 1024, height: ''}, {prune: true})
     );
 });
+
+})();
