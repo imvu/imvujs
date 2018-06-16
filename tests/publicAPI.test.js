@@ -43,9 +43,6 @@
 
     test("this is limited to the following symbols", function() {
         var actual_symbols = Object.keys(root_this);
-        console.log('IMVUJS_SYMBOLS', IMVUJS_SYMBOLS);
-        console.log('actual_symbols', actual_symbols);
-        console.log('_.intersection', _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJS_SYMBOLS, _.intersection(IMVUJS_SYMBOLS, actual_symbols));
         assert.deepEqual(IMVUJSTEST_SYMBOLS, _.intersection(IMVUJSTEST_SYMBOLS, actual_symbols));
 
