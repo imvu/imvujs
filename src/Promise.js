@@ -202,7 +202,8 @@ var IMVU = IMVU || {};
             var result;
 
             try {
-                result = callback.call(promise, argument);
+                // Promises/A+ 2.2.5: Fulfilled and onRejected must be called as functions (i.e. with no this value).
+                result = callback.call(undefined, argument);
                 resolver.resolve(result); // per spec: synchronous=true
             } catch (e) {
                 result = e;
