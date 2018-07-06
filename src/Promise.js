@@ -231,11 +231,13 @@ var IMVU = IMVU || {};
             }
 
             this.acceptCallbacks.push(
-                acceptCallback ?
+                // Promises/A+ 2.2.7.3: If `onFulfilled` is not a function and `promise1` is fulfilled, `promise2` must be fulfilled with the same value.
+                typeof acceptCallback === 'function' ?
                     promiseWrapperCallback(acceptCallback) :
                     resolver.accept.bind(resolver));
             this.rejectCallbacks.push(
-                rejectCallback ?
+                // Promises/A+ 2.2.7.4: If `onRejected` is not a function and `promise1` is rejected, `promise2` must be rejected with the same reason.
+                typeof rejectCallback === 'function' ?
                     promiseWrapperCallback(rejectCallback) :
                     resolver.reject.bind(resolver));
 
