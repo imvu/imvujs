@@ -4,6 +4,9 @@ module({
 }, function (imports) {
     function fail(exception, info) {
         exception.info = info;
+        if (info && info.Actual && info.Actual.stack) {
+            exception.stack += '\nWrapped stack:\n' + info.Actual.stack;
+        }
         throw exception;
     }
 
