@@ -1,7 +1,7 @@
 module({
     unexpectedThrower: 'unexpectedThrower.js',
 }, function(imports) {
-    fixture('new', function() {
+    fixture('assert tests', function() {
         test("assert.throw includes actual message in error", function() {
             var e = assert.throws(Error, function() {
                 assert.throws(ReferenceError, function() {
