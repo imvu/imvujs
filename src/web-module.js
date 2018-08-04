@@ -33,8 +33,6 @@
 
                 if ('string' === typeof aliases[name]) {
                     // Pass the string on to require verbatim.  Do not treat it like a relative path.
-                } else if (/^\/asset/.test(name)) {
-                    depList[i] = plugin + '//webasset-akm.imvu.com' + name;
                 } else if (/[a-zA-Z0-9]+:\/\/.*/.test(name)) {
                 } else if (/^[\.\/]/.test(name)) {
                 } else {
