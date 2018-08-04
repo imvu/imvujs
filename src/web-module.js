@@ -18,36 +18,6 @@
         return [keys, values];
     }
 
-    function makeRelative(url) {
-        var plugin;
-        var path;
-        var r = /^([a-zA-Z0-9_]+)\!(.*)/.exec(url);
-
-        if (r) {
-            plugin = r[1];
-            path = r[2];
-        } else {
-            plugin = null;
-            path = url;
-        }
-
-        var isRelative = (
-            (!/^https?:\/\//.test(path)) &&
-            (!/^\//.test(path)) &&
-            true
-        );
-
-        if (isRelative) {
-            path = './' + path;
-        }
-
-        if (plugin !== null) {
-            return plugin + '!' + path;
-        } else {
-            return path;
-        }
-    }
-
     function preprocessDeps(dependencies) {
         var a = objectToList(dependencies);
         var depNames = a[0];
