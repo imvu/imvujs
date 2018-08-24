@@ -39,6 +39,7 @@ BASE_SOURCES = [
 
 WEB_SOURCES = FIRST_SOURCES + [
     'ext/jquery-3.3.1.js',
+    'src/jquery-3.3.1-deferred-exception-hook-patch.js',
     'src/Timer.js',
 ] + BASE_SOURCES + [
     'src/web-module.js',

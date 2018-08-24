@@ -37,7 +37,6 @@
         'AssertionError',
         'registerSuperFixture',
         'window',
-        'document',
 
     ];
 
