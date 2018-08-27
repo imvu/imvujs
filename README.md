@@ -7,10 +7,7 @@ grown-ups."
 
 Unlike jQuery, YUI, and Backbone, and AngularJS, imvujs attempts to
 avoid being a new API or programming model.  As much as possible, it
-tries to follow open standards such as HTML5 and ES5.  For example,
-imvujs includes Kris Kowal's excellent
-[es5-shim](https://github.com/kriskowal/es5-shim/), guaranteeing that
-Array.forEach and other ES5 functions are available, even on IE8.
+tries to follow open standards such as HTML5 and ES5.
 
 imvujs provides a module system so you can write code in separate
 files and combine them into one minified JavaScript file for efficient
@@ -26,7 +23,7 @@ browser, or with a headless browser such as PhantomJS or Leprechaun
 Finally, imvujs includes common libraries that are hard to live
 without, such as jQuery, Underscore.js, and Backbone.js.
 
-imvujs targets both modern browsers and Node.js.  
+imvujs targets both modern browsers and Node.js.
 
 
 Browser Support
@@ -52,5 +49,5 @@ The JSHint options live in `.jshintrc` at the root of this tree.
 
 *Setup*: The `s/pull` script just copies `s/.githooks/pre-commit` to your `.git/hooks/` directory and assures it's executable.
 
-If it's _absolutely urgent_ for you to bypass this hook, there are a couple of options: `git add --no-verify` is one, and `git commit -n` is the other. 
+If it's _absolutely urgent_ for you to bypass this hook, there are a couple of options: `git add --no-verify` is one, and `git commit -n` is the other.
 

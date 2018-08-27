@@ -6,9 +6,6 @@ print "running with -j", GetOption('num_jobs')
 
 FIRST_SOURCES = [
     'src/includeguard.js',
-    'src/polyfill.js',
-    'third-party/es5-shim/es5-shim.js',
-    'third-party/es5-shim/es5-sham.js',
     'src/es6-collections.js',
     'ext/underscore-1.8.3.js',
 ]
