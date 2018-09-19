@@ -454,6 +454,22 @@ module({
                 assert.equal(expected, $(selector).css(propertyName));
             },
 
+            cssPx: function(expected, propertyName, selector) {
+                var rawValue = $(selector).css(propertyName).replace('px', '');
+                assert.equal(expected, parseFloat(rawValue));
+            },
+
+            cssPxNear: function(expected, propertyName, selector, tolerance) {
+                requireArgumentCount(4, arguments.length, "cssPxNear");
+                var actual = $(selector).css(propertyName).replace('px', '');
+                if ((Math.abs(expected - actual) <= tolerance) === false) {
+                    fail(new imports.AssertionError("expected: " + formatTestValue(expected) + ", actual: " + formatTestValue(actual) + ", tolerance: " + formatTestValue(tolerance) + ", diff: " + formatTestValue(actual - expected)), {
+                        Expected: expected,
+                        Actual: actual,
+                        Tolerance: tolerance});
+                }
+            },
+
             empty: function(selectorOrJQueryObject) {
                 var el = selectorOrJQueryObject;
                 assert.dom.present(el);

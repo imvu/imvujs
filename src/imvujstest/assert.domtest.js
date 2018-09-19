@@ -149,6 +149,19 @@ module({
             assert.dom.css('rgb(255, 0, 0)', 'color', '.test-sandbox div');
         });
 
+        test('cssPx', function() {
+            $('.test-sandbox').append('<div class="a" style="width:1px;"></div><div class="b" style="width:1.5px"></div>');
+            assert.dom.cssPx(1, 'width', '.test-sandbox .a');
+            assert.dom.cssPx(1.5, 'width', '.test-sandbox .b');
+        });
+
+        test('cssPxNear', function() {
+            $('.test-sandbox').append('<div class="a" style="width:1.7px;">');
+            $('.test-sandbox').append('</div><div class="b" style="width:314px"></div>');
+            assert.dom.cssPxNear(1.5, 'width', '.test-sandbox .a', 0.2);
+            assert.dom.cssPxNear(300, 'width', '.test-sandbox .b', 15);
+        });
+
         test('empty', function() {
             $('.test-sandbox').append('<p></p>');
             assert.dom.empty('.test-sandbox p');
