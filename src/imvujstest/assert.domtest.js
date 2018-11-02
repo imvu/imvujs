@@ -88,7 +88,7 @@ module({
             assert.dom.visible('.test-sandbox .widget');
         });
 
-        test('still considered visible of no size', function() {
+        test('still considered visible if no size', function() {
             $('.test-sandbox').append('<div class="widget" style="width:0;height:0;"></div>');
             assert.dom.visible('.test-sandbox .widget');
         });
@@ -101,6 +101,31 @@ module({
         test('notVisible if display none', function() {
             $('.test-sandbox').append('<div class="widget" style="display:none"></div>');
             assert.dom.notVisible('.test-sandbox .widget');
+        });
+
+        test('visible includes styling summary', function() {
+            $('.test-sandbox').append('<div class="widget" style="width:0; height:1px; opacity:1; display:none"/>');
+            var e = assert.throws(Error, function() {
+                assert.dom.visible('.test-sandbox .widget');
+            });
+            assert.equal(
+                "Selector '.test-sandbox .widget' expected to be visible. " +
+                "Note: width: 0px; height: 1px; display: none; opacity: 1;",
+                e.message
+            );
+        });
+
+        test('notVisible includes styling summary', function() {
+            $('.test-sandbox').append('<div class="widget" style="width:0; height:1px; opacity:0; display:inline"/>');
+            var e = assert.throws(Error, function() {
+                assert.dom.notVisible('.test-sandbox .widget');
+            });
+            // 0px height because inline elements cannot be sized.
+            assert.equal(
+                "Selector '.test-sandbox .widget' expected to be NOT visible. " +
+                "Note: width: 0px; height: 0px; display: inline; opacity: 0;",
+                e.message
+            );
         });
 
         test('disabled', function() {

@@ -48,6 +48,12 @@ module({
         }
     }
 
+    function getElementStyles(domElement, styleNames) {
+        return styleNames.map(function(name) {
+            return name + ': ' + $(domElement).css(name);
+        }).join('; ') + ';';
+    }
+
     var assert = {
         MAX_OUTPUT_SIZE: 1024,
 
@@ -407,14 +413,14 @@ module({
 
             visible: function(domElement) {
                 if (!$(domElement).is(':visible')) {
-                    fail(new imports.AssertionError(decipherDomElement(domElement) + ' expected to be visible'));
+                    fail(new imports.AssertionError(decipherDomElement(domElement) + ' expected to be visible. Note: ' + getElementStyles(domElement, ['width', 'height', 'display', 'opacity'])));
                 }
             },
 
             notVisible: function(domElement) {
                 assert.dom.present(domElement);
                 if ($(domElement).is(':visible')) {
-                    fail(new imports.AssertionError(decipherDomElement(domElement) + ' expected to be NOT visible'));
+                    fail(new imports.AssertionError(decipherDomElement(domElement) + ' expected to be NOT visible. Note: ' + getElementStyles(domElement, ['width', 'height', 'display', 'opacity'])));
                 }
             },
 
