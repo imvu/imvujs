@@ -3,11 +3,11 @@ HERE=`dirname "$0"`
 
 OS=`python -c "import sys; print sys.platform"`
 if [ $OS = 'darwin' ]; then
-    NODEJS="$HERE/../third-party/mac/node-v0.10.28-darwin-x64/bin/node"
+    NODEJS="$HERE/../third-party/mac/node-v10.13.0-darwin-x64/bin/node"
 elif [ $OS = 'linux2' ]; then
-    NODEJS="$HERE/../third-party/linux/node-v10.4.1-linux-x64/bin/node"
+    NODEJS="$HERE/../third-party/linux/node-v10.13.0-linux-x64/bin/node"
 else
-    NODEJS="$HERE/../third-party/windows/nodejs-0.8.6/node"
+    NODEJS="$HERE/../third-party/windows/node-v10.13.0-win-x64/node"
 fi
 
 exec $NODEJS "$@"
