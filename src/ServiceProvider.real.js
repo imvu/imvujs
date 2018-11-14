@@ -7,7 +7,6 @@ module({
             this.register('timer', IMVU.Timer);
             this.register('Promise', new IMVU.PromiseFactory(IMVU.EventLoop, {
                 immediateCallbacks: true,
-                exposeErrors: true
             }));
             this.register('XMLHttpRequest', IMVU.XMLHttpRequest);
         }
