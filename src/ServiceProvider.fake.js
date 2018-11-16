@@ -12,6 +12,7 @@ module({
             this.register('_eventLoop', new imports.FakeEventLoop()); // test-only
             this.register('Promise', new IMVU.PromiseFactory(this.get('_eventLoop'), {
                 immediateCallbacks: true,
+                exposeErrors: true
             }));
             this.register('XMLHttpRequest', new imports.FakeXMLHttpRequestFactory());
         }

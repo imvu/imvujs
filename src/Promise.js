@@ -29,6 +29,10 @@ var IMVU = IMVU || {};
             then.call(value, accept, reject);
         } catch (e) {
             this.reject(e);
+
+            if (promise.exposeErrors) {
+                throw e;
+            }
         }
     };
 
@@ -77,6 +81,7 @@ var IMVU = IMVU || {};
             this.result = undefined;
 
             this.immediateCallbacks = getOption(settings, 'immediateCallbacks', false);
+            this.exposeErrors = getOption(settings, 'exposeErrors', false);
 
             init(new PromiseResolver(this));
         }
@@ -203,6 +208,10 @@ var IMVU = IMVU || {};
             } catch (e) {
                 result = e;
                 resolver.reject(result);  // per spec: synchronous=true
+
+                if (promise.exposeErrors) {
+                    throw result;
+                }
             }
         }
 
@@ -212,6 +221,7 @@ var IMVU = IMVU || {};
                 resolver = r;
             }, {
                 immediateCallbacks: this.immediateCallbacks,
+                exposeErrors: this.exposeErrors
             });
 
             function promiseWrapperCallback(callback) {
