@@ -9,8 +9,8 @@ module({
     // imports.testglobals.replaceIntermittentGlobals();
 
     return {
-        start: function (superfixtureUrl) {
-            imports.BrowserDispatcher.dispatch(asyncRunner, superfixtureUrl);
+        start: function (superfixtureUrl, options) {
+            imports.BrowserDispatcher.dispatch(asyncRunner, superfixtureUrl, options);
         }
     };
 });
