@@ -31,7 +31,10 @@ function loadModule(filename) {
             node.callee.name === 'module' &&
             node.arguments.length === 2 &&
             node.arguments[0].type === 'ObjectExpression' &&
-            node.arguments[1].type === 'FunctionExpression';
+            (
+                node.arguments[1].type === 'FunctionExpression' ||
+                node.arguments[1].type === 'ArrowFunctionExpression'
+            );
     });
     return node? { deps: node.node.arguments[0].properties, body: node.node.arguments[1]} : null;
 }
@@ -133,7 +136,7 @@ var server = net.createServer(function(socket) {
                             var px = cleanupRemoteFile(pp);
                             if(px.indexOf(purl) === 0)
                                 return true;
-                        }           
+                        }
                         return false;
                     }
                     );
@@ -145,9 +148,9 @@ var server = net.createServer(function(socket) {
                         options.registry[p] = '___$$$_URL_$$$___' + (++options.index) + '__';
                     return options.registry[p];
                     }})
-                  )  
+                  )
                   .process(d, {});
-                socket.write(JSON.stringify({urls: options.registry, 
+                socket.write(JSON.stringify({urls: options.registry,
                     css: output.css}));
             }
             else {
@@ -170,7 +173,7 @@ var server = net.createServer(function(socket) {
        console.log('Server closed by client');
     }
   });
-  
+
 });
 
 var port = process.argv.length > 2? process.argv[2]:'/tmp/bb-imports.sock';
@@ -179,7 +182,7 @@ server.listen(port);
 process.on('SIGTERM', function() {
   console.log('Server closed');
   server.close(function() { fs.unlinkSync(process.arv[2]); });
-}); 
+});
 
 console.log("import server running at " + port + "\n");
 
