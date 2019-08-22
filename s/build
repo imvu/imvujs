@@ -3,5 +3,7 @@ HERE=`dirname "$0"`
 
 set -e
 
+JAVA_VERSION=openjdk8 source /usr/local/bin/jdk-setenv.sh && java -version source /usr/local/lib/jdk-setenv.sh && java -version
+
 python "$HERE/../third-party/scons.py" -C "$HERE/../bin"  -Q --debug=explain
 python "$HERE/../third-party/scons.py" -C "$HERE/.." -Q --debug=explain "$@"
