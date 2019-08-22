@@ -2,6 +2,8 @@
 
 HERE=`dirname "$0"`
 
+JAVA_VERSION=openjdk8 source /usr/local/bin/jdk-setenv.sh && java -version source /usr/local/lib/jdk-setenv.sh && java -version
+
 NODEJS="$HERE/node"
 JSHINT="$HERE/../third-party/jshint/bin/jshint"
 

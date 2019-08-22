@@ -21,7 +21,7 @@ def generate(env):
         os.path.dirname(__file__),
         '..',
         'third-party',
-        'closure-compiler-20130411',
+        'closure-compiler-20180716',
         'compiler.jar')
     closure = env.File(closure)
 
