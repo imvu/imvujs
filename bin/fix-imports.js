@@ -26,11 +26,11 @@ function matchModuleCall(path, anyNode) {
     var arg1 = node.args[1];
 
     if (!(deps = matchModules(arg0))) {
-        console.error("Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(arg0));
-        throw new exports.ScriptError("Bad deps");
+        console.error("ES6: Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(arg0));
+        throw new exports.ScriptError("ES6: Bad deps");
     } else if (!(body = matchModuleBody(arg1))) {
-        console.error("Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(arg1));
-        throw new exports.ScriptError("Bad module body");
+        console.error("ES6: Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(arg1));
+        throw new exports.ScriptError("ES6: Bad module body");
     } else {
         return {
             deps: matchModules(arg0),
@@ -196,7 +196,7 @@ function assertModuleReturns(name, module) {
     var statements = module.body.body;
     var last = statements[statements.length - 1];
     if (!(last instanceof uglify.AST_Return)) {
-        throw new exports.ScriptError("Module " + name + " does not end with a return statement.  Modules must return export tables!");
+        throw new exports.ScriptError("ES6: Module " + name + " does not end with a return statement.  Modules must return export tables!");
     }
 }
 

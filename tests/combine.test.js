@@ -87,7 +87,7 @@ module({}, function(imports) {
             var exc = assert.throws(combine.ScriptError, function() {
                 combine.combine(combine.readModules('combine/has-missing.js'), 'combine/has-missing.js');
             });
-            assert.equal("Module '" + path.normalize('combine/missing.js') + "' is missing, referred to by: combine/has-missing.js", exc.message);
+            assert.equal("ES5: Module '" + path.normalize('combine/missing.js') + "' is missing, referred to by: combine/has-missing.js", exc.message);
         });
 
         test('readModules returns module dependencies', function() {
@@ -127,14 +127,14 @@ module({}, function(imports) {
         var ast, e;
         ast = uglify.parse('module({}, function(imports) { }());');
         e = assert.throws(Error, combine.readModule.bind(null, 'blarp', ast));
-        assert.equal('Bad module body', e.message);
+        assert.equal('ES5: Bad module body', e.message);
     });
 
     test('invalid dependency list produces an error message', function() {
         var ast, e;
         ast = uglify.parse('module(["a", "b.js"], function(imports) { });');
         e = assert.throws(Error, combine.readModule.bind(null, 'blarp', ast));
-        assert.equal('Bad deps', e.message);
+        assert.equal('ES5: Bad deps', e.message);
     });
 
     test('missing return statement produces an error message', function() {

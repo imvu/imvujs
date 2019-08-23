@@ -66,12 +66,12 @@ function matchModuleCall(path: string, anyNode: uglify.AST_Node): ModuleInfo {
     var arg1 = node.args[1];
 
     if (!(deps = matchModules(arg0))) {
-        console.error("Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(arg0));
-        throw new ScriptError("Bad deps");
+        console.error("ES5: Bad deps in " + JSON.stringify(path) + ".  Expected object literal, got", JSON.stringify(arg0));
+        throw new ScriptError("ES5: Bad deps");
 
     } else if (!(body = matchModuleBody(arg1))) {
-        console.error("Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(arg1));
-        throw new ScriptError("Bad module body");
+        console.error("ES5: Bad module body in " + JSON.stringify(path) + ".  Expected function, got", JSON.stringify(arg1));
+        throw new ScriptError("ES5: Bad module body");
 
     } else {
         return {
@@ -254,10 +254,10 @@ export function readModules(root: string): ReadModulesResult {
             if (fs.existsSync(filename)) {
                 module = loadModule(filename);
                 if (module === null) {
-                    throw "Invalid module " + filename;
+                    throw "ES5: Invalid module " + filename;
                 }
                 if (module === undefined) {
-                    throw 'Invalid module (undefined)?!?!? ' + filename;
+                    throw 'ES5: Invalid module (undefined)?!?!? ' + filename;
                 }
             } else {
                 if (filename[0] === '@') {
@@ -319,7 +319,7 @@ function assertModuleReturns(name: string, module: ModuleInfo) {
     var statements = module.body.body;
     var last = statements[statements.length - 1];
     if (!(last instanceof uglify.AST_Return)) {
-        throw new ScriptError("Module " + name + " does not end with a return statement.  Modules must return export tables!");
+        throw new ScriptError("ES5: Module " + name + " does not end with a return statement.  Modules must return export tables!");
     }
 }
 
@@ -422,7 +422,7 @@ export function combine(readModules: ReadModulesResult, rootPath: string) {
     var customActions = readModules.customActions;
 
     if (Object.keys(missing).length) {
-        var msg = '';
+        var msg = 'ES5: ';
         for (var mm in missing) {
             msg += "Module '" + mm + "' is missing, referred to by: " + Object.keys(missing[mm]).join(', ');
         }
@@ -528,7 +528,7 @@ function main(argv: string[]) {
             ++i;
         } else {
             if (fileName) {
-                throw new Error('Only one input file can be given');
+                throw new Error('ES5: Only one input file can be given');
             }
             fileName = argv[i];
         }
