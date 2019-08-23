@@ -66,7 +66,7 @@ function matchModuleCall(path, anyNode) {
     }
 
     function matchModuleBody(node) {
-        return (node instanceof uglify.AST_Function) ? node : null;
+        return (node instanceof uglify.AST_Function || node instanceof uglify.AST_Lambda) ? node : null;
     }
 }
 
